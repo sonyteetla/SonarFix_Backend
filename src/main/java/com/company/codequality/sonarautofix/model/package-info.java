@@ -1,0 +1,1 @@
+package com.company.codequality.sonarautofix.model;

@@ -1,1 +1,1 @@
-package service;
+package com.company.codequality.sonarautofix.service;

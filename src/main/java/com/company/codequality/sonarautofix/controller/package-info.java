@@ -1,1 +1,1 @@
-package controller;
+package com.company.codequality.sonarautofix.controller;
