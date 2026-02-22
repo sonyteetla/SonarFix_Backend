@@ -6,9 +6,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync   
-public class SonarautofixApplication {
+public class SonarAutofixApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SonarautofixApplication.class, args);
+        SpringApplication.run(SonarAutofixApplication.class, args);
     }
 }

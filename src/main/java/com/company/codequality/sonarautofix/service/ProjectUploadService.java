@@ -14,7 +14,7 @@ public class ProjectUploadService {
 
     private static final String WORKSPACE = "D:/sonar-workspace/";
 
-    // 1️⃣ ZIP Upload
+    //  ZIP Upload
     public String handleZipUpload(MultipartFile file) {
         try {
             if (file.isEmpty()) {
@@ -59,7 +59,7 @@ public class ProjectUploadService {
         }
     }
 
-    // 2️⃣ GitHub Clone
+    //  GitHub Clone
     public String cloneGithub(String repoUrl) {
         try {
             String projectDir = WORKSPACE + System.currentTimeMillis();
@@ -94,7 +94,7 @@ public class ProjectUploadService {
         }
     }
 
-    // 3️⃣ Local Directory
+    //  Local Directory
     public String useLocalDirectory(String localPath) {
 
         File src = new File(localPath);

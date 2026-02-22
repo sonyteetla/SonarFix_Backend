@@ -1,8 +1,11 @@
 package com.company.codequality.sonarautofix.controller;
 
+import com.company.codequality.sonarautofix.model.ScanTask;
 import com.company.codequality.sonarautofix.service.ScanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/scan")
@@ -14,22 +17,57 @@ public class ScanController {
         this.scanService = scanService;
     }
 
-    // 1️⃣ Start Scan
+    // START NEW PROJECT SCAN
     @PostMapping("/start")
-    public ResponseEntity<?> startScan(@RequestParam String projectPath) {
-        String scanId = scanService.startScan(projectPath);
-        return ResponseEntity.ok("Scan started. scanId = " + scanId);
+    public ResponseEntity<?> startNewScan(
+            @RequestParam String projectPath) {
+
+        String scanId =
+                scanService.startNewScan(projectPath);
+
+        ScanTask task =
+                scanService.getScanTask(scanId);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "scanId", scanId,
+                        "projectKey", task.getProjectKey()
+                )
+        );
     }
 
-    // 2️⃣ Check Status
+    // RE-SCAN EXISTING PROJECT
+    @PostMapping("/rescan")
+    public ResponseEntity<?> reScan(
+            @RequestParam String projectPath,
+            @RequestParam String projectKey) {
+
+        String scanId =
+                scanService.reScan(projectPath, projectKey);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "scanId", scanId,
+                        "projectKey", projectKey
+                )
+        );
+    }
+
+    // CHECK STATUS
     @GetMapping("/status/{scanId}")
-    public ResponseEntity<?> getStatus(@PathVariable String scanId) {
-        return ResponseEntity.ok(scanService.getStatus(scanId));
+    public ResponseEntity<?> getStatus(
+            @PathVariable String executionId) {
+
+        return ResponseEntity.ok(
+                scanService.getStatus(executionId));
     }
 
-    // 3️⃣ Get Result
+    // GET RESULT
     @GetMapping("/result/{scanId}")
-    public ResponseEntity<?> getResult(@PathVariable String scanId) {
-        return ResponseEntity.ok(scanService.getResult(scanId));
+    public ResponseEntity<?> getResult(
+            @PathVariable String executionId) {
+
+        return ResponseEntity.ok(
+                scanService.getResult(executionId));
     }
 }
