@@ -51,8 +51,8 @@ public class SonarService {
             StringBuilder output = new StringBuilder();
 
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);          // show in console
-                output.append(line).append("\n");  // store result
+                System.out.println(line);          
+                output.append(line).append("\n");  
             }
 
             int exitCode = process.waitFor();

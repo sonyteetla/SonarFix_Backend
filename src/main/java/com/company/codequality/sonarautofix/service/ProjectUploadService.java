@@ -2,7 +2,6 @@ package com.company.codequality.sonarautofix.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.company.codequality.sonarautofix.service.ProjectUploadService;
 
 import java.io.*;
 import java.nio.file.*;
@@ -12,124 +11,136 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ProjectUploadService {
 
-    private static final String WORKSPACE = "D:/sonar-workspace/";
+    private static final String WORKSPACE = "C:/sonar-workspace/";
 
-    // 1️⃣ ZIP Upload
+    // ------------------ ZIP Upload ------------------
     public String handleZipUpload(MultipartFile file) {
         try {
-            if (file.isEmpty()) {
-                throw new RuntimeException("Uploaded file is empty");
-            }
-
             String projectDir = WORKSPACE + System.currentTimeMillis();
             Files.createDirectories(Paths.get(projectDir));
 
-            ZipInputStream zis = new ZipInputStream(file.getInputStream());
-            ZipEntry entry;
+            try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
+                ZipEntry entry;
 
-            while ((entry = zis.getNextEntry()) != null) {
+                while ((entry = zis.getNextEntry()) != null) {
+                    Path newFile = Paths.get(projectDir, entry.getName());
 
-                File newFile = new File(projectDir, entry.getName());
-
-                // Prevent Zip Slip
-                String canonicalPath = newFile.getCanonicalPath();
-                if (!canonicalPath.startsWith(new File(projectDir).getCanonicalPath())) {
-                    throw new IOException("Invalid ZIP entry");
-                }
-
-                if (entry.isDirectory()) {
-                    newFile.mkdirs();
-                } else {
-                    new File(newFile.getParent()).mkdirs();
-                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                        byte[] buffer = new byte[8192];
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, len);
+                    if (entry.isDirectory()) {
+                        Files.createDirectories(newFile);
+                    } else {
+                        Files.createDirectories(newFile.getParent());
+                        try (OutputStream fos = Files.newOutputStream(newFile)) {
+                            byte[] buffer = new byte[8192];
+                            int len;
+                            while ((len = zis.read(buffer)) > 0) {
+                                fos.write(buffer, 0, len);
+                            }
                         }
                     }
                 }
             }
-            zis.close();
 
             return projectDir;
 
         } catch (Exception e) {
-            throw new RuntimeException("ZIP Upload failed: " + e.getMessage());
+            throw new RuntimeException("ZIP Upload failed: " + e.getMessage(), e);
         }
     }
 
-    // 2️⃣ GitHub Clone
+    // ------------------ GitHub Clone ------------------
     public String cloneGithub(String repoUrl) {
         try {
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
-            ProcessBuilder builder = new ProcessBuilder(
-                    "git", "clone", repoUrl, projectDir
-            );
-
-            builder.redirectErrorStream(true);
+            ProcessBuilder builder = new ProcessBuilder("git", "clone", repoUrl, projectDir);
             Process process = builder.start();
+            process.waitFor();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-            String line;
-            StringBuilder output = new StringBuilder();
-
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
-
-            int exitCode = process.waitFor();
-
-            if (exitCode != 0) {
-                throw new RuntimeException("Git clone failed:\n" + output);
+            if (process.exitValue() != 0) {
+                throw new RuntimeException("Git clone failed, exit code: " + process.exitValue());
             }
 
             return projectDir;
 
         } catch (Exception e) {
-            throw new RuntimeException("Git clone failed: " + e.getMessage());
+            throw new RuntimeException("Git clone failed: " + e.getMessage(), e);
         }
     }
 
-    // 3️⃣ Local Directory
+    // ------------------ Local Directory ------------------
     public String useLocalDirectory(String localPath) {
+        Path src = Paths.get(localPath);
 
-        File src = new File(localPath);
-
-        if (!src.exists() || !src.isDirectory()) {
+        if (!Files.exists(src) || !Files.isDirectory(src)) {
             throw new RuntimeException("Invalid local directory");
         }
 
         String projectDir = WORKSPACE + System.currentTimeMillis();
+        Path dest = Paths.get(projectDir);
 
         try {
-            Files.createDirectories(Paths.get(projectDir));
-
-            Files.walk(Paths.get(localPath))
-                .forEach(source -> {
-                    Path destination = Paths.get(projectDir,
-                            source.toString().substring(localPath.length()));
-
-                    try {
-                        if (source.toFile().isDirectory()) {
-                            Files.createDirectories(destination);
-                        } else {
-                            Files.copy(source, destination,
-                                    StandardCopyOption.REPLACE_EXISTING);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+            Files.walk(src).forEach(source -> {
+                try {
+                    Path target = dest.resolve(src.relativize(source));
+                    if (Files.isDirectory(source)) {
+                        Files.createDirectories(target);
+                    } else {
+                        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     }
-                });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
             return projectDir;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Local directory copy failed: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException("Local directory copy failed: " + e.getMessage(), e);
         }
     }
 
+    // ------------------ Copy Project for Fixing ------------------
+    public String copyProject(String originalPath) throws IOException {
+
+        Path sourcePath = Paths.get(originalPath);
+
+        // Determine fixed path safely (avoid _fixed duplication)
+        String fixedPathStr = originalPath.endsWith("_fixed") ? originalPath : originalPath + "_fixed";
+        Path fixedPath = Paths.get(fixedPathStr);
+
+        // Delete old fixed folder if exists
+        if (Files.exists(fixedPath)) {
+            deleteDirectory(fixedPath);
+        }
+
+        // Copy project recursively
+        Files.walk(sourcePath).forEach(source -> {
+            try {
+                Path target = fixedPath.resolve(sourcePath.relativize(source));
+                if (Files.isDirectory(source)) {
+                    Files.createDirectories(target);
+                } else {
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to copy file: " + source, e);
+            }
+        });
+
+        return fixedPath.toString();
+    }
+
+    // ------------------ Helper: Delete directory recursively ------------------
+    private void deleteDirectory(Path path) throws IOException {
+        if (!Files.exists(path)) return;
+
+        Files.walk(path)
+                .sorted((a, b) -> b.compareTo(a)) // delete children first
+                .forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to delete: " + p, e);
+                    }
+                });
+    }
 }
