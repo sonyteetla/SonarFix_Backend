@@ -11,63 +11,50 @@ public class SonarService {
 
     @Value("${sonar.token}")
     private String token;
-    
-    @Value("${sonar.projectKey}")
-    private String projectKey;
-
 
     /**
      * Runs Maven + Sonar scan on given project path
      */
-    public String runSonarScan(String projectPath) {
+    public String runSonarScan(String projectPath, String projectKey) {
 
         try {
-
-            // 🔹 Unique project key (prevents overwrite in SonarQube)
-            String dynamicProjectKey = "auto-project-" + System.currentTimeMillis();
-
             ProcessBuilder builder = new ProcessBuilder(
-                    "C:\\Program Files\\apache-maven-3.9.12-bin\\apache-maven-3.9.12\\bin\\mvn.cmd",
+                    "D:\\UI_Design\\apache-maven-3.9.12\\bin\\mvn.cmd",
                     "clean",
                     "verify",
-                    "sonar:sonar",
-                    "-Dsonar.projectKey=" + dynamicProjectKey,
+                    "-DskipTests=true",
+                    "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
+                    "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.host.url=http://localhost:9000",
-                    "-Dsonar.token=" + token
-            );
+                    "-Dsonar.token=" + token);
 
-            // 🔹 Set project directory where pom.xml exists
             builder.directory(new java.io.File(projectPath));
-
-            // 🔹 Merge error stream into output
             builder.redirectErrorStream(true);
 
             Process process = builder.start();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line;
             StringBuilder output = new StringBuilder();
 
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);          
-                output.append(line).append("\n");  
+                System.out.println(line);
+                output.append(line).append("\n");
             }
 
             int exitCode = process.waitFor();
 
             if (exitCode != 0) {
                 throw new RuntimeException(
-                        "Sonar scan failed. Exit code: " + exitCode + "\n" + output
-                );
+                        "Sonar scan failed. Exit code: " + exitCode + "\n" + output);
             }
 
-            return "✅ Sonar Scan Completed Successfully\nProjectKey: "
-                    + dynamicProjectKey + "\n\n" + output;
+            return "Sonar Scan Completed Successfully\nProjectKey: "
+                    + projectKey + "\n\n" + output;
 
         } catch (Exception e) {
-            throw new RuntimeException("❌ Sonar Scan Failed: " + e.getMessage(), e);
+            throw new RuntimeException("Sonar Scan Failed: " + e.getMessage(), e);
         }
     }
 }

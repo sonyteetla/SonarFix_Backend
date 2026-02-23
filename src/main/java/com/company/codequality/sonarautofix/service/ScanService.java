@@ -14,40 +14,56 @@ public class ScanService {
     private final Map<String, ScanTask> scanStore = new ConcurrentHashMap<>();
     private final SonarService sonarService;
 
-    // 🔗 Inject SonarService
     public ScanService(SonarService sonarService) {
         this.sonarService = sonarService;
     }
 
-    // ==============================
-    // 🚀 START SCAN
-    // ==============================
-    public String startScan(String projectPath) {
+    // CREATE NEW PROJECT
+    public String startNewScan(String projectPath) {
 
-        String scanId = UUID.randomUUID().toString();
+        String executionId = UUID.randomUUID().toString();
+        String projectKey = "auto-project-" + executionId;
 
-        ScanTask task = new ScanTask(scanId, projectPath);
-        task.setStatus("QUEUED");
-
-        scanStore.put(scanId, task);
-
-        // Run scan in background
-        runScanAsync(task);
-
-        return scanId;
+        return startScanInternal(projectPath, projectKey, executionId);
     }
 
-    // ==============================
-    // ⚙️ RUN SCAN (ASYNC)
-    // ==============================
+    //  RE-SCAN EXISTING PROJECT
+    public String reScan(String projectPath, String projectKey) {
+
+        String executionId = UUID.randomUUID().toString();
+
+        return startScanInternal(projectPath, projectKey, executionId);
+    }
+
+    // Common internal method
+    private String startScanInternal(String projectPath,
+                                     String projectKey,
+                                     String executionId) {
+
+        ScanTask task = new ScanTask(executionId, projectPath);
+        task.setProjectKey(projectKey);
+        task.setStatus("QUEUED");
+
+        scanStore.put(executionId, task);
+
+        runScanAsync(task);
+
+        return executionId;
+    }
+
+    // RUN SCAN (ASYNC)
     @Async
     public void runScanAsync(ScanTask task) {
 
         try {
             task.setStatus("RUNNING");
 
-            // 🔥 REAL SONAR SCAN EXECUTION
-            String sonarOutput = sonarService.runSonarScan(task.getProjectPath());
+            // SONAR EXECUTION 
+            String sonarOutput =
+            	    sonarService.runSonarScan(
+            	        task.getProjectPath(),
+            	        task.getProjectKey()
+            	    );
 
             task.setResult(sonarOutput);
             task.setStatus("COMPLETED");
@@ -58,17 +74,11 @@ public class ScanService {
         }
     }
 
-    // ==============================
-    // 📊 GET SCAN STATUS
-    // ==============================
     public String getStatus(String scanId) {
         ScanTask task = scanStore.get(scanId);
         return task == null ? "NOT_FOUND" : task.getStatus();
     }
 
-    // ==============================
-    // 📄 GET SCAN RESULT
-    // ==============================
     public String getResult(String scanId) {
         ScanTask task = scanStore.get(scanId);
 
@@ -81,5 +91,9 @@ public class ScanService {
         }
 
         return task.getResult();
+    }
+
+    public ScanTask getScanTask(String scanId) {
+        return scanStore.get(scanId);
     }
 }

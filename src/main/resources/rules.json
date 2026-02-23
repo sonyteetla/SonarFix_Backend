@@ -1,0 +1,62 @@
+[
+  {
+    "ruleId": "java:S106",
+    "title": "Use of System.out.println",
+    "autoFixable": true,
+    "fixType": "REPLACE_SYSTEM_OUT"
+  },
+  {
+    "ruleId": "java:S1128",
+    "title": "Unused Imports",
+    "autoFixable": true,
+    "fixType": "REMOVE_UNUSED_IMPORT"
+  },
+  {
+    "ruleId": "java:S108",
+    "title": "Empty Catch Block",
+    "autoFixable": true,
+    "fixType": "ADD_LOGGER_TO_EMPTY_CATCH"
+  },
+  {
+    "ruleId": "java:S1643",
+    "title": "String Concatenation Inside Loop",
+    "autoFixable": true,
+    "fixType": "REPLACE_WITH_STRING_BUILDER"
+  },
+  {
+    "ruleId": "java:S109",
+    "title": "Magic Numbers",
+    "autoFixable": true,
+    "fixType": "EXTRACT_TO_CONSTANT"
+  },
+  {
+    "ruleId": "java:S1874",
+    "title": "Deprecated API Usage",
+    "autoFixable": true,
+    "fixType": "REPLACE_DEPRECATED_API"
+  },
+  {
+    "ruleId": "java:S6833",
+    "title": "Field Injection Instead of Constructor Injection",
+    "autoFixable": true,
+    "fixType": "CONVERT_TO_CONSTRUCTOR_INJECTION"
+  },
+  {
+    "ruleId": "java:S1075",
+    "title": "Hardcoded Configuration (Paths/URIs)",
+    "autoFixable": true,
+    "fixType": "MOVE_TO_CONFIG_PROPERTIES"
+  },
+  {
+    "ruleId": "java:S2129",
+    "title": "Unnecessary Object Creation",
+    "autoFixable": true,
+    "fixType": "REMOVE_EXPLICIT_INSTANTIATION"
+  },
+  {
+    "ruleId": "java:S112",
+    "title": "Throwing Raw Exception",
+    "autoFixable": true,
+    "fixType": "REPLACE_WITH_SPECIFIC_EXCEPTION"
+  }
+]
