@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
-
 @RestController
 @RequestMapping("/api/project")
 @CrossOrigin("*")
@@ -30,7 +29,7 @@ public class ProjectUploadController {
     // GitHub Clone
     @PostMapping("/upload-github")
     public ResponseEntity<String> uploadGithub(
-            @RequestParam String repoUrl) {
+            @RequestParam("repoUrl") String repoUrl) {
 
         String path = uploadService.cloneGithub(repoUrl);
         return ResponseEntity.ok("Project cloned at: " + path);
@@ -39,7 +38,7 @@ public class ProjectUploadController {
     // Local Directory
     @PostMapping("/upload-local")
     public ResponseEntity<String> uploadLocal(
-            @RequestParam String localPath) {
+            @RequestParam("localPath") String localPath) {
 
         String path = uploadService.useLocalDirectory(localPath);
         return ResponseEntity.ok("Project loaded from: " + path);
