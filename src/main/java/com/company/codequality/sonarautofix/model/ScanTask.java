@@ -1,5 +1,6 @@
 package com.company.codequality.sonarautofix.model;
 
+import java.util.List;
 
 public class ScanTask {
 
@@ -9,13 +10,16 @@ public class ScanTask {
     private String result;
     private String projectKey;
 
+    // ✅ Store mapped issues for AutoFix + JSON response
+    private List<MappedIssue> mappedIssues;
+
     public ScanTask(String scanId, String projectPath) {
         this.scanId = scanId;
         this.projectPath = projectPath;
         this.status = "QUEUED";
     }
 
-    // Getters and setters
+    // Getters
 
     public String getScanId() {
         return scanId;
@@ -37,6 +41,12 @@ public class ScanTask {
         return projectKey;
     }
 
+    public List<MappedIssue> getMappedIssues() {
+        return mappedIssues;
+    }
+
+    // Setters
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -47,5 +57,9 @@ public class ScanTask {
 
     public void setProjectKey(String projectKey) {
         this.projectKey = projectKey;
+    }
+
+    public void setMappedIssues(List<MappedIssue> mappedIssues) {
+        this.mappedIssues = mappedIssues;
     }
 }

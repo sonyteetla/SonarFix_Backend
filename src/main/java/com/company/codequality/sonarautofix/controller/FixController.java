@@ -2,6 +2,7 @@ package com.company.codequality.sonarautofix.controller;
 
 import com.company.codequality.sonarautofix.model.FixRequest;
 import com.company.codequality.sonarautofix.service.AutoFixEngine;
+import com.company.codequality.sonarautofix.service.ScanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +13,20 @@ import java.util.List;
 public class FixController {
 
     private final AutoFixEngine autoFixEngine;
+    private final ScanService scanService;
 
-    public FixController(AutoFixEngine autoFixEngine) {
+    public FixController(AutoFixEngine autoFixEngine,
+                         ScanService scanService) {
         this.autoFixEngine = autoFixEngine;
+        this.scanService = scanService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> applyFixes(
-            @RequestBody List<FixRequest> requests,
+    // ================= APPLY SELECTED FIXES =================
+    @PostMapping("/apply")
+    public ResponseEntity<?> applySelectedFixes(
             @RequestParam String projectPath,
-            @RequestParam String projectKey) {
+            @RequestParam String projectKey,
+            @RequestBody List<FixRequest> requests) {
 
         try {
 
@@ -32,11 +37,28 @@ public class FixController {
             );
 
             return ResponseEntity.ok(
-                    "Fix(es) applied successfully. Re-scan started.");
+                    "Selected fixes applied successfully. Re-scan started.");
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body("Auto fix failed: " + e.getMessage());
+        }
+    }
+
+    // ================= AUTO FIX ALL =================
+    @PostMapping("/apply/{scanId}")
+    public ResponseEntity<?> autoFixAll(@PathVariable String scanId) {
+
+        try {
+
+            String newScanId = scanService.autoFixAll(scanId);
+
+            return ResponseEntity.ok(
+                    "AutoFix ALL completed. New ScanId: " + newScanId);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("AutoFix ALL failed: " + e.getMessage());
         }
     }
 }

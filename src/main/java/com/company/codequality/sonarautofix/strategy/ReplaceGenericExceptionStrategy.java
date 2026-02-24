@@ -2,20 +2,26 @@ package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RemoveUnusedImportStrategy implements FixStrategy {
+public class ReplaceGenericExceptionStrategy implements FixStrategy {
 
     @Override
     public FixType getFixType() {
-        return FixType.REMOVE_UNUSED_IMPORT;
+        return FixType.REPLACE_GENERIC_EXCEPTION;
     }
 
     @Override
     public boolean apply(CompilationUnit cu, int line) {
-        cu.getImports().removeIf(ImportDeclaration::isAsterisk);
+
+        cu.findAll(Parameter.class).forEach(p -> {
+            if (p.getType().asString().equals("Exception")) {
+                p.setType("RuntimeException");
+            }
+        });
+
         return true;
     }
 }

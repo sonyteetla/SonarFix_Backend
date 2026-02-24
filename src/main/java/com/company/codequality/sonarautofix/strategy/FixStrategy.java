@@ -7,5 +7,5 @@ public interface FixStrategy {
 
     FixType getFixType();
 
-    boolean apply(CompilationUnit cu, int startLine) throws Exception;
+    boolean apply(CompilationUnit cu, int line);
 }
