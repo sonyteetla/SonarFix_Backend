@@ -2,7 +2,6 @@ package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +14,15 @@ public class RemoveUnusedImportStrategy implements FixStrategy {
 
     @Override
     public boolean apply(CompilationUnit cu, int line) {
-        cu.getImports().removeIf(ImportDeclaration::isAsterisk);
-        return true;
+
+        if (line <= 0) {
+            return false;
+        }
+
+        return cu.getImports().removeIf(importDecl ->
+                importDecl.getBegin()
+                        .map(pos -> pos.line == line)
+                        .orElse(false)
+        );
     }
 }

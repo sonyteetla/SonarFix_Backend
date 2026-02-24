@@ -13,14 +13,12 @@ public class ScanService {
     private final Map<String, ScanTask> scanStore = new ConcurrentHashMap<>();
 
     private final SonarService sonarService;
-    private final IssueMappingService issueMappingService;
     private final AutoFixEngine autoFixEngine;
 
+    
     public ScanService(SonarService sonarService,
-                       IssueMappingService issueMappingService,
                        AutoFixEngine autoFixEngine) {
         this.sonarService = sonarService;
-        this.issueMappingService = issueMappingService;
         this.autoFixEngine = autoFixEngine;
     }
 
@@ -28,12 +26,6 @@ public class ScanService {
     public String startNewScan(String projectPath) {
         String executionId = UUID.randomUUID().toString();
         String projectKey = "auto-project-" + executionId;
-        return startScanInternal(projectPath, projectKey, executionId);
-    }
-
-    // ================= RE-SCAN =================
-    public String reScan(String projectPath, String projectKey) {
-        String executionId = UUID.randomUUID().toString();
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
@@ -69,21 +61,14 @@ public class ScanService {
         try {
             task.setStatus("RUNNING");
 
-            // STEP 1 — Run Sonar
-            sonarService.runSonarScan(
-                    task.getProjectPath(),
-                    task.getProjectKey()
-            );
-
-            // STEP 2 — Fetch Issues
-            List<SonarIssue> issues =
-                    sonarService.fetchIssues(task.getProjectKey());
-
-            // STEP 3 — Map Issues
-            List<MappedIssue> mappedIssues =
-                    issueMappingService.mapIssues(issues);
-
-            task.setMappedIssues(mappedIssues);
+            // SONAR EXECUTION 
+            String sonarOutput =
+            	    sonarService.runSonarScan(
+            	        task.getProjectPath(),
+            	        task.getProjectKey()
+            	    );
+            
+            task.setResult(sonarOutput);
             task.setStatus("COMPLETED");
 
         } catch (Exception e) {
@@ -91,6 +76,7 @@ public class ScanService {
             task.setResult(e.getMessage());
         }
     }
+
 
     // ================= APPLY AUTO FIX =================
     public int applyAutoFix(String scanId,
@@ -106,7 +92,7 @@ public class ScanService {
                 requests,
                 task.getProjectPath(),
                 task.getProjectKey(),
-                scanId   // 🔥 important (same scanId re-used)
+                scanId   //  important (same scanId re-used)
         );
     }
 
@@ -116,31 +102,26 @@ public class ScanService {
         return task == null ? "NOT_FOUND" : task.getStatus();
     }
 
-    // ================= RESULT =================
-    public ScanResultResponse getResult(String scanId) {
+    //  RE-SCAN EXISTING PROJECT
+    public String reScan(String projectPath, String projectKey) {
 
+        String executionId = UUID.randomUUID().toString();
+
+        return startScanInternal(projectPath, projectKey, executionId);
+    }
+
+    public String getResult(String scanId) {
         ScanTask task = scanStore.get(scanId);
-        if (task == null) return null;
 
-        List<MappedIssue> issues = task.getMappedIssues();
-
-        int total = (issues == null) ? 0 : issues.size();
-        int autoFixable = 0;
-
-        if (issues != null) {
-            for (MappedIssue i : issues) {
-                if (i.isAutoFixable()) autoFixable++;
-            }
+        if (task == null) {
+            return "NOT_FOUND";
         }
 
-        return ScanResultResponse.builder()
-                .scanId(scanId)
-                .projectKey(task.getProjectKey())
-                .status(task.getStatus())
-                .totalIssues(total)
-                .autoFixableCount(autoFixable)
-                .issues(issues)
-                .build();
+        if (!"COMPLETED".equals(task.getStatus())) {
+            return "SCAN_NOT_FINISHED";
+        }
+
+        return task.getResult();
     }
 
     public ScanTask getScanTask(String scanId) {
@@ -197,7 +178,7 @@ public class ScanService {
                 requests,
                 task.getProjectPath(),
                 task.getProjectKey(),
-                scanId   // 🔥 re-use same scan
+                scanId   //  re-use same scan
         );
 
         return scanId;   // same scan updated after re-scan

@@ -17,7 +17,7 @@ public class AddLoggerToEmptyCatchStrategy implements FixStrategy {
     }
 
     @Override
-    public boolean apply(CompilationUnit cu, int startLine) throws Exception {
+    public boolean apply(CompilationUnit cu, int line)  {
 
         List<CatchClause> catches = cu.findAll(CatchClause.class);
 
@@ -25,9 +25,9 @@ public class AddLoggerToEmptyCatchStrategy implements FixStrategy {
 
             if (!cc.getBegin().isPresent()) continue;
 
-            int line = cc.getBegin().get().line;
+            int startline = cc.getBegin().get().line;
 
-            if (line != startLine) continue;
+            if (startline != line) continue;
 
             // Check Already handled
             if (!cc.getBody().getStatements().isEmpty()) {

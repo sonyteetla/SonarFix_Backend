@@ -75,32 +75,12 @@ public class ScanController {
         );
     }
 
- // ==============================
- // GET RESULT (FINAL OUTPUT)
- // ==============================
- @GetMapping("/result/{scanId}")
- public ResponseEntity<?> getResult(@PathVariable String scanId) {
+  // GET RESULT
+    @GetMapping("/result/{scanId}")
+    public ResponseEntity<?> getResult(
+            @PathVariable String executionId) {
 
-     ScanResultResponse response = scanService.getResult(scanId);
-
-     // If scan ID not found
-     if (response == null) {
-         return ResponseEntity.notFound().build();
-     }
-
-     // If scan still running or queued
-     if (!"COMPLETED".equals(response.getStatus())) {
-         return ResponseEntity.ok(
-                 Map.of(
-                         "scanId", scanId,
-                         "projectKey", response.getProjectKey(),
-                         "status", response.getStatus(),
-                         "message", "Scan is still in progress"
-                 )
-         );
-     }
-
-     // If completed — return full JSON result
-     return ResponseEntity.ok(response);
- }
+        return ResponseEntity.ok(
+                scanService.getResult(executionId));
+    }
 }

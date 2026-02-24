@@ -9,6 +9,6 @@ import lombok.*;
 public class FixRequest {
 
     private String filePath;
-    private int line;
+    private Integer line;
     private String fixType;
 }
