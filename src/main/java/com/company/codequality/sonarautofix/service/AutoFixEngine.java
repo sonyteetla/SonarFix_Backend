@@ -29,9 +29,6 @@ public class AutoFixEngine {
         this.scanService = scanService;
     }
 
-    /**
-     * Apply Auto Fixes safely
-     */
     public int applyFixes(List<FixRequest> requests,
                           String projectPath,
                           String projectKey,
@@ -42,58 +39,56 @@ public class AutoFixEngine {
         }
 
         int totalFixed = 0;
+        Map<FixType, Integer> fixReport = new HashMap<>();
 
         try {
 
-            // Group by file path
+            // Group by file
             Map<String, List<FixRequest>> grouped = new HashMap<>();
 
             for (FixRequest request : requests) {
                 if (request.getFilePath() == null || request.getFilePath().isBlank()) {
                     continue;
                 }
-                grouped
-                    .computeIfAbsent(request.getFilePath(), k -> new ArrayList<>())
-                    .add(request);
+                grouped.computeIfAbsent(request.getFilePath(),
+                        k -> new ArrayList<>()).add(request);
             }
 
-            // Process file by file
             for (Map.Entry<String, List<FixRequest>> entry : grouped.entrySet()) {
 
                 String filePath = entry.getKey();
                 List<FixRequest> fileFixes = entry.getValue();
 
-                // Safe bottom → top sorting
-                fileFixes.sort((a, b) -> {
+                // Bottom → Top sorting (no null checks needed)
+                fileFixes.sort((a, b) ->
+                        Integer.compare(b.getLine(), a.getLine()));
 
-                    Integer lineA = a.getLine();
-                    Integer lineB = b.getLine();
+                Path path;
 
-                    int safeA = (lineA == null) ? 0 : lineA;
-                    int safeB = (lineB == null) ? 0 : lineB;
-
-                    return Integer.compare(safeB, safeA);
-                });
-
-                Path path = Path.of(filePath);
+                if (Path.of(filePath).isAbsolute()) {
+                    path = Path.of(filePath);
+                } else {
+                    path = Path.of(projectPath, filePath);
+                }
 
                 if (!Files.exists(path)) {
-                    System.out.println("⚠ File not found. Skipping: " + filePath);
+                    System.out.println("⚠ File not found. Skipping: " + path);
                     continue;
                 }
 
-                CompilationUnit cu = StaticJavaParser.parse(path);
+                CompilationUnit cu;
+
+                try {
+                    cu = StaticJavaParser.parse(path);
+                } catch (Exception parseError) {
+                    System.out.println("❌ JavaParser failed for: " + path);
+                    parseError.printStackTrace();
+                    continue;
+                }
 
                 for (FixRequest request : fileFixes) {
 
-                    // Skip manual issues
-                    if (request.getFixType() == null ||
-                        request.getFixType().isBlank()) {
-                        continue;
-                    }
-
-                    Integer line = request.getLine();
-                    if (line == null) {
+                    if (request.getFixType() == null || request.getFixType().isBlank()) {
                         continue;
                     }
 
@@ -101,8 +96,7 @@ public class AutoFixEngine {
                     try {
                         type = FixType.valueOf(request.getFixType());
                     } catch (Exception e) {
-                        System.out.println("⚠ Unknown FixType skipped: "
-                                + request.getFixType());
+                        System.out.println("⚠ Unknown FixType skipped: " + request.getFixType());
                         continue;
                     }
 
@@ -114,24 +108,29 @@ public class AutoFixEngine {
                     }
 
                     try {
-                        boolean applied = strategy.apply(cu, line);
+                        boolean applied = strategy.apply(cu, request.getLine());
+
                         if (applied) {
                             totalFixed++;
+                            fixReport.put(type,
+                                    fixReport.getOrDefault(type, 0) + 1);
                         }
+
                     } catch (Exception ex) {
-                        System.out.println("⚠ Fix failed at "
-                                + filePath + ":" + line);
+                        System.out.println("⚠ Fix failed at " + path + ":" + request.getLine());
+                        ex.printStackTrace();
                     }
                 }
 
-                // Write once after all fixes
-                Files.write(
-                        path,
-                        cu.toString().getBytes(StandardCharsets.UTF_8)
-                );
+                try {
+                    Files.write(path, cu.toString().getBytes(StandardCharsets.UTF_8));
+                } catch (Exception writeError) {
+                    System.out.println("❌ Failed writing file: " + path);
+                    writeError.printStackTrace();
+                }
             }
 
-            // Re-scan after fixes
+            // Re-scan
             try {
                 if (scanId != null && !scanId.isBlank()) {
                     scanService.reScan(projectPath, projectKey, scanId);
@@ -139,15 +138,26 @@ public class AutoFixEngine {
                     scanService.reScan(projectPath, projectKey);
                 }
             } catch (Exception e) {
-                System.out.println("⚠ Re-scan failed (non-critical): "
-                        + e.getMessage());
+                System.out.println("⚠ Re-scan failed (non-critical): " + e.getMessage());
             }
 
-            System.out.println("✔ AutoFix applied: " + totalFixed + " fixes");
+            // Execution Report
+            System.out.println("\n====== AutoFix Execution Report ======");
+            for (Map.Entry<FixType, Integer> entry : fixReport.entrySet()) {
+                System.out.println(entry.getKey() + " -> " + entry.getValue() + " fixes");
+            }
+            System.out.println("Total fixes applied: " + totalFixed);
+            System.out.println("======================================\n");
+
             return totalFixed;
 
         } catch (Exception e) {
-            throw new RuntimeException("Auto fix failed", e);
+
+            System.out.println("\n❌ AUTO FIX CRASHED");
+            e.printStackTrace();
+            System.out.println("❌ END ERROR\n");
+
+            throw new RuntimeException("Auto fix failed: " + e.getMessage(), e);
         }
     }
-} 
+}
