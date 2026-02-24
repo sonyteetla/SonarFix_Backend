@@ -2,61 +2,236 @@
   {
     "ruleId": "java:S106",
     "title": "Use of System.out.println",
-    "autoFixable": true,
+    "description": "Detect direct console printing instead of proper logging framework.",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
     "fixType": "REPLACE_SYSTEM_OUT"
   },
   {
     "ruleId": "java:S1128",
     "title": "Unused Imports",
-    "autoFixable": true,
+    "description": "Identify and remove unnecessary import statements.",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
     "fixType": "REMOVE_UNUSED_IMPORT"
   },
   {
     "ruleId": "java:S108",
     "title": "Empty Catch Block",
-    "autoFixable": true,
-    "fixType": "ADD_LOGGER_TO_EMPTY_CATCH"
+    "description": "Catch block with no handling logic.",
+    "severity": "MAJOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "HANDLE_EMPTY_CATCH"
   },
   {
     "ruleId": "java:S1643",
     "title": "String Concatenation Inside Loop",
-    "autoFixable": true,
-    "fixType": "REPLACE_WITH_STRING_BUILDER"
+    "description": "Use StringBuilder instead of repeated string concatenation inside loops.",
+    "severity": "MAJOR",
+    "category": "PERFORMANCE",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "STRING_BUILDER_LOOP"
   },
   {
     "ruleId": "java:S109",
     "title": "Magic Numbers",
-    "autoFixable": true,
-    "fixType": "EXTRACT_TO_CONSTANT"
+    "description": "Numeric literals should be replaced with named constants.",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "EXTRACT_CONSTANT"
   },
   {
     "ruleId": "java:S1874",
     "title": "Deprecated API Usage",
-    "autoFixable": true,
+    "description": "Use of deprecated methods or classes should be avoided.",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
     "fixType": "REPLACE_DEPRECATED_API"
   },
   {
     "ruleId": "java:S6833",
     "title": "Field Injection Instead of Constructor Injection",
-    "autoFixable": true,
-    "fixType": "CONVERT_TO_CONSTRUCTOR_INJECTION"
+    "description": "Use constructor injection instead of field injection.",
+    "severity": "MAJOR",
+    "category": "SPRING",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "FIELD_TO_CONSTRUCTOR_INJECTION"
   },
   {
     "ruleId": "java:S1075",
-    "title": "Hardcoded Configuration (Paths/URIs)",
-    "autoFixable": true,
-    "fixType": "MOVE_TO_CONFIG_PROPERTIES"
+    "title": "Hardcoded Configuration",
+    "description": "Avoid hardcoding paths, URLs, and configuration values in code.",
+    "severity": "MAJOR",
+    "category": "SPRING",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "MOVE_TO_CONFIG"
   },
   {
     "ruleId": "java:S2129",
     "title": "Unnecessary Object Creation",
-    "autoFixable": true,
-    "fixType": "REMOVE_EXPLICIT_INSTANTIATION"
+    "description": "Avoid repeatedly creating objects inside loops.",
+    "severity": "MINOR",
+    "category": "PERFORMANCE",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "OPTIMIZE_OBJECT_CREATION"
   },
   {
     "ruleId": "java:S112",
     "title": "Throwing Raw Exception",
-    "autoFixable": true,
-    "fixType": "REPLACE_WITH_SPECIFIC_EXCEPTION"
+    "description": "Use meaningful or custom exceptions instead of generic Exception.",
+    "severity": "MAJOR",
+    "category": "LOGGING",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "REPLACE_GENERIC_EXCEPTION"
+  },
+  {
+    "ruleId": "java:S1118",
+    "title": "Utility Class Should Not Have Public Constructor",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "HIDE_UTILITY_CONSTRUCTOR"
+  },
+  {
+    "ruleId": "java:S1192",
+    "title": "Duplicate String Literals",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "EXTRACT_STRING_CONSTANT"
+  },
+  {
+    "ruleId": "java:S138",
+    "title": "Long Method",
+    "severity": "MAJOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S134",
+    "title": "Deeply Nested Blocks",
+    "severity": "MAJOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S4144",
+    "title": "Duplicate Code",
+    "severity": "CRITICAL",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S3776",
+    "title": "High Cognitive Complexity",
+    "severity": "MAJOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S2259",
+    "title": "Null Pointer Dereference",
+    "severity": "CRITICAL",
+    "category": "BUG",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S1193",
+    "title": "Improper Exception Handling",
+    "severity": "MAJOR",
+    "category": "LOGGING",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S2077",
+    "title": "SQL Injection Risk",
+    "severity": "CRITICAL",
+    "category": "SECURITY",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S4787",
+    "title": "Hardcoded Credentials",
+    "severity": "CRITICAL",
+    "category": "SECURITY",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S4790",
+    "title": "Weak Cryptographic Algorithm",
+    "severity": "CRITICAL",
+    "category": "SECURITY",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S2092",
+    "title": "Deserialization of Untrusted Data",
+    "severity": "CRITICAL",
+    "category": "SECURITY",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S1181",
+    "title": "Catching Throwable",
+    "severity": "MAJOR",
+    "category": "LOGGING",
+    "enabled": true,
+    "autofixSupported": false,
+    "fixType": null
+  },
+  {
+    "ruleId": "java:S3749",
+    "title": "Spring Field Injection",
+    "severity": "MAJOR",
+    "category": "SPRING",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "FIELD_TO_CONSTRUCTOR_INJECTION"
+  },
+  {
+    "ruleId": "java:S3626",
+    "title": "Redundant Conditional Return",
+    "severity": "MINOR",
+    "category": "CODE_SMELL",
+    "enabled": true,
+    "autofixSupported": true,
+    "fixType": "SIMPLIFY_RETURN"
   }
 ]

@@ -20,21 +20,32 @@ public class RuleRegistry {
     public void loadRules() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
+
         InputStream is = getClass()
                 .getClassLoader()
                 .getResourceAsStream("rules.json");
 
+        if (is == null) {
+            throw new RuntimeException("rules.json NOT FOUND in resources folder");
+        }
+
         List<RuleConfig> rules =
-                mapper.readValue(is, new TypeReference<>() {});
+                mapper.readValue(is, new TypeReference<List<RuleConfig>>() {});
 
         ruleMap = rules.stream()
                 .collect(Collectors.toMap(
                         RuleConfig::getRuleId,
                         r -> r
                 ));
+
+        System.out.println("✔ Loaded Rules: " + ruleMap.size());
     }
 
     public RuleConfig getRule(String ruleId) {
         return ruleMap.get(ruleId);
+    }
+
+    public Map<String, RuleConfig> getAllRules() {
+        return ruleMap;
     }
 }

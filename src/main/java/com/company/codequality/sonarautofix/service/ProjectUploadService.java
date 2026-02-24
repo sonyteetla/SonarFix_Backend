@@ -13,11 +13,11 @@ public class ProjectUploadService {
 
     private static final String WORKSPACE = "C:/sonar-workspace/";
 
-<<<<<<< HEAD
+
     // ------------------ ZIP Upload ------------------
-=======
+
     //  ZIP Upload
->>>>>>> f194b4e29b65dfe498d0ef80187fe0192dad2ccc
+
     public String handleZipUpload(MultipartFile file) {
         try {
             String projectDir = WORKSPACE + System.currentTimeMillis();
@@ -51,11 +51,11 @@ public class ProjectUploadService {
         }
     }
 
-<<<<<<< HEAD
+
     // ------------------ GitHub Clone ------------------
-=======
+
     //  GitHub Clone
->>>>>>> f194b4e29b65dfe498d0ef80187fe0192dad2ccc
+
     public String cloneGithub(String repoUrl) {
         try {
             String projectDir = WORKSPACE + System.currentTimeMillis();
@@ -75,11 +75,11 @@ public class ProjectUploadService {
         }
     }
 
-<<<<<<< HEAD
+
     // ------------------ Local Directory ------------------
-=======
+
     //  Local Directory
->>>>>>> f194b4e29b65dfe498d0ef80187fe0192dad2ccc
+
     public String useLocalDirectory(String localPath) {
         Path src = Paths.get(localPath);
 
@@ -110,7 +110,7 @@ public class ProjectUploadService {
         }
     }
 
-<<<<<<< HEAD
+
     // ------------------ Copy Project for Fixing ------------------
     public String copyProject(String originalPath) throws IOException {
 
@@ -156,6 +156,8 @@ public class ProjectUploadService {
                     }
                 });
     }
-=======
->>>>>>> f194b4e29b65dfe498d0ef80187fe0192dad2ccc
+
 }
+
+
+
