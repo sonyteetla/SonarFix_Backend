@@ -1,18 +1,16 @@
 package com.company.codequality.sonarautofix.service;
 
-import com.company.codequality.sonarautofix.model.Issue;
-import com.company.codequality.sonarautofix.model.IssueResponse;
+import com.company.codequality.sonarautofix.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ScanIssueService {
@@ -23,106 +21,232 @@ public class ScanIssueService {
     @Value("${sonar.token}")
     private String token;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+    private final RuleEngineService ruleEngineService;
 
+    public ScanIssueService(RestTemplate restTemplate,
+                            ObjectMapper objectMapper,
+                            RuleEngineService ruleEngineService) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.ruleEngineService = ruleEngineService;
+    }
 
-	public IssueResponse fetchIssues(String projectKey,
+    public IssueResponse fetchIssues(String projectKey,
                                      List<String> softwareQualities,
                                      List<String> severities,
-                                     List<String> statuses,
-                                     List<String> tags,
+                                     List<String> rules,
+                                     Boolean autoFixOnly,
                                      int page,
                                      int pageSize) {
 
+        // 🔥 Enforce Sonar limit
+        int safePageSize = Math.min(pageSize, 500);
+
+        String url = buildSonarUrl(
+                projectKey,
+                softwareQualities,
+                severities,
+                rules,
+                page,
+                safePageSize
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(token, "");
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> sonarResponse =
+                restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        if (!sonarResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("SonarQube API returned error");
+        }
+
+        return processResponse(
+                sonarResponse.getBody(),
+                autoFixOnly,
+                page,
+                safePageSize
+        );
+    }
+
+    private String buildSonarUrl(String projectKey,
+                                 List<String> softwareQualities,
+                                 List<String> severities,
+                                 List<String> rules,
+                                 int page,
+                                 int pageSize) {
+
+        StringBuilder url = new StringBuilder();
+
+        url.append(sonarUrl)
+           .append("/api/issues/search?")
+           .append("componentKeys=").append(projectKey)
+           .append("&resolved=false")
+           .append("&p=").append(page)
+           .append("&ps=").append(pageSize);
+
+        if (severities != null && !severities.isEmpty()) {
+            url.append("&severities=")
+               .append(String.join(",", severities));
+        }
+
+        if (softwareQualities != null && !softwareQualities.isEmpty()) {
+            url.append("&types=")
+               .append(String.join(",", mapSoftwareQualityToTypes(softwareQualities)));
+        }
+
+        if (rules != null && !rules.isEmpty()) {
+            url.append("&rules=")
+               .append(String.join(",", rules));
+        }
+
+        return url.toString();
+    }
+
+    private IssueResponse processResponse(String body,
+                                          Boolean autoFixOnly,
+                                          int page,
+                                          int pageSize) {
+
         try {
 
-            // Map Software Quality to Types
-            List<String> types = mapSoftwareQualityToTypes(softwareQualities);
+            JsonNode root = objectMapper.readTree(body);
+            JsonNode issuesNode = root.path("issues");
 
-            StringBuilder apiUrl = new StringBuilder();
-            apiUrl.append(sonarUrl)
-                    .append("/api/issues/search?")
-                    .append("componentKeys=").append(projectKey)
-                    .append("&branch=main")
-                    .append("&p=").append(page)
-                    .append("&ps=").append(pageSize);
+            JsonNode pagingNode = root.path("paging");
+            long total = pagingNode.path("total").asLong();
+            int sonarPageSize = pagingNode.path("pageSize").asInt();
 
-            if (types != null && !types.isEmpty()) {
-                apiUrl.append("&types=").append(String.join(",", types));
-            }
+            List<Issue> issues = new ArrayList<>();
 
-            if (severities != null && !severities.isEmpty()) {
-                apiUrl.append("&severities=").append(String.join(",", severities));
-            }
+            if (issuesNode.isArray()) {
+                for (JsonNode node : issuesNode) {
 
-            if (statuses != null && !statuses.isEmpty()) {
-                apiUrl.append("&statuses=").append(String.join(",", statuses));
-            }
+                    String type = node.path("type").asText();
 
-            if (tags != null && !tags.isEmpty()) {
-                apiUrl.append("&tags=").append(String.join(",", tags));
-            }
+                    String fullComponent = node.path("component").asText();
+                    String filePath = fullComponent.contains(":")
+                            ? fullComponent.substring(fullComponent.indexOf(":") + 1)
+                            : fullComponent;
 
-            // Authorization
-            String auth = token + ":";
-            String encodedAuth = Base64.getEncoder()
-                    .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+                    JsonNode textRange = node.path("textRange");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Basic " + encodedAuth);
+                    Integer startLine = null;
+                    Integer endLine = null;
+                    Integer startOffset = null;
+                    Integer endOffset = null;
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+                    if (!textRange.isMissingNode()) {
+                        startLine = textRange.path("startLine").asInt();
+                        endLine = textRange.path("endLine").asInt();
+                        startOffset = textRange.path("startOffset").asInt();
+                        endOffset = textRange.path("endOffset").asInt();
+                    }
 
-            ResponseEntity<String> response =
-                    restTemplate.exchange(apiUrl.toString(), HttpMethod.GET, entity, String.class);
+                    Issue issue = Issue.builder()
+                            .key(node.path("key").asText())
+                            .rule(node.path("rule").asText())
+                            .severity(node.path("severity").asText())
+                            .type(type)
+                            .softwareQuality(mapTypeToSoftwareQuality(type))
+                            .message(node.path("message").asText())
+                            .filePath(filePath)
+                            .line(node.has("line") ? node.get("line").asInt() : null)
 
-            JsonNode root = objectMapper.readTree(response.getBody());
+                            .startLine(startLine)
+                            .endLine(endLine)
+                            .startOffset(startOffset)
+                            .endOffset(endOffset)
 
-            int total = root.get("total").asInt();
+                            .build();
 
-            List<Issue> issueList = new ArrayList<>();
-
-            for (JsonNode node : root.get("issues")) {
-
-                Issue issue = new Issue();
-
-                String type = node.get("type").asText();
-
-                issue.setKey(node.get("key").asText());
-                issue.setRule(node.get("rule").asText());
-                issue.setSeverity(node.get("severity").asText());
-                issue.setType(type);
-                issue.setSoftwareQuality(mapTypeToSoftwareQuality(type));
-                issue.setMessage(node.get("message").asText());
-                issue.setFilePath(node.get("component").asText());
-
-                if (node.has("line")) {
-                    issue.setLine(node.get("line").asInt());
+                    issues.add(issue);
                 }
-
-                issueList.add(issue);
             }
 
-            IssueResponse issueResponse = new IssueResponse();
-            issueResponse.setTotal(total);
-            issueResponse.setIssues(issueList);
-            issueResponse.setPage(page);
-            issueResponse.setPageSize(pageSize);
+            // Enrich issues (description + autofix)
+            ruleEngineService.enrichIssues(issues);
 
-            return issueResponse;
+            // Strip HTML
+            for (Issue issue : issues) {
+                if (issue.getDescription() != null) {
+                    issue.setDescription(stripHtml(issue.getDescription()));
+                }
+            }
+
+            // Auto-fix filter
+            if (Boolean.TRUE.equals(autoFixOnly)) {
+                issues = issues.stream()
+                        .filter(Issue::isAutoFixable)
+                        .collect(Collectors.toList());
+                total = issues.size();
+            }
+
+            // Group by file
+            Map<String, List<Issue>> grouped =
+                    issues.stream()
+                          .collect(Collectors.groupingBy(Issue::getFilePath));
+
+            List<FileIssueGroup> content =
+                    grouped.entrySet().stream()
+                            .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
+                            .collect(Collectors.toList());
+
+            // 🔥 Correct total pages calculation using Sonar paging
+            int totalPages = (int) Math.ceil((double) total / sonarPageSize);
+
+            return IssueResponse.builder()
+                    .totalElements(total)
+                    .page(page)
+                    .pageSize(pageSize)
+                    .totalPages(totalPages)
+                    .content(content)
+                    .filterCounts(buildFilterCounts(issues))
+                    .build();
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch issues from SonarQube", e);
+            throw new RuntimeException("Failed to parse Sonar response", e);
         }
     }
 
-    // Map UI Software Quality to Sonar Types
-    private List<String> mapSoftwareQualityToTypes(List<String> qualities) {
-
-        if (qualities == null || qualities.isEmpty()) {
-            return null;
+    private String stripHtml(String html) {
+        if (html == null || html.isBlank()) {
+            return "";
         }
+        return Jsoup.parse(html).text().trim();
+    }
+
+    private FilterCounts buildFilterCounts(List<Issue> issues) {
+
+        Map<String, Long> severityCounts =
+                issues.stream()
+                        .collect(Collectors.groupingBy(
+                                Issue::getSeverity,
+                                Collectors.counting()
+                        ));
+
+        Map<String, Long> qualityCounts =
+                issues.stream()
+                        .collect(Collectors.groupingBy(
+                                Issue::getSoftwareQuality,
+                                Collectors.counting()
+                        ));
+
+        Map<String, Long> ruleCounts =
+                issues.stream()
+                        .collect(Collectors.groupingBy(
+                                Issue::getRule,
+                                Collectors.counting()
+                        ));
+
+        return new FilterCounts(severityCounts, qualityCounts, ruleCounts);
+    }
+
+    private List<String> mapSoftwareQualityToTypes(List<String> qualities) {
 
         List<String> types = new ArrayList<>();
 
@@ -143,18 +267,45 @@ public class ScanIssueService {
         return types;
     }
 
-    // Map Sonar Type to UI Software Quality
     private String mapTypeToSoftwareQuality(String type) {
-
         switch (type) {
-            case "BUG":
-                return "Reliability";
-            case "VULNERABILITY":
-                return "Security";
-            case "CODE_SMELL":
-                return "Maintainability";
-            default:
-                return "Unknown";
+            case "BUG": return "Reliability";
+            case "VULNERABILITY": return "Security";
+            case "CODE_SMELL": return "Maintainability";
+            default: return "Unknown";
         }
+    }
+
+    // 🔥 Fetch ALL issues safely using pagination
+    public List<Issue> fetchAllIssues(String projectKey,
+                                      List<String> softwareQualities,
+                                      List<String> severities,
+                                      List<String> rules) {
+
+        int page = 1;
+        int pageSize = 500;
+        boolean hasMore = true;
+
+        List<Issue> allIssues = new ArrayList<>();
+
+        while (hasMore) {
+
+            IssueResponse response =
+                    fetchIssues(projectKey,
+                            softwareQualities,
+                            severities,
+                            rules,
+                            false,
+                            page,
+                            pageSize);
+
+            response.getContent()
+                    .forEach(group -> allIssues.addAll(group.getIssues()));
+
+            hasMore = page < response.getTotalPages();
+            page++;
+        }
+
+        return allIssues;
     }
 }

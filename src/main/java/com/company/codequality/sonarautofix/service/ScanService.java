@@ -14,11 +14,12 @@ public class ScanService {
 
     private final SonarService sonarService;
     private final AutoFixEngine autoFixEngine;
-
+    private final ProjectUploadService projectUploadService;
     
-    public ScanService(SonarService sonarService,
+    public ScanService(SonarService sonarService,ProjectUploadService projectUploadService,
                        AutoFixEngine autoFixEngine) {
         this.sonarService = sonarService;
+        this.projectUploadService = projectUploadService;
         this.autoFixEngine = autoFixEngine;
     }
 
@@ -26,10 +27,12 @@ public class ScanService {
     public String startNewScan(String projectPath) {
         String executionId = UUID.randomUUID().toString();
         String projectKey = "auto-project-" + executionId;
+        // register metadata here
+        projectUploadService.registerProjectKey(projectPath, projectKey);
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
-    // 🔥 NEW: re-scan with SAME scanId (used after AutoFix)
+    //  NEW: re-scan with SAME scanId (used after AutoFix)
     public void reScan(String projectPath, String projectKey, String scanId) {
         ScanTask task = scanStore.get(scanId);
         if (task == null) {

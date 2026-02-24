@@ -1,10 +1,12 @@
 package com.company.codequality.sonarautofix.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -156,7 +158,19 @@ public class ProjectUploadService {
                     }
                 });
     }
+    
+    //METADATA WRITER
 
+    public void registerProjectKey(String projectDir, String projectKey) {
+
+        try {
+            Path metadata = Paths.get(projectDir, ".project-key");
+            Files.writeString(metadata, projectKey);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store project key", e);
+        }
+    }
+    
 }
 
 

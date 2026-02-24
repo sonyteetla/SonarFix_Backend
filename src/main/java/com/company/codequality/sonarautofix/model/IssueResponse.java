@@ -1,6 +1,7 @@
 package com.company.codequality.sonarautofix.model;
 
 import lombok.*;
+
 import java.util.List;
 
 @Data
@@ -9,9 +10,10 @@ import java.util.List;
 @Builder
 public class IssueResponse {
 
-    private int total;       
-    private int page;       
-    private int pageSize;     
-    private int totalPages;  
-    private List<Issue> issues;
+    private long totalElements;
+    private int page;
+    private int pageSize;
+    private int totalPages;
+    private List<FileIssueGroup> content;
+    private FilterCounts filterCounts;
 }
