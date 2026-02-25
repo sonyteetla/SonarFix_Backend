@@ -2,9 +2,13 @@ package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.*;
 
+
 import com.company.codequality.sonarautofix.repository.ScanRepository;
 
 import com.company.codequality.sonarautofix.util.ProjectZipUtil;
+
+
+import com.company.codequality.sonarautofix.repository.ScanRepository;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -51,6 +55,7 @@ public class ScanService {
     }
 
 
+
     // NEW: re-scan with SAME scanId (used after AutoFix)
 
     // ================= RE-SCAN =================
@@ -59,6 +64,8 @@ public class ScanService {
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
+
+    // NEW: re-scan with SAME scanId (used after AutoFix)
 
     public void reScan(String projectPath, String projectKey, String scanId) {
         ScanTask task = scanRepository.findById(scanId);
@@ -105,6 +112,7 @@ public class ScanService {
             int maxRetries = 5;
             int retryDelayMs = 3000;
 
+
             // 🔥 FIX: pass ScanTask to capture build log
             sonarService.runSonarScan(
                     task.getProjectPath(),
@@ -117,6 +125,7 @@ public class ScanService {
 
             List<MappedIssue> mappedIssues =
                     issueMappingService.mapIssues(issues);
+
 
 
             for (int i = 0; i < maxRetries; i++) {
@@ -138,10 +147,12 @@ public class ScanService {
             task.setMappedIssues(mappedIssues);
 
 
+
             // Ensure suggestions list initialized
             if (task.getSuggestions() == null) {
                 task.setSuggestions(new ArrayList<>());
             }
+
 
 
             task.setStatus("COMPLETED");
@@ -153,9 +164,11 @@ public class ScanService {
             task.setResult(e.getMessage());
             scanRepository.save(task);
 
+
             System.out.println("⚠ Scan completed with build issues (tolerated)");
             task.setStatus("COMPLETED");
             task.setResult("Scan completed with compilation errors in target project.");
+
 
         }
     }
@@ -175,9 +188,13 @@ public class ScanService {
                 task.getProjectPath(),
                 task.getProjectKey(),
 
+
                 scanId // important (same scanId re-used)
 
                 scanId
+
+
+                scanId // important (same scanId re-used)
 
         );
     }
@@ -270,6 +287,7 @@ public class ScanService {
     public List<ScanTask> getAllScans() {
         return scanRepository.findAll();
 
+
                 scanId
         );
 
@@ -289,6 +307,8 @@ public class ScanService {
         }
 
         return task.getSuggestions();
+
+
 
     }
 }

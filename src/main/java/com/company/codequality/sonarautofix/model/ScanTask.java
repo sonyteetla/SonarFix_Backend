@@ -13,10 +13,10 @@ public class ScanTask {
 
     private List<MappedIssue> mappedIssues;
 
-<<<<<<< HEAD
+
     public ScanTask() {
     }
-=======
+
     // Suggestions
     private List<FixSuggestion> suggestions = new ArrayList<>();
 
@@ -26,13 +26,22 @@ public class ScanTask {
     // Execution Report (NEW)
     private Map<String, Integer> fixExecutionReport = new HashMap<>();
     private int totalFixesApplied;
->>>>>>> Auto-fix
+
+    public ScanTask() {
+    }
+
 
     public ScanTask(String scanId, String projectPath) {
         this.scanId = scanId;
         this.projectPath = projectPath;
         this.status = "QUEUED";
         this.createdAt = java.time.LocalDateTime.now();
+
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+
     }
 
     public java.time.LocalDateTime getCreatedAt() {

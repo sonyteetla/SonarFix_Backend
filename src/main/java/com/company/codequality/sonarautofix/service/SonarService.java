@@ -45,6 +45,9 @@ public class SonarService {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
             StringBuilder logBuffer = new StringBuilder();
 
 
@@ -68,6 +71,7 @@ public class SonarService {
                         "Sonar scan failed. Exit code: " + exitCode + "\n" + output);
 
                 System.out.println("⚠ Maven build failed but continuing scan");
+
 
             }
 

@@ -27,6 +27,7 @@ public class ScanController {
                 String scanId = scanService.startNewScan(projectPath);
                 ScanTask task = scanService.getScanTask(scanId);
 
+
                 return ResponseEntity.ok(
                                 Map.of(
                                                 "scanId", scanId,
@@ -88,5 +89,58 @@ public class ScanController {
      if (task == null) return ResponseEntity.notFound().build();
      return ResponseEntity.ok(task.getBuildLog());
  }
+
+
+
+                return ResponseEntity.ok(
+                                Map.of(
+                                                "scanId", scanId,
+                                                "projectKey", task.getProjectKey(),
+                                                "status", task.getStatus()));
+        }
+
+        // ==============================
+        // RE-SCAN EXISTING PROJECT
+        // ==============================
+        @PostMapping("/rescan")
+        public ResponseEntity<?> reScan(
+                        @RequestParam("projectPath") String projectPath,
+                        @RequestParam("projectKey") String projectKey) {
+
+                String scanId = scanService.reScan(projectPath, projectKey);
+
+                return ResponseEntity.ok(
+                                Map.of(
+                                                "scanId", scanId,
+                                                "projectKey", projectKey,
+                                                "status", "QUEUED"));
+        }
+
+        // ==============================
+        // CHECK STATUS
+        // ==============================
+        @GetMapping("/status/{scanId}")
+        public ResponseEntity<?> getStatus(@PathVariable("scanId") String scanId) {
+
+                String status = scanService.getStatus(scanId);
+
+                if ("NOT_FOUND".equals(status)) {
+                        return ResponseEntity.notFound().build();
+                }
+
+                return ResponseEntity.ok(
+                                Map.of(
+                                                "scanId", scanId,
+                                                "status", status));
+        }
+
+        // GET RESULT
+        @GetMapping("/result/{scanId}")
+        public ResponseEntity<?> getResult(
+                        @PathVariable("scanId") String scanId) {
+
+                return ResponseEntity.ok(
+                                scanService.getResult(scanId));
+        }
 
 }

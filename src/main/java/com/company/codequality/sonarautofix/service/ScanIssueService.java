@@ -33,7 +33,9 @@ public class ScanIssueService {
         this.ruleEngineService = ruleEngineService;
     }
 
+
     // ================= MAIN ENTRY =================
+
 
     public IssueResponse fetchIssues(String projectKey,
             List<String> softwareQualities,
@@ -64,7 +66,7 @@ public class ScanIssueService {
                         safePageSize
                 );
 
-<<<<<<< HEAD
+
         // 2️⃣ Fetch ALL issues for total filter counts
         List<Issue> allIssues =
                 fetchAllIssuesForCounts(
@@ -74,13 +76,14 @@ public class ScanIssueService {
                         rules,
                         autoFixOnly
                 );
-=======
+
         ResponseEntity<String> sonarResponse = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
->>>>>>> dashboard_system_API
+
+        ResponseEntity<String> sonarResponse = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         FilterCounts fullCounts = buildFilterCounts(allIssues);
 
-<<<<<<< HEAD
+
         // 3️⃣ Return paginated content + full counts
         return IssueResponse.builder()
                 .totalElements(pagedResult.getTotalElements())
@@ -98,7 +101,12 @@ public class ScanIssueService {
                                                Boolean autoFixOnly,
                                                int page,
                                                int pageSize) {
-=======
+
+        System.out.println("Sonar Response Status: " + sonarResponse.getStatusCode());
+        System.out.println("Sonar Response Body Sample: " + (sonarResponse.getBody() != null
+                ? sonarResponse.getBody().substring(0, Math.min(200, sonarResponse.getBody().length()))
+                : "null"));
+
         System.out.println("Sonar Response Status: " + sonarResponse.getStatusCode());
         System.out.println("Sonar Response Body Sample: " + (sonarResponse.getBody() != null
                 ? sonarResponse.getBody().substring(0, Math.min(200, sonarResponse.getBody().length()))
@@ -149,7 +157,6 @@ public class ScanIssueService {
             Boolean autoFixOnly,
             int page,
             int pageSize) {
->>>>>>> dashboard_system_API
 
         try {
 
@@ -162,11 +169,11 @@ public class ScanIssueService {
             List<Issue> parsedIssues =
                     parseIssuesFromSonar(issuesNode, autoFixOnly);
 
-<<<<<<< HEAD
+
             Map<String, List<Issue>> grouped =
                     parsedIssues.stream()
                             .collect(Collectors.groupingBy(Issue::getFilePath));
-=======
+
             if (issuesNode.isArray()) {
                 for (JsonNode node : issuesNode) {
 
@@ -233,7 +240,7 @@ public class ScanIssueService {
             // Group by file
             Map<String, List<Issue>> grouped = issues.stream()
                     .collect(Collectors.groupingBy(Issue::getFilePath));
->>>>>>> dashboard_system_API
+
 
             List<FileIssueGroup> content = grouped.entrySet().stream()
                     .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
@@ -401,6 +408,27 @@ public class ScanIssueService {
             return "";
         }
         return Jsoup.parse(html).text().trim();
+    }
+
+
+    private FilterCounts buildFilterCounts(List<Issue> issues) {
+
+        Map<String, Long> severityCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getSeverity,
+                        Collectors.counting()));
+
+        Map<String, Long> qualityCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getSoftwareQuality,
+                        Collectors.counting()));
+
+        Map<String, Long> ruleCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getRule,
+                        Collectors.counting()));
+
+        return new FilterCounts(severityCounts, qualityCounts, ruleCounts);
     }
 
     private List<String> mapSoftwareQualityToTypes(List<String> qualities) {

@@ -6,7 +6,9 @@ import com.company.codequality.sonarautofix.model.FixRequest;
 import com.company.codequality.sonarautofix.model.FixType;
 import com.company.codequality.sonarautofix.repository.FixRecordRepository;
 
+
 import com.company.codequality.sonarautofix.model.*;
+
 
 import com.company.codequality.sonarautofix.strategy.FixStrategy;
 import com.github.javaparser.StaticJavaParser;
@@ -76,8 +78,10 @@ public class AutoFixEngine {
                 // Bottom → Top sorting (no null checks needed)
                 fileFixes.sort((a, b) -> Integer.compare(b.getLine(), a.getLine()));
 
+
                 fileFixes.sort((a, b) ->
                         Integer.compare(b.getLine(), a.getLine()));
+
 
 
                 Path path = Path.of(projectPath, filePath);

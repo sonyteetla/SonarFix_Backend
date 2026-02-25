@@ -45,10 +45,14 @@ public class FixController {
                     projectPath,
                     projectKey,
 
+
                     null);
 
                     null
             );
+
+                    null);
+
 
 
             return ResponseEntity.ok(
