@@ -9,14 +9,23 @@ public class ScanTask {
     private String status;
     private String result;
     private String projectKey;
+    private java.time.LocalDateTime createdAt;
 
     // ✅ Store mapped issues for AutoFix + JSON response
     private List<MappedIssue> mappedIssues;
+
+    public ScanTask() {
+    }
 
     public ScanTask(String scanId, String projectPath) {
         this.scanId = scanId;
         this.projectPath = projectPath;
         this.status = "QUEUED";
+        this.createdAt = java.time.LocalDateTime.now();
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     // Getters

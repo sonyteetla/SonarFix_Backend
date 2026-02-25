@@ -10,13 +10,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/fix")
+@CrossOrigin("*")
 public class FixController {
 
     private final AutoFixEngine autoFixEngine;
     private final ScanService scanService;
 
     public FixController(AutoFixEngine autoFixEngine,
-                         ScanService scanService) {
+            ScanService scanService) {
         this.autoFixEngine = autoFixEngine;
         this.scanService = scanService;
     }
@@ -24,8 +25,8 @@ public class FixController {
     // ================= APPLY SELECTED FIXES =================
     @PostMapping("/apply")
     public ResponseEntity<?> applySelectedFixes(
-            @RequestParam String projectPath,
-            @RequestParam String projectKey,
+            @RequestParam("projectPath") String projectPath,
+            @RequestParam("projectKey") String projectKey,
             @RequestBody List<FixRequest> requests) {
 
         try {
@@ -33,8 +34,8 @@ public class FixController {
             autoFixEngine.applyFixes(
                     requests,
                     projectPath,
-                    projectKey
-            );
+                    projectKey,
+                    null);
 
             return ResponseEntity.ok(
                     "Selected fixes applied successfully. Re-scan started.");

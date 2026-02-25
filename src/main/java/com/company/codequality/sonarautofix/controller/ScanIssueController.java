@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/scan")
+@CrossOrigin("*")
 public class ScanIssueController {
 
     private final ScanIssueService scanIssueService;
@@ -18,14 +19,13 @@ public class ScanIssueController {
 
     @GetMapping("/{projectKey}/issues")
     public IssueResponse getIssues(
-            @PathVariable String projectKey,
-            @RequestParam(required = false) List<String> softwareQualities,
-            @RequestParam(required = false) List<String> severities,
-            @RequestParam(required = false) List<String> rules,
-            @RequestParam(required = false) Boolean autoFixOnly,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize
-    ) {
+            @PathVariable("projectKey") String projectKey,
+            @RequestParam(value = "softwareQualities", required = false) List<String> softwareQualities,
+            @RequestParam(value = "severities", required = false) List<String> severities,
+            @RequestParam(value = "rules", required = false) List<String> rules,
+            @RequestParam(value = "autoFixOnly", required = false) Boolean autoFixOnly,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         return scanIssueService.fetchIssues(
                 projectKey,
                 softwareQualities,
@@ -33,7 +33,6 @@ public class ScanIssueController {
                 rules,
                 autoFixOnly,
                 page,
-                pageSize
-        );
+                pageSize);
     }
 }

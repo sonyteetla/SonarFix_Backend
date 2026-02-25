@@ -19,8 +19,8 @@ public class DifferenceController {
 
     // Constructor Injection (BEST PRACTICE)
     public DifferenceController(FixService fixService,
-                                DifferenceService differenceService,
-                                ProjectUploadService projectUploadService) {
+            DifferenceService differenceService,
+            ProjectUploadService projectUploadService) {
         this.fixService = fixService;
         this.differenceService = differenceService;
         this.projectUploadService = projectUploadService;
@@ -34,7 +34,7 @@ public class DifferenceController {
      * @throws Exception in case of file IO errors
      */
     @PostMapping("/compare")
-    public List<FileDifference> compare(@RequestParam String projectPath) throws Exception {
+    public List<FileDifference> compare(@RequestParam("projectPath") String projectPath) throws Exception {
 
         // 1️⃣ Copy project to a fixed folder (avoid _fixed duplication)
         String fixedPath = projectUploadService.copyProject(projectPath);
