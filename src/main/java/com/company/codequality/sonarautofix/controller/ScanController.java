@@ -44,6 +44,7 @@ public class ScanController {
 
                 String scanId = scanService.reScan(projectPath, projectKey);
 
+
                 return ResponseEntity.ok(
                                 Map.of(
                                                 "scanId", scanId,
@@ -77,4 +78,15 @@ public class ScanController {
                 return ResponseEntity.ok(
                                 scanService.getResult(scanId));
         }
+
+     // If completed — return full JSON result
+     return ResponseEntity.ok(response);
+ }
+ @GetMapping("/build-log/{scanId}")
+ public ResponseEntity<?> getBuildLog(@PathVariable String scanId) {
+     ScanTask task = scanService.getScanTask(scanId);
+     if (task == null) return ResponseEntity.notFound().build();
+     return ResponseEntity.ok(task.getBuildLog());
+ }
+
 }

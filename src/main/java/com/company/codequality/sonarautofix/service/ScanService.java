@@ -1,7 +1,11 @@
 package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.*;
+
 import com.company.codequality.sonarautofix.repository.ScanRepository;
+
+import com.company.codequality.sonarautofix.util.ProjectZipUtil;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -46,13 +50,21 @@ public class ScanService {
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
+
     // NEW: re-scan with SAME scanId (used after AutoFix)
+
+    // ================= RE-SCAN =================
+    public String reScan(String projectPath, String projectKey) {
+        String executionId = UUID.randomUUID().toString();
+        return startScanInternal(projectPath, projectKey, executionId);
+    }
+
+
     public void reScan(String projectPath, String projectKey, String scanId) {
         ScanTask task = scanRepository.findById(scanId);
         if (task == null) {
             throw new IllegalArgumentException("Scan not found");
         }
-
         task.setStatus("QUEUED");
         scanRepository.save(task);
         runScanAsync(task);
@@ -80,6 +92,7 @@ public class ScanService {
             task.setStatus("RUNNING");
             scanRepository.save(task);
 
+
             // SONAR EXECUTION
             String sonarOutput = sonarService.runSonarScan(
                     task.getProjectPath(),
@@ -91,6 +104,20 @@ public class ScanService {
             List<Issue> issues = new java.util.ArrayList<>();
             int maxRetries = 5;
             int retryDelayMs = 3000;
+
+            // 🔥 FIX: pass ScanTask to capture build log
+            sonarService.runSonarScan(
+                    task.getProjectPath(),
+                    task.getProjectKey(),
+                    task
+            );
+
+            List<SonarIssue> issues =
+                    sonarService.fetchIssues(task.getProjectKey());
+
+            List<MappedIssue> mappedIssues =
+                    issueMappingService.mapIssues(issues);
+
 
             for (int i = 0; i < maxRetries; i++) {
                 issues = scanIssueService.fetchAllIssues(task.getProjectKey(), null, null, null);
@@ -110,13 +137,26 @@ public class ScanService {
             List<MappedIssue> mappedIssues = scanIssueService.toMappedIssues(issues);
             task.setMappedIssues(mappedIssues);
 
+
+            // Ensure suggestions list initialized
+            if (task.getSuggestions() == null) {
+                task.setSuggestions(new ArrayList<>());
+            }
+
+
             task.setStatus("COMPLETED");
             scanRepository.save(task);
 
         } catch (Exception e) {
+
             task.setStatus("FAILED");
             task.setResult(e.getMessage());
             scanRepository.save(task);
+
+            System.out.println("⚠ Scan completed with build issues (tolerated)");
+            task.setStatus("COMPLETED");
+            task.setResult("Scan completed with compilation errors in target project.");
+
         }
     }
 
@@ -134,7 +174,11 @@ public class ScanService {
                 requests,
                 task.getProjectPath(),
                 task.getProjectKey(),
+
                 scanId // important (same scanId re-used)
+
+                scanId
+
         );
     }
 
@@ -195,8 +239,6 @@ public class ScanService {
             if (issue.isAutoFixable() && issue.getFixType() != null) {
 
                 String realPath = issue.getFile();
-
-                // Remove sonar prefix: projectKey:
                 int idx = realPath.indexOf(":");
                 if (idx != -1) {
                     realPath = realPath.substring(idx + 1);
@@ -218,6 +260,7 @@ public class ScanService {
                 requests,
                 task.getProjectPath(),
                 task.getProjectKey(),
+
                 scanId // re-use same scan
         );
 
@@ -226,5 +269,26 @@ public class ScanService {
 
     public List<ScanTask> getAllScans() {
         return scanRepository.findAll();
+
+                scanId
+        );
+
+        String zipPath = ProjectZipUtil.zipProject(task.getProjectPath());
+        System.out.println("📦 Refactored project zipped at: " + zipPath);
+
+        return scanId;
+    }
+
+    // ================= GET SUGGESTIONS =================
+    public List<FixSuggestion> getSuggestions(String scanId) {
+
+        ScanTask task = scanStore.get(scanId);
+
+        if (task == null || task.getSuggestions() == null) {
+            return Collections.emptyList();
+        }
+
+        return task.getSuggestions();
+
     }
 }

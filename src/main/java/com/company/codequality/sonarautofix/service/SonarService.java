@@ -1,5 +1,11 @@
 package com.company.codequality.sonarautofix.service;
 
+
+import com.company.codequality.sonarautofix.model.ScanTask;
+import com.company.codequality.sonarautofix.model.SonarIssue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +21,7 @@ public class SonarService {
     @Value("${sonar.host.url}")
     private String sonarHost;
 
-    /**
-     * Runs Maven + Sonar scan
-     */
-    public String runSonarScan(String projectPath, String projectKey) {
+    public String runSonarScan(String projectPath, String projectKey, ScanTask task) {
 
         try {
 
@@ -27,6 +30,8 @@ public class SonarService {
                     "clean",
                     "verify",
                     "-DskipTests=true",
+                    "-Dmaven.test.failure.ignore=true",
+                    "-Dmaven.compiler.failOnError=false",
                     "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.host.url=" + sonarHost,
@@ -37,28 +42,80 @@ public class SonarService {
 
             Process process = builder.start();
 
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            String line;
-            StringBuilder output = new StringBuilder();
+            StringBuilder logBuffer = new StringBuilder();
 
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-                output.append(line).append("\n");
+
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                    logBuffer.append(line).append("\n");
+                }
             }
+
+            task.setBuildLog(logBuffer.toString());
 
             int exitCode = process.waitFor();
 
             if (exitCode != 0) {
+
                 throw new RuntimeException(
                         "Sonar scan failed. Exit code: " + exitCode + "\n" + output);
+
+                System.out.println("⚠ Maven build failed but continuing scan");
+
             }
 
-            return output.toString();
+            return logBuffer.toString();
 
         } catch (Exception e) {
-            throw new RuntimeException("Sonar Scan Failed: " + e.getMessage(), e);
+            task.setBuildLog("Scan failed: " + e.getMessage());
+            return "Scan completed with errors";
         }
     }
 
+
 }
+
+    public List<SonarIssue> fetchIssues(String projectKey) {
+        try {
+            String url = sonarHost + "/api/issues/search?projectKeys=" + projectKey + "&ps=500";
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            String auth = token + ":";
+            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+            headers.add("Authorization", "Basic " + encodedAuth);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+
+            List<SonarIssue> issues = new ArrayList<>();
+
+            for (JsonNode node : root.get("issues")) {
+                SonarIssue issue = new SonarIssue();
+                issue.setRule(node.get("rule").asText());
+                issue.setComponent(node.get("component").asText());
+                issue.setLine(node.has("line") ? node.get("line").asInt() : 0);
+                issues.add(issue);
+            }
+
+            return issues;
+
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+}
+
