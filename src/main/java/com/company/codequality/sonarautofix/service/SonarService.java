@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-
 @Service
 public class SonarService {
 
@@ -24,23 +23,21 @@ public class SonarService {
         try {
 
             ProcessBuilder builder = new ProcessBuilder(
-                    "C:\\Program Files\\Apache\\Maven\\bin\\mvn.cmd",
+                    "mvn.cmd",
                     "clean",
                     "verify",
                     "-DskipTests=true",
                     "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.host.url=" + sonarHost,
-                    "-Dsonar.token=" + token
-            );
+                    "-Dsonar.token=" + token);
 
             builder.directory(new java.io.File(projectPath));
             builder.redirectErrorStream(true);
 
             Process process = builder.start();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line;
             StringBuilder output = new StringBuilder();
@@ -54,8 +51,7 @@ public class SonarService {
 
             if (exitCode != 0) {
                 throw new RuntimeException(
-                        "Sonar scan failed. Exit code: " + exitCode + "\n" + output
-                );
+                        "Sonar scan failed. Exit code: " + exitCode + "\n" + output);
             }
 
             return output.toString();

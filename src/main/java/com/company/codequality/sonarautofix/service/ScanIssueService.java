@@ -26,20 +26,20 @@ public class ScanIssueService {
     private final RuleEngineService ruleEngineService;
 
     public ScanIssueService(RestTemplate restTemplate,
-                            ObjectMapper objectMapper,
-                            RuleEngineService ruleEngineService) {
+            ObjectMapper objectMapper,
+            RuleEngineService ruleEngineService) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.ruleEngineService = ruleEngineService;
     }
 
     public IssueResponse fetchIssues(String projectKey,
-                                     List<String> softwareQualities,
-                                     List<String> severities,
-                                     List<String> rules,
-                                     Boolean autoFixOnly,
-                                     int page,
-                                     int pageSize) {
+            List<String> softwareQualities,
+            List<String> severities,
+            List<String> rules,
+            Boolean autoFixOnly,
+            int page,
+            int pageSize) {
 
         // 🔥 Enforce Sonar limit
         int safePageSize = Math.min(pageSize, 500);
@@ -50,67 +50,69 @@ public class ScanIssueService {
                 severities,
                 rules,
                 page,
-                safePageSize
-        );
+                safePageSize);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(token, "");
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> sonarResponse =
-                restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> sonarResponse = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         if (!sonarResponse.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("SonarQube API returned error");
         }
 
+        System.out.println("Sonar Response Status: " + sonarResponse.getStatusCode());
+        System.out.println("Sonar Response Body Sample: " + (sonarResponse.getBody() != null
+                ? sonarResponse.getBody().substring(0, Math.min(200, sonarResponse.getBody().length()))
+                : "null"));
+
         return processResponse(
                 sonarResponse.getBody(),
                 autoFixOnly,
                 page,
-                safePageSize
-        );
+                safePageSize);
     }
 
     private String buildSonarUrl(String projectKey,
-                                 List<String> softwareQualities,
-                                 List<String> severities,
-                                 List<String> rules,
-                                 int page,
-                                 int pageSize) {
+            List<String> softwareQualities,
+            List<String> severities,
+            List<String> rules,
+            int page,
+            int pageSize) {
 
         StringBuilder url = new StringBuilder();
 
         url.append(sonarUrl)
-           .append("/api/issues/search?")
-           .append("componentKeys=").append(projectKey)
-           .append("&resolved=false")
-           .append("&p=").append(page)
-           .append("&ps=").append(pageSize);
+                .append("/api/issues/search?")
+                .append("componentKeys=").append(projectKey)
+                .append("&resolved=false")
+                .append("&p=").append(page)
+                .append("&ps=").append(pageSize);
 
         if (severities != null && !severities.isEmpty()) {
             url.append("&severities=")
-               .append(String.join(",", severities));
+                    .append(String.join(",", severities));
         }
 
         if (softwareQualities != null && !softwareQualities.isEmpty()) {
             url.append("&types=")
-               .append(String.join(",", mapSoftwareQualityToTypes(softwareQualities)));
+                    .append(String.join(",", mapSoftwareQualityToTypes(softwareQualities)));
         }
 
         if (rules != null && !rules.isEmpty()) {
             url.append("&rules=")
-               .append(String.join(",", rules));
+                    .append(String.join(",", rules));
         }
 
         return url.toString();
     }
 
     private IssueResponse processResponse(String body,
-                                          Boolean autoFixOnly,
-                                          int page,
-                                          int pageSize) {
+            Boolean autoFixOnly,
+            int page,
+            int pageSize) {
 
         try {
 
@@ -187,14 +189,12 @@ public class ScanIssueService {
             }
 
             // Group by file
-            Map<String, List<Issue>> grouped =
-                    issues.stream()
-                          .collect(Collectors.groupingBy(Issue::getFilePath));
+            Map<String, List<Issue>> grouped = issues.stream()
+                    .collect(Collectors.groupingBy(Issue::getFilePath));
 
-            List<FileIssueGroup> content =
-                    grouped.entrySet().stream()
-                            .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
-                            .collect(Collectors.toList());
+            List<FileIssueGroup> content = grouped.entrySet().stream()
+                    .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
 
             // 🔥 Correct total pages calculation using Sonar paging
             int totalPages = (int) Math.ceil((double) total / sonarPageSize);
@@ -222,26 +222,20 @@ public class ScanIssueService {
 
     private FilterCounts buildFilterCounts(List<Issue> issues) {
 
-        Map<String, Long> severityCounts =
-                issues.stream()
-                        .collect(Collectors.groupingBy(
-                                Issue::getSeverity,
-                                Collectors.counting()
-                        ));
+        Map<String, Long> severityCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getSeverity,
+                        Collectors.counting()));
 
-        Map<String, Long> qualityCounts =
-                issues.stream()
-                        .collect(Collectors.groupingBy(
-                                Issue::getSoftwareQuality,
-                                Collectors.counting()
-                        ));
+        Map<String, Long> qualityCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getSoftwareQuality,
+                        Collectors.counting()));
 
-        Map<String, Long> ruleCounts =
-                issues.stream()
-                        .collect(Collectors.groupingBy(
-                                Issue::getRule,
-                                Collectors.counting()
-                        ));
+        Map<String, Long> ruleCounts = issues.stream()
+                .collect(Collectors.groupingBy(
+                        Issue::getRule,
+                        Collectors.counting()));
 
         return new FilterCounts(severityCounts, qualityCounts, ruleCounts);
     }
@@ -269,18 +263,22 @@ public class ScanIssueService {
 
     private String mapTypeToSoftwareQuality(String type) {
         switch (type) {
-            case "BUG": return "Reliability";
-            case "VULNERABILITY": return "Security";
-            case "CODE_SMELL": return "Maintainability";
-            default: return "Unknown";
+            case "BUG":
+                return "Reliability";
+            case "VULNERABILITY":
+                return "Security";
+            case "CODE_SMELL":
+                return "Maintainability";
+            default:
+                return "Unknown";
         }
     }
 
     // 🔥 Fetch ALL issues safely using pagination
     public List<Issue> fetchAllIssues(String projectKey,
-                                      List<String> softwareQualities,
-                                      List<String> severities,
-                                      List<String> rules) {
+            List<String> softwareQualities,
+            List<String> severities,
+            List<String> rules) {
 
         int page = 1;
         int pageSize = 500;
@@ -290,14 +288,13 @@ public class ScanIssueService {
 
         while (hasMore) {
 
-            IssueResponse response =
-                    fetchIssues(projectKey,
-                            softwareQualities,
-                            severities,
-                            rules,
-                            false,
-                            page,
-                            pageSize);
+            IssueResponse response = fetchIssues(projectKey,
+                    softwareQualities,
+                    severities,
+                    rules,
+                    false,
+                    page,
+                    pageSize);
 
             response.getContent()
                     .forEach(group -> allIssues.addAll(group.getIssues()));
@@ -307,5 +304,25 @@ public class ScanIssueService {
         }
 
         return allIssues;
+    }
+
+    public List<MappedIssue> toMappedIssues(List<Issue> issues) {
+        if (issues == null)
+            return new ArrayList<>();
+        return issues.stream()
+                .map(this::toMappedIssue)
+                .collect(Collectors.toList());
+    }
+
+    public MappedIssue toMappedIssue(Issue issue) {
+        return new MappedIssue(
+                issue.getRule(),
+                issue.getFilePath(),
+                issue.getLine() != null ? issue.getLine() : 0,
+                issue.getMessage(),
+                issue.getSeverity(),
+                issue.getSoftwareQuality(),
+                issue.isAutoFixable(),
+                issue.getFixType() != null ? issue.getFixType().name() : null);
     }
 }

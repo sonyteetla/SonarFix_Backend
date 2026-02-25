@@ -1,7 +1,9 @@
 package com.company.codequality.sonarautofix.service;
 
+import com.company.codequality.sonarautofix.model.FixRecord;
 import com.company.codequality.sonarautofix.model.FixRequest;
 import com.company.codequality.sonarautofix.model.FixType;
+import com.company.codequality.sonarautofix.repository.FixRecordRepository;
 import com.company.codequality.sonarautofix.strategy.FixStrategy;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -18,21 +20,24 @@ public class AutoFixEngine {
 
     private final Map<FixType, FixStrategy> strategyMap = new HashMap<>();
     private final ScanService scanService;
+    private final FixRecordRepository fixRecordRepository;
 
     public AutoFixEngine(List<FixStrategy> strategies,
-                         @Lazy ScanService scanService) {
+            @Lazy ScanService scanService,
+            FixRecordRepository fixRecordRepository) {
 
         for (FixStrategy strategy : strategies) {
             strategyMap.put(strategy.getFixType(), strategy);
         }
 
         this.scanService = scanService;
+        this.fixRecordRepository = fixRecordRepository;
     }
 
     public int applyFixes(List<FixRequest> requests,
-                          String projectPath,
-                          String projectKey,
-                          String scanId) {
+            String projectPath,
+            String projectKey,
+            String scanId) {
 
         if (requests == null || requests.isEmpty()) {
             throw new IllegalArgumentException("No fixes provided");
@@ -60,8 +65,7 @@ public class AutoFixEngine {
                 List<FixRequest> fileFixes = entry.getValue();
 
                 // Bottom → Top sorting (no null checks needed)
-                fileFixes.sort((a, b) ->
-                        Integer.compare(b.getLine(), a.getLine()));
+                fileFixes.sort((a, b) -> Integer.compare(b.getLine(), a.getLine()));
 
                 Path path;
 
@@ -114,6 +118,19 @@ public class AutoFixEngine {
                             totalFixed++;
                             fixReport.put(type,
                                     fixReport.getOrDefault(type, 0) + 1);
+
+                            // Record the fix for the dashboard
+                            FixRecord record = FixRecord.builder()
+                                    .projectKey(projectKey)
+                                    .filePath(filePath)
+                                    .line(request.getLine())
+                                    .fixType(type.name())
+                                    .fixedAt(java.time.LocalDateTime.now())
+                                    .build();
+                            fixRecordRepository.save(record);
+                        } else {
+                            // Fix was NOT applied (strategy returned false). Check if the issue exists at
+                            // this line.
                         }
 
                     } catch (Exception ex) {
