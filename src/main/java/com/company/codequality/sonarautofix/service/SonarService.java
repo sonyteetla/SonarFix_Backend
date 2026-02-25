@@ -1,5 +1,6 @@
 package com.company.codequality.sonarautofix.service;
 
+import com.company.codequality.sonarautofix.model.ScanTask;
 import com.company.codequality.sonarautofix.model.SonarIssue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,10 +22,7 @@ public class SonarService {
     @Value("${sonar.host.url}")
     private String sonarHost;
 
-    /**
-     * Runs Maven + Sonar scan
-     */
-    public String runSonarScan(String projectPath, String projectKey) {
+    public String runSonarScan(String projectPath, String projectKey, ScanTask task) {
 
         try {
 
@@ -33,6 +31,8 @@ public class SonarService {
                     "clean",
                     "verify",
                     "-DskipTests=true",
+                    "-Dmaven.test.failure.ignore=true",
+                    "-Dmaven.compiler.failOnError=false",
                     "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.host.url=" + sonarHost,
@@ -44,35 +44,35 @@ public class SonarService {
 
             Process process = builder.start();
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder logBuffer = new StringBuilder();
 
-            String line;
-            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-                output.append(line).append("\n");
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                    logBuffer.append(line).append("\n");
+                }
             }
+
+            task.setBuildLog(logBuffer.toString());
 
             int exitCode = process.waitFor();
 
             if (exitCode != 0) {
-                throw new RuntimeException("Sonar scan failed\n" + output);
+                System.out.println("⚠ Maven build failed but continuing scan");
             }
 
-            return output.toString();
+            return logBuffer.toString();
 
         } catch (Exception e) {
-            throw new RuntimeException("Sonar Scan Failed: " + e.getMessage(), e);
+            task.setBuildLog("Scan failed: " + e.getMessage());
+            return "Scan completed with errors";
         }
     }
 
-    /**
-     * Fetch issues from SonarQube
-     */
     public List<SonarIssue> fetchIssues(String projectKey) {
-
         try {
             String url = sonarHost + "/api/issues/search?projectKeys=" + projectKey + "&ps=500";
 
@@ -104,7 +104,7 @@ public class SonarService {
             return issues;
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch Sonar issues: " + e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

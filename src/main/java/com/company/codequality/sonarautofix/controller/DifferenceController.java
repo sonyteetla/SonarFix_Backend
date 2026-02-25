@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/diff")
-@CrossOrigin("*")
+
 public class DifferenceController {
 
     private final FixService fixService;

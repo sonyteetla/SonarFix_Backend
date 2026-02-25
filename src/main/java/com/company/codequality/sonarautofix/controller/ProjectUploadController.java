@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/project")
-@CrossOrigin("*")
 public class ProjectUploadController {
 
     private final ProjectUploadService uploadService;
@@ -17,30 +18,36 @@ public class ProjectUploadController {
         this.uploadService = uploadService;
     }
 
-    // ZIP Upload
+    // ================= ZIP Upload =================
     @PostMapping(value = "/upload-zip", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadZip(
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadZip(@RequestParam("file") MultipartFile file) {
 
         String path = uploadService.handleZipUpload(file);
-        return ResponseEntity.ok("Project uploaded at: " + path);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+        );
     }
 
-    // GitHub Clone
+    // ================= GitHub Clone =================
     @PostMapping("/upload-github")
-    public ResponseEntity<String> uploadGithub(
-            @RequestParam("repoUrl") String repoUrl) {
+    public ResponseEntity<?> uploadGithub(@RequestParam("repoUrl") String repoUrl) {
 
         String path = uploadService.cloneGithub(repoUrl);
-        return ResponseEntity.ok("Project cloned at: " + path);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+        );
     }
 
-    // Local Directory
+    // ================= Local Directory =================
     @PostMapping("/upload-local")
-    public ResponseEntity<String> uploadLocal(
-            @RequestParam("localPath") String localPath) {
+    public ResponseEntity<?> uploadLocal(@RequestParam("localPath") String localPath) {
 
         String path = uploadService.useLocalDirectory(localPath);
-        return ResponseEntity.ok("Project loaded from: " + path);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+        );
     }
 }

@@ -103,4 +103,10 @@ public class ScanController {
      // If completed — return full JSON result
      return ResponseEntity.ok(response);
  }
+ @GetMapping("/build-log/{scanId}")
+ public ResponseEntity<?> getBuildLog(@PathVariable String scanId) {
+     ScanTask task = scanService.getScanTask(scanId);
+     if (task == null) return ResponseEntity.notFound().build();
+     return ResponseEntity.ok(task.getBuildLog());
+ }
 }
