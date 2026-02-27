@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/service/SonarService.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176636608,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176636608,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.service;\r\n\r\nimport com.company.codequality.sonarautofix.model.ScanTask;\r\nimport org.springframework.beans.factory.annotation.Value;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.InputStreamReader;\r\n\r\n@Service\r\npublic class SonarService {\r\n\r\n    @Value(\"${sonar.token}\")\r\n    private String token;\r\n\r\n    @Value(\"${sonar.host.url}\")\r\n    private String sonarHost;\r\n\r\n    /**\r\n     * Runs Maven + Sonar scan\r\n     * Captures full build log into ScanTask\r\n     */\r\n    public void runSonarScan(String projectPath,\r\n            String projectKey,\r\n            ScanTask task) {\r\n\r\nStringBuilder output = new StringBuilder();\r\n\r\ntry {\r\n\r\nProcessBuilder builder = new ProcessBuilder(\r\n        \"C:\\\\Program Files\\\\Apache\\\\Maven\\\\bin\\\\mvn.cmd\",\r\n        \"clean\",\r\n        \"verify\",\r\n        \"-DskipTests=true\",\r\n        \"org.sonarsource.scanner.maven:sonar-maven-plugin:sonar\",\r\n        \"-Dsonar.projectKey=\" + projectKey,\r\n        \"-Dsonar.host.url=http://localhost:9000\",\r\n        \"-Dsonar.token=\" + token\r\n\r\n);\r\n\r\nbuilder.directory(new java.io.File(projectPath));\r\nbuilder.redirectErrorStream(true);\r\n\r\n\r\nProcess process = builder.start();\r\n\r\ntry (BufferedReader reader =\r\n        new BufferedReader(\r\n                new InputStreamReader(process.getInputStream()))) {\r\n\r\nString line;\r\n\r\nwhile ((line = reader.readLine()) != null) {\r\n   output.append(line).append(\"\\n\");\r\n}\r\n}\r\n\r\nint exitCode = process.waitFor();\r\n\r\ntask.setBuildLog(output.toString());\r\n\r\nif (exitCode != 0) {\r\nthrow new RuntimeException(\r\n       \"Sonar scan failed. Exit code: \" + exitCode\r\n);\r\n}\r\n\r\n} catch (Exception e) {\r\n\r\ntask.setBuildLog(output.toString());\r\n\r\nthrow new RuntimeException(\r\n   \"Sonar Scan Failed: \" + e.getMessage(),\r\n   e\r\n);\r\n}\r\n}\r\n}\r\n"
+        }
+    ]
+}

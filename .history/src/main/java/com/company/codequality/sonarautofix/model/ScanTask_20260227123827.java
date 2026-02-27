@@ -13,26 +13,35 @@ public class ScanTask {
 
     private List<MappedIssue> mappedIssues;
 
+
+    public ScanTask() {
+    }
+
     // Suggestions
     private List<FixSuggestion> suggestions = new ArrayList<>();
 
-    // Build Log
+    // Build Log (NEW)
     private String buildLog;
 
-    // Execution Report
+    // Execution Report (NEW)
     private Map<String, Integer> fixExecutionReport = new HashMap<>();
     private int totalFixesApplied;
 
-    // Default constructor
     public ScanTask() {
-        this.createdAt = java.time.LocalDateTime.now();
     }
+
 
     public ScanTask(String scanId, String projectPath) {
         this.scanId = scanId;
         this.projectPath = projectPath;
         this.status = "QUEUED";
         this.createdAt = java.time.LocalDateTime.now();
+
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+
     }
 
     public java.time.LocalDateTime getCreatedAt() {
@@ -48,9 +57,16 @@ public class ScanTask {
     public String getProjectKey() { return projectKey; }
     public List<MappedIssue> getMappedIssues() { return mappedIssues; }
     public List<FixSuggestion> getSuggestions() { return suggestions; }
+
     public String getBuildLog() { return buildLog; }
-    public Map<String, Integer> getFixExecutionReport() { return fixExecutionReport; }
-    public int getTotalFixesApplied() { return totalFixesApplied; }
+
+    public Map<String, Integer> getFixExecutionReport() {
+        return fixExecutionReport;
+    }
+
+    public int getTotalFixesApplied() {
+        return totalFixesApplied;
+    }
 
     // ================= SETTERS =================
 
@@ -61,7 +77,7 @@ public class ScanTask {
     public void setBuildLog(String buildLog) { this.buildLog = buildLog; }
 
     public void setFixExecutionReport(Map<String, Integer> report) {
-        this.fixExecutionReport = (report == null) ? new HashMap<>() : report;
+        this.fixExecutionReport = report;
     }
 
     public void setTotalFixesApplied(int total) {

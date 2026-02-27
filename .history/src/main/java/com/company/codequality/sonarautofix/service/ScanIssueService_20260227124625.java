@@ -258,6 +258,7 @@ public class ScanIssueService {
             }
         }
 
+        // 🔥 IMPORTANT:
         // Enrich AFTER parsing (adds description, fix info, examples, blocks, etc.)
         ruleEngineService.enrichIssues(parsedIssues);
 

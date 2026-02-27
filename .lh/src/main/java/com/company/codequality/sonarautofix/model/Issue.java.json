@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/model/Issue.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176398146,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176398146,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.model;\r\n\r\nimport lombok.*;\r\nimport java.util.List;\r\n@Data\r\n@Builder\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Issue {\r\n\r\n    private String key;\r\n    private String rule;\r\n    private String severity;\r\n    private String type;\r\n    private String softwareQuality;\r\n    private String message;\r\n    private String filePath;\r\n    private Integer line;\r\n    private Integer startLine;\r\n    private Integer endLine;\r\n    private Integer startOffset;\r\n    private Integer endOffset;\r\n    private boolean supported;\r\n    private boolean autoFixable;\r\n    private FixType fixType;\r\n\r\n    private List<ContentBlock> whyBlocks;\r\n\r\n    private String nonCompliantExample;\r\n    private String compliantExample;\r\n}\r\n"
+        }
+    ]
+}

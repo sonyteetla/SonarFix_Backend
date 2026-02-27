@@ -35,20 +35,4 @@ public class ScanIssueController {
                 page,
                 pageSize);
     }
-    @GetMapping("/{projectKey}/issues/all")
-    public IssueResponse getAllIssues(
-            @PathVariable("projectKey") String projectKey,
-            @RequestParam(value = "softwareQualities", required = false) List<String> softwareQualities,
-            @RequestParam(value = "severities", required = false) List<String> severities,
-            @RequestParam(value = "rules", required = false) List<String> rules,
-            @RequestParam(value = "autoFixOnly", required = false) Boolean autoFixOnly) {
-
-        return scanIssueService.fetchAllIssuesForViewer(
-                projectKey,
-                softwareQualities,
-                severities,
-                rules,
-                autoFixOnly
-        );
-    }
 }

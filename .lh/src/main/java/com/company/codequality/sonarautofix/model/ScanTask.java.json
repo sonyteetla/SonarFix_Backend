@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/model/ScanTask.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176427518,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176427518,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.model;\r\n\r\nimport java.util.*;\r\n\r\npublic class ScanTask {\r\n\r\n    private String scanId;\r\n    private String projectPath;\r\n    private String status;\r\n    private String result;\r\n    private String projectKey;\r\n    private java.time.LocalDateTime createdAt;\r\n\r\n    private List<MappedIssue> mappedIssues;\r\n\r\n    // Suggestions\r\n    private List<FixSuggestion> suggestions = new ArrayList<>();\r\n\r\n    // Build Log\r\n    private String buildLog;\r\n\r\n    // Execution Report\r\n    private Map<String, Integer> fixExecutionReport = new HashMap<>();\r\n    private int totalFixesApplied;\r\n\r\n    // Default constructor\r\n    public ScanTask() {\r\n        this.createdAt = java.time.LocalDateTime.now();\r\n    }\r\n\r\n    public ScanTask(String scanId, String projectPath) {\r\n        this.scanId = scanId;\r\n        this.projectPath = projectPath;\r\n        this.status = \"QUEUED\";\r\n        this.createdAt = java.time.LocalDateTime.now();\r\n    }\r\n\r\n    public java.time.LocalDateTime getCreatedAt() {\r\n        return createdAt;\r\n    }\r\n\r\n    // ================= GETTERS =================\r\n\r\n    public String getScanId() { return scanId; }\r\n    public String getProjectPath() { return projectPath; }\r\n    public String getStatus() { return status; }\r\n    public String getResult() { return result; }\r\n    public String getProjectKey() { return projectKey; }\r\n    public List<MappedIssue> getMappedIssues() { return mappedIssues; }\r\n    public List<FixSuggestion> getSuggestions() { return suggestions; }\r\n    public String getBuildLog() { return buildLog; }\r\n    public Map<String, Integer> getFixExecutionReport() { return fixExecutionReport; }\r\n    public int getTotalFixesApplied() { return totalFixesApplied; }\r\n\r\n    // ================= SETTERS =================\r\n\r\n    public void setStatus(String status) { this.status = status; }\r\n    public void setResult(String result) { this.result = result; }\r\n    public void setProjectKey(String projectKey) { this.projectKey = projectKey; }\r\n    public void setMappedIssues(List<MappedIssue> mappedIssues) { this.mappedIssues = mappedIssues; }\r\n    public void setBuildLog(String buildLog) { this.buildLog = buildLog; }\r\n\r\n    public void setFixExecutionReport(Map<String, Integer> report) {\r\n        this.fixExecutionReport = (report == null) ? new HashMap<>() : report;\r\n    }\r\n\r\n    public void setTotalFixesApplied(int total) {\r\n        this.totalFixesApplied = total;\r\n    }\r\n\r\n    // ================= SUGGESTIONS =================\r\n\r\n    public void addSuggestion(FixSuggestion suggestion) {\r\n        if (this.suggestions == null) {\r\n            this.suggestions = new ArrayList<>();\r\n        }\r\n        this.suggestions.add(suggestion);\r\n    }\r\n\r\n    public void setSuggestions(List<FixSuggestion> suggestions) {\r\n        this.suggestions = (suggestions == null) ? new ArrayList<>() : suggestions;\r\n    }\r\n}\r\n"
+        }
+    ]
+}

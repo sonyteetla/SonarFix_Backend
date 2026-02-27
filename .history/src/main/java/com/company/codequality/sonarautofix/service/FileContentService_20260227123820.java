@@ -1,10 +1,14 @@
 package com.company.codequality.sonarautofix.service;
 
+import com.company.codequality.sonarautofix.model.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class FileContentService {
 

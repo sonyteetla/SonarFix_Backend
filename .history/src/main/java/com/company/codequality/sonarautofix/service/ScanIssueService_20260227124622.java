@@ -258,6 +258,7 @@ public class ScanIssueService {
             }
         }
 
+        // 🔥 IMPORTANT:
         // Enrich AFTER parsing (adds description, fix info, examples, blocks, etc.)
         ruleEngineService.enrichIssues(parsedIssues);
 
@@ -442,7 +443,7 @@ throw new RuntimeException("Error fetching all issues", e);
 }
 }
 
-// Group by file 
+// Group by file (same structure )
 Map<String, List<Issue>> grouped =
 allIssues.stream()
 .collect(Collectors.groupingBy(Issue::getFilePath));

@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/project")
-@CrossOrigin("*")
 public class ProjectUploadController {
 
     private final ProjectUploadService uploadService;
@@ -19,8 +18,9 @@ public class ProjectUploadController {
         this.uploadService = uploadService;
     }
 
-    // ZIP Upload
+    // ================= ZIP Upload =================
     @PostMapping(value = "/upload-zip", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
     public ResponseEntity<Map<String, String>> uploadZip(
             @RequestParam("file") MultipartFile file) {
 
@@ -28,14 +28,23 @@ public class ProjectUploadController {
 
         return ResponseEntity.ok(
                 Map.of(
-                        "projectPath", projectDir,
+                        "workspacePath", projectDir,
                         "status", "UPLOADED"
                 )
+
+    public ResponseEntity<?> uploadZip(@RequestParam("file") MultipartFile file) {
+
+        String path = uploadService.handleZipUpload(file);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+
         );
     }
 
-    // GitHub Clone
+    // ================= GitHub Clone =================
     @PostMapping("/upload-github")
+
     public ResponseEntity<Map<String, String>> uploadGithub(
             @RequestParam("repoUrl") String repoUrl) {
 
@@ -43,14 +52,23 @@ public class ProjectUploadController {
 
         return ResponseEntity.ok(
                 Map.of(
-                        "projectPath", projectDir,
+                        "workspacePath", projectDir,
                         "status", "CLONED"
                 )
+
+    public ResponseEntity<?> uploadGithub(@RequestParam("repoUrl") String repoUrl) {
+
+        String path = uploadService.cloneGithub(repoUrl);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+
         );
     }
 
-    // Local Directory
+    // ================= Local Directory =================
     @PostMapping("/upload-local")
+
     public ResponseEntity<Map<String, String>> uploadLocal(
             @RequestParam("localPath") String localPath) {
 
@@ -58,9 +76,17 @@ public class ProjectUploadController {
 
         return ResponseEntity.ok(
                 Map.of(
-                        "projectPath", projectDir,
+                        "workspacePath", projectDir,
                         "status", "LOADED"
                 )
+
+    public ResponseEntity<?> uploadLocal(@RequestParam("localPath") String localPath) {
+
+        String path = uploadService.useLocalDirectory(localPath);
+
+        return ResponseEntity.ok(
+                Map.of("projectPath", path)
+
         );
     }
 }

@@ -62,7 +62,7 @@ public class ProjectUploadService {
         try {
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
-            ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\Git\\bin\\git.exe", "clone", repoUrl, projectDir);
+            ProcessBuilder builder = new ProcessBuilder("git", "clone", repoUrl, projectDir);
             Process process = builder.start();
             process.waitFor();
 
@@ -172,4 +172,6 @@ public class ProjectUploadService {
     }
     
 }
+
+
 
