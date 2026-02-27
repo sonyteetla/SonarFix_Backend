@@ -118,105 +118,6 @@
     "fixType": "EXTRACT_STRING_CONSTANT"
   },
   {
-    "ruleId": "java:S138",
-    "title": "Long Method",
-    "severity": "MAJOR",
-    "category": "CODE_SMELL",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S134",
-    "title": "Deeply Nested Blocks",
-    "severity": "MAJOR",
-    "category": "CODE_SMELL",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S4144",
-    "title": "Duplicate Code",
-    "severity": "CRITICAL",
-    "category": "CODE_SMELL",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S3776",
-    "title": "High Cognitive Complexity",
-    "severity": "MAJOR",
-    "category": "CODE_SMELL",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S2259",
-    "title": "Null Pointer Dereference",
-    "severity": "CRITICAL",
-    "category": "BUG",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S1193",
-    "title": "Improper Exception Handling",
-    "severity": "MAJOR",
-    "category": "LOGGING",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S2077",
-    "title": "SQL Injection Risk",
-    "severity": "CRITICAL",
-    "category": "SECURITY",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S4787",
-    "title": "Hardcoded Credentials",
-    "severity": "CRITICAL",
-    "category": "SECURITY",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S4790",
-    "title": "Weak Cryptographic Algorithm",
-    "severity": "CRITICAL",
-    "category": "SECURITY",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S2092",
-    "title": "Deserialization of Untrusted Data",
-    "severity": "CRITICAL",
-    "category": "SECURITY",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
-    "ruleId": "java:S1181",
-    "title": "Catching Throwable",
-    "severity": "MAJOR",
-    "category": "LOGGING",
-    "enabled": true,
-    "autofixSupported": false,
-    "fixType": null
-  },
-  {
     "ruleId": "java:S3749",
     "title": "Spring Field Injection",
     "severity": "MAJOR",
@@ -233,5 +134,117 @@
     "enabled": true,
     "autofixSupported": true,
     "fixType": "SIMPLIFY_RETURN"
-  }
+  },
+  [
+    {
+      "ruleId": "java:S2095",
+      "title": "Resources Should Be Closed",
+      "description": "Use try-with-resources to ensure resources are closed automatically.",
+      "severity": "MAJOR",
+      "category": "BUG",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "CONVERT_TO_TRY_WITH_RESOURCES"
+    },
+    {
+      "ruleId": "java:S3655",
+      "title": "Optional Value Should Not Be Accessed Without Check",
+      "description": "Replace isPresent() + get() pattern with ifPresent().",
+      "severity": "MAJOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "OPTIONAL_IF_PRESENT"
+    },
+    {
+      "ruleId": "java:S1656",
+      "title": "Assignments Should Not Be Made From Within Sub-Expressions",
+      "description": "Split assignment from condition for clarity and safety.",
+      "severity": "MAJOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "SPLIT_ASSIGNMENT_FROM_CONDITION"
+    },
+    {
+      "ruleId": "java:S1481",
+      "title": "Unused Local Variables Should Be Removed",
+      "description": "Remove local variables that are declared but never used.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "REMOVE_UNUSED_VARIABLE"
+    },
+    {
+      "ruleId": "java:S1854",
+      "title": "Dead Store Should Be Removed",
+      "description": "Remove assignments to variables that are never subsequently used.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "REMOVE_DEAD_ASSIGNMENT"
+    },
+    {
+      "ruleId": "java:S1905",
+      "title": "Redundant Casts Should Be Removed",
+      "description": "Remove unnecessary type casts that do not affect behavior.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "REMOVE_REDUNDANT_CAST"
+    },
+    {
+      "ruleId": "java:S1698",
+      "title": "String Comparison Should Use equals()",
+      "description": "Replace '==' with '.equals()' for string comparison.",
+      "severity": "MAJOR",
+      "category": "BUG",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "USE_EQUALS_FOR_STRING"
+    },
+    {
+      "ruleId": "java:S1132",
+      "title": "Switch Statements Should Have a Default Case",
+      "description": "Add a default case to switch statements.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "ADD_DEFAULT_CASE"
+    },
+    {
+      "ruleId": "java:S1604",
+      "title": "Anonymous Classes Should Be Converted to Lambdas",
+      "description": "Convert eligible anonymous classes to lambda expressions.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "ANONYMOUS_TO_LAMBDA"
+    },
+    {
+      "ruleId": "java:S1612",
+      "title": "Lambdas Should Be Replaced With Method References",
+      "description": "Use method references where possible.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "LAMBDA_TO_METHOD_REFERENCE"
+    },
+    {
+      "ruleId": "java:S1319",
+      "title": "Traditional For Loop Can Be Replaced With Enhanced For Loop",
+      "description": "Convert index-based loops to enhanced for-each loops when possible.",
+      "severity": "MINOR",
+      "category": "CODE_SMELL",
+      "enabled": true,
+      "autofixSupported": true,
+      "fixType": "FOR_TO_ENHANCED_FOR"
+    }
+  ]
 ]
