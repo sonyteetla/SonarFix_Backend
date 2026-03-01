@@ -35,6 +35,7 @@ public class ScanIssueController {
                 page,
                 pageSize);
     }
+    
     @GetMapping("/{projectKey}/issues/all")
     public IssueResponse getAllIssues(
             @PathVariable("projectKey") String projectKey,

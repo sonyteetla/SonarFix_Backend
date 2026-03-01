@@ -135,7 +135,6 @@
     "autofixSupported": true,
     "fixType": "SIMPLIFY_RETURN"
   },
-  [
     {
       "ruleId": "java:S2095",
       "title": "Resources Should Be Closed",
@@ -246,5 +245,5 @@
       "autofixSupported": true,
       "fixType": "FOR_TO_ENHANCED_FOR"
     }
-  ]
+  
 ]
