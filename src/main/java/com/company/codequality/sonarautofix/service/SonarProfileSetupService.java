@@ -116,22 +116,33 @@ public class SonarProfileSetupService {
     
     private void activateRules(String profileKey) {
 
-        List<String> rules = List.of(
-                "java:S3749",
-                "java:S3626",
-                "java:S106",
-                "java:S1128",
-                "java:S108",
-                "java:S1643",
-                "java:S109",
-                "java:S1874",
-                "java:S6833",
-                "java:S1075",
-                "java:S2129",
-                "java:S112",
-                "java:S1118",
-                "java:S1192"
-        );
+    	List<String> rules = List.of(
+    	        "java:S3749",
+    	        "java:S3626",
+    	        "java:S106",
+    	        "java:S1128",
+    	        "java:S108",
+    	        "java:S1643",
+    	        "java:S109",
+    	        "java:S1874",
+    	        "java:S6833",
+    	        "java:S1075",
+    	        "java:S2129",
+    	        "java:S112",
+    	        "java:S1118",
+    	        "java:S1192",
+    	        "java:S2095",
+    	        "java:S3655",
+    	        "java:S1656",
+    	        "java:S1481",
+    	        "java:S1854",
+    	        "java:S1905",
+    	        "java:S1698",
+    	        "java:S1132",
+    	        "java:S1604",
+    	        "java:S1612",
+    	        "java:S1319"
+    	);
 
         for (String rule : rules) {
 

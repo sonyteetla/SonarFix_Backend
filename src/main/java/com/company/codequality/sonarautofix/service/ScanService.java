@@ -41,7 +41,7 @@ public class ScanService {
         String projectKey = "auto-project-" + executionId;
 
         Project project = Project.builder()
-                .projectKey(projectKey)
+                .id(projectKey)
                 .description("Auto-scan for: " + projectPath)
                 .build();
 
