@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/controller/ProjectUploadController.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176316590,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176316590,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.controller;\r\n\r\nimport com.company.codequality.sonarautofix.service.ProjectUploadService;\r\nimport org.springframework.http.ResponseEntity;\r\nimport org.springframework.web.bind.annotation.*;\r\nimport org.springframework.web.multipart.MultipartFile;\r\nimport org.springframework.http.MediaType;\r\n\r\nimport java.util.Map;\r\n\r\n@RestController\r\n@RequestMapping(\"/api/project\")\r\n@CrossOrigin(\"*\")\r\npublic class ProjectUploadController {\r\n\r\n    private final ProjectUploadService uploadService;\r\n\r\n    public ProjectUploadController(ProjectUploadService uploadService) {\r\n        this.uploadService = uploadService;\r\n    }\r\n\r\n    // ZIP Upload\r\n    @PostMapping(value = \"/upload-zip\", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)\r\n    public ResponseEntity<Map<String, String>> uploadZip(\r\n            @RequestParam(\"file\") MultipartFile file) {\r\n\r\n        String projectDir = uploadService.handleZipUpload(file);\r\n\r\n        return ResponseEntity.ok(\r\n                Map.of(\r\n                        \"projectPath\", projectDir,\r\n                        \"status\", \"UPLOADED\"\r\n                )\r\n        );\r\n    }\r\n\r\n    // GitHub Clone\r\n    @PostMapping(\"/upload-github\")\r\n    public ResponseEntity<Map<String, String>> uploadGithub(\r\n            @RequestParam(\"repoUrl\") String repoUrl) {\r\n\r\n        String projectDir = uploadService.cloneGithub(repoUrl);\r\n\r\n        return ResponseEntity.ok(\r\n                Map.of(\r\n                        \"projectPath\", projectDir,\r\n                        \"status\", \"CLONED\"\r\n                )\r\n        );\r\n    }\r\n\r\n    // Local Directory\r\n    @PostMapping(\"/upload-local\")\r\n    public ResponseEntity<Map<String, String>> uploadLocal(\r\n            @RequestParam(\"localPath\") String localPath) {\r\n\r\n        String projectDir = uploadService.useLocalDirectory(localPath);\r\n\r\n        return ResponseEntity.ok(\r\n                Map.of(\r\n                        \"projectPath\", projectDir,\r\n                        \"status\", \"LOADED\"\r\n                )\r\n        );\r\n    }\r\n}"
+        }
+    ]
+}

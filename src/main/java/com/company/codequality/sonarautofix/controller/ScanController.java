@@ -1,9 +1,12 @@
 package com.company.codequality.sonarautofix.controller;
 
 import com.company.codequality.sonarautofix.model.FixExecutionReport;
+
 import com.company.codequality.sonarautofix.model.ScanTask;
 import java.util.List;
+
 import com.company.codequality.sonarautofix.model.ScanTask;
+import java.util.List;
 import com.company.codequality.sonarautofix.service.ScanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

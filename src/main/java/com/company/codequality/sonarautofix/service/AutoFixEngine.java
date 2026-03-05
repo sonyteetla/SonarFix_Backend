@@ -4,9 +4,15 @@ import com.company.codequality.sonarautofix.model.*;
 import com.company.codequality.sonarautofix.strategy.FixStrategy;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +30,7 @@ public class AutoFixEngine {
         for (FixStrategy strategy : strategies) {
             strategyMap.put(strategy.getFixType(), strategy);
         }
-
+        System.out.println("Registered strategies: " + strategyMap.keySet());
         this.scanService = scanService;
     }
 
@@ -56,16 +62,25 @@ public class AutoFixEngine {
                 grouped.computeIfAbsent(request.getFilePath(),
                         k -> new ArrayList<>()).add(request);
             }
-
+            
+            initSymbolSolver(projectPath);
+            System.out.println("Incoming fix requests: " + requests.size());
             for (Map.Entry<String, List<FixRequest>> entry : grouped.entrySet()) {
 
                 String filePath = entry.getKey();
                 List<FixRequest> fileFixes = entry.getValue();
 
+                System.out.println("Incoming fix requests: " + requests.size());
+
                 fileFixes.sort((a, b) ->
                         Integer.compare(b.getLine(), a.getLine()));
 
                 Path path = Path.of(projectPath, filePath);
+                System.out.println("---- FILE DEBUG ----");
+                System.out.println("projectPath = " + projectPath);
+                System.out.println("filePath = " + filePath);
+                System.out.println("resolved path = " + path);
+                System.out.println("exists = " + Files.exists(path));
                 if (!Files.exists(path)) continue;
 
                 List<String> originalLines =
@@ -74,6 +89,7 @@ public class AutoFixEngine {
                 CompilationUnit cu;
 
                 try {
+                	
                     cu = StaticJavaParser.parse(path);
                 } catch (Exception e) {
                     continue;
@@ -190,5 +206,24 @@ public class AutoFixEngine {
         } catch (Exception e) {
             throw new RuntimeException("Auto fix failed", e);
         }
+    }
+    
+    private void initSymbolSolver(String projectPath) {
+
+        CombinedTypeSolver solver = new CombinedTypeSolver();
+
+        solver.add(new ReflectionTypeSolver());
+
+        File srcMainJava = new File(projectPath, "src/main/java");
+
+        if (srcMainJava.exists()) {
+            solver.add(new JavaParserTypeSolver(srcMainJava));
+        }
+
+        JavaSymbolSolver symbolSolver =
+                new JavaSymbolSolver(solver);
+
+        StaticJavaParser.getConfiguration()
+                .setSymbolResolver(symbolSolver);
     }
 }

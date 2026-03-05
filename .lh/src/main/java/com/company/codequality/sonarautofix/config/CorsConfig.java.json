@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/config/CorsConfig.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176178557,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176178557,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.config;\r\n\r\nimport org.springframework.context.annotation.Bean;\r\nimport org.springframework.context.annotation.Configuration;\r\nimport org.springframework.web.servlet.config.annotation.CorsRegistry;\r\nimport org.springframework.web.servlet.config.annotation.WebMvcConfigurer;\r\n\r\n@Configuration\r\npublic class CorsConfig {\r\n    @Bean\r\n    public WebMvcConfigurer corsConfigurer() {\r\n        return new WebMvcConfigurer() {\r\n            @Override\r\n            public void addCorsMappings(CorsRegistry registry) {\r\n                registry.addMapping(\"/**\")\r\n                        .allowedOrigins(\"http://localhost:5173\")\r\n                        .allowedMethods(\"*\");\r\n            }\r\n        };\r\n    }\r\n}\r\n"
+        }
+    ]
+}

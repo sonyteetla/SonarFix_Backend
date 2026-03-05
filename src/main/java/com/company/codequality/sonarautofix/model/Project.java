@@ -4,19 +4,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonAlias;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Project {
+
+    @JsonIgnore
     private String id;
 
-    @JsonProperty("projectKey")
-    @JsonAlias({ "project Key", "projectName" })
-    private String projectKey;
-
+    private String name;
     private String description;
+    @JsonProperty("projectKey")
+    public String getProjectKey() {
+        return id;
+    }
 }

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/controller/ScanIssueController.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176367017,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176367017,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.controller;\r\n\r\nimport com.company.codequality.sonarautofix.model.IssueResponse;\r\nimport com.company.codequality.sonarautofix.service.ScanIssueService;\r\nimport org.springframework.web.bind.annotation.*;\r\n\r\nimport java.util.List;\r\n\r\n@RestController\r\n@RequestMapping(\"/api/scan\")\r\n@CrossOrigin(\"*\")\r\npublic class ScanIssueController {\r\n\r\n    private final ScanIssueService scanIssueService;\r\n\r\n    public ScanIssueController(ScanIssueService scanIssueService) {\r\n        this.scanIssueService = scanIssueService;\r\n    }\r\n\r\n    @GetMapping(\"/{projectKey}/issues\")\r\n    public IssueResponse getIssues(\r\n            @PathVariable(\"projectKey\") String projectKey,\r\n            @RequestParam(value = \"softwareQualities\", required = false) List<String> softwareQualities,\r\n            @RequestParam(value = \"severities\", required = false) List<String> severities,\r\n            @RequestParam(value = \"rules\", required = false) List<String> rules,\r\n            @RequestParam(value = \"autoFixOnly\", required = false) Boolean autoFixOnly,\r\n            @RequestParam(value = \"page\", defaultValue = \"1\") int page,\r\n            @RequestParam(value = \"pageSize\", defaultValue = \"10\") int pageSize) {\r\n        return scanIssueService.fetchIssues(\r\n                projectKey,\r\n                softwareQualities,\r\n                severities,\r\n                rules,\r\n                autoFixOnly,\r\n                page,\r\n                pageSize);\r\n    }\r\n    @GetMapping(\"/{projectKey}/issues/all\")\r\n    public IssueResponse getAllIssues(\r\n            @PathVariable(\"projectKey\") String projectKey,\r\n            @RequestParam(value = \"softwareQualities\", required = false) List<String> softwareQualities,\r\n            @RequestParam(value = \"severities\", required = false) List<String> severities,\r\n            @RequestParam(value = \"rules\", required = false) List<String> rules,\r\n            @RequestParam(value = \"autoFixOnly\", required = false) Boolean autoFixOnly) {\r\n\r\n        return scanIssueService.fetchAllIssuesForViewer(\r\n                projectKey,\r\n                softwareQualities,\r\n                severities,\r\n                rules,\r\n                autoFixOnly\r\n        );\r\n    }\r\n}\r\n"
+        }
+    ]
+}

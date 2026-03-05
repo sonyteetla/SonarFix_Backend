@@ -11,5 +11,9 @@ public class FixRequest {
     private String filePath;
     private Integer line;
     private String fixType;
+
     private String ruleId;
+
+    private String ruleId;  
+
 }

@@ -68,8 +68,14 @@ public class ProjectUploadService {
 
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
+
             ProcessBuilder builder = new ProcessBuilder("git", "clone", repoUrl, projectDir);
             builder.redirectErrorStream(true);
+
+            ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\Git\\bin\\git.exe", "clone", repoUrl, projectDir);
+            Process process = builder.start();
+            process.waitFor();
+
 
             Process process = builder.start();
 
@@ -182,4 +188,10 @@ public class ProjectUploadService {
             throw new RuntimeException("Failed to store project key", e);
         }
     }
+
 }
+
+    
+}
+
+

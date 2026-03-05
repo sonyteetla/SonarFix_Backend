@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/company/codequality/sonarautofix/service/FileContentService.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1772176480958,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1772176480958,
+            "name": "Commit-0",
+            "content": "package com.company.codequality.sonarautofix.service;\r\n\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.io.IOException;\r\nimport java.nio.file.*;\r\nimport java.util.*;\r\n@Service\r\npublic class FileContentService {\r\n\r\n    private final WorkspaceResolverService resolverService;\r\n\r\n    public FileContentService(WorkspaceResolverService resolverService) {\r\n        this.resolverService = resolverService;\r\n    }\r\n\r\n    public List<String> getFileContent(String projectKey,\r\n                                       String relativePath) {\r\n\r\n        try {\r\n\r\n            String workspacePath =\r\n                    resolverService.resolveWorkspacePath(projectKey);\r\n\r\n            Path basePath = Paths.get(workspacePath);\r\n            Path fullPath = basePath.resolve(relativePath).normalize();\r\n\r\n            if (!fullPath.startsWith(basePath)) {\r\n                throw new RuntimeException(\"Invalid file path access\");\r\n            }\r\n\r\n            if (!Files.exists(fullPath)) {\r\n                throw new RuntimeException(\"File not found: \" + fullPath);\r\n            }\r\n\r\n            return Files.readAllLines(fullPath);\r\n\r\n        } catch (IOException e) {\r\n            throw new RuntimeException(\"Failed to read file\", e);\r\n        }\r\n    }\r\n}"
+        }
+    ]
+}

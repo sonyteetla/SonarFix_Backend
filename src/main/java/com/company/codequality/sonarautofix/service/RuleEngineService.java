@@ -5,6 +5,8 @@ import com.company.codequality.sonarautofix.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,9 @@ public class RuleEngineService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    // Cache Sonar rule descriptions
-    private final Map<String, String> ruleDescriptionCache = new ConcurrentHashMap<>();
+    // Cache rule metadata (avoid repeated API calls)
+    private final Map<String, RuleDescriptionData> ruleCache =
+            new ConcurrentHashMap<>();
 
     public RuleEngineService(RuleRegistry ruleRegistry,
                              RestTemplate restTemplate,
@@ -38,29 +41,29 @@ public class RuleEngineService {
         this.objectMapper = objectMapper;
     }
 
+    // ================= ENRICH ISSUES =================
+
     public void enrichIssues(List<Issue> issues) {
 
-        if (issues == null || issues.isEmpty()) {
-            return;
-        }
+        if (issues == null || issues.isEmpty()) return;
 
-        // Collect unique rule keys
         Set<String> ruleKeys = issues.stream()
                 .map(Issue::getRule)
                 .collect(Collectors.toSet());
 
-        fetchMissingDescriptions(ruleKeys);
+        fetchMissingRuleData(ruleKeys);
 
         for (Issue issue : issues) {
 
-            // 1️⃣ Set Sonar description
-            issue.setDescription(ruleDescriptionCache.get(issue.getRule()));
+            RuleDescriptionData data = ruleCache.get(issue.getRule());
 
-            // 2️⃣ Apply internal RuleRegistry logic
+            if (data != null) {
+                issue.setWhyBlocks(data.getWhyBlocks());
+            }
+
             RuleConfig rule = ruleRegistry.getRule(issue.getRule());
 
             if (rule != null) {
-
                 issue.setSupported(true);
                 issue.setAutoFixable(rule.isAutoFixable());
 
@@ -69,9 +72,7 @@ public class RuleEngineService {
                 } catch (Exception e) {
                     issue.setFixType(FixType.NONE);
                 }
-
             } else {
-
                 issue.setSupported(false);
                 issue.setAutoFixable(false);
                 issue.setFixType(FixType.NONE);
@@ -79,7 +80,9 @@ public class RuleEngineService {
         }
     }
 
-    private void fetchMissingDescriptions(Set<String> ruleKeys) {
+    // ================= FETCH RULE METADATA =================
+
+    private void fetchMissingRuleData(Set<String> ruleKeys) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(token, "");
@@ -87,56 +90,145 @@ public class RuleEngineService {
 
         for (String ruleKey : ruleKeys) {
 
-            if (!ruleDescriptionCache.containsKey(ruleKey)) {
+            if (ruleCache.containsKey(ruleKey)) continue;
 
-                try {
+            try {
 
-                    String url = sonarUrl + "/api/rules/show?key=" + ruleKey;
+                String url = sonarUrl + "/api/rules/show?key=" + ruleKey;
 
-                    ResponseEntity<String> response =
-                            restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+                ResponseEntity<String> response =
+                        restTemplate.exchange(
+                                url,
+                                HttpMethod.GET,
+                                entity,
+                                String.class
+                        );
 
-                    JsonNode root = objectMapper.readTree(response.getBody());
-                    JsonNode ruleNode = root.path("rule");
+                JsonNode root = objectMapper.readTree(response.getBody());
+                JsonNode ruleNode = root.path("rule");
 
-                    String description = "";
+                List<ContentBlock> whyBlocks = new ArrayList<>();
 
-                    // Modern Sonar
-                    if (ruleNode.has("descriptionSections")) {
+                if (ruleNode.has("descriptionSections")) {
 
-                        for (JsonNode section : ruleNode.path("descriptionSections")) {
+                    for (JsonNode section :
+                            ruleNode.get("descriptionSections")) {
 
-                            if ("root_cause"
-                                    .equalsIgnoreCase(section.path("key").asText())) {
+                        String html =
+                                section.path("content").asText();
 
-                                String rawHtml =
-                                        section.path("content").asText();
-
-                                // Strip HTML safely
-                                description = Jsoup.parse(rawHtml).text();
-                                break;
-                            }
+                        if (html != null && !html.isBlank()) {
+                            whyBlocks.addAll(parseHtmlToBlocks(html));
                         }
                     }
-
-                    // Fallback for older Sonar
-                    if (description.isEmpty() && ruleNode.has("htmlDesc")) {
-                        description = Jsoup.parse(
-                                ruleNode.path("htmlDesc").asText()
-                        ).text();
-                    }
-
-                    if (description.isEmpty()) {
-                        description = "No description available.";
-                    }
-
-                    ruleDescriptionCache.put(ruleKey, description);
-
-                } catch (Exception e) {
-                    ruleDescriptionCache.put(ruleKey,
-                            "Description unavailable.");
                 }
+
+                ruleCache.put(
+                        ruleKey,
+                        new RuleDescriptionData(whyBlocks)
+                );
+
+            } catch (Exception e) {
+
+                ruleCache.put(
+                        ruleKey,
+                        new RuleDescriptionData(
+                                Collections.singletonList(
+                                        new ContentBlock(
+                                                "paragraph",
+                                                "Description unavailable"
+                                        )
+                                )
+                        )
+                );
             }
         }
+    }
+
+    // ================= HTML → STRUCTURED BLOCKS =================
+
+    private List<ContentBlock> parseHtmlToBlocks(String html) {
+
+        List<ContentBlock> blocks = new ArrayList<>();
+
+        if (html == null || html.isBlank()) return blocks;
+
+        Document doc = Jsoup.parse(html);
+
+        for (Element el : doc.body().children()) {
+
+            switch (el.tagName()) {
+
+                case "h1":
+                case "h2":
+                case "h3":
+                    blocks.add(new ContentBlock(
+                            "heading",
+                            el.text()
+                    ));
+                    break;
+
+                case "p":
+                    blocks.add(new ContentBlock(
+                            "paragraph",
+                            el.text()
+                    ));
+                    break;
+
+                case "ul":
+                    blocks.add(new ContentBlock(
+                            "unordered_list",
+                            el.select("li")
+                              .stream()
+                              .map(Element::text)
+                              .collect(Collectors.toList())
+                    ));
+                    break;
+
+                case "ol":
+                    blocks.add(new ContentBlock(
+                            "ordered_list",
+                            el.select("li")
+                              .stream()
+                              .map(Element::text)
+                              .collect(Collectors.toList())
+                    ));
+                    break;
+
+                case "pre":
+
+                    String diffType =
+                            el.attr("data-diff-type");
+
+                    if ("noncompliant".equals(diffType)) {
+
+                        blocks.add(new ContentBlock(
+                                "noncompliant_code",
+                                el.text()
+                        ));
+
+                    } else if ("compliant".equals(diffType)) {
+
+                        blocks.add(new ContentBlock(
+                                "compliant_code",
+                                el.text()
+                        ));
+
+                    } else {
+
+                        blocks.add(new ContentBlock(
+                                "code",
+                                el.text()
+                        ));
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        return blocks;
     }
 }
