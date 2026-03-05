@@ -22,14 +22,16 @@ public class OptimizeObjectCreationStrategy implements FixStrategy {
 
         for (ObjectCreationExpr obj : cu.findAll(ObjectCreationExpr.class)) {
 
-            boolean insideLoop = obj.findAncestor(ForStmt.class).isPresent() ||
+            boolean insideLoop =
+                    obj.findAncestor(ForStmt.class).isPresent() ||
                     obj.findAncestor(WhileStmt.class).isPresent();
 
-            if (!insideLoop)
-                continue;
+            if (!insideLoop) continue;
 
-            obj.setLineComment("TODO: Move object creation outside loop");
-            fixed = true;
+            if (!obj.getComment().isPresent()) {
+                obj.setLineComment("TODO: Move object creation outside loop");
+                fixed = true;
+            }
         }
 
         return fixed;

@@ -25,8 +25,7 @@ public class FixController {
     private final AutoFixEngine autoFixEngine;
     private final ScanService scanService;
 
-    public FixController(AutoFixEngine autoFixEngine,
-            ScanService scanService) {
+    public FixController(AutoFixEngine autoFixEngine, ScanService scanService) {
         this.autoFixEngine = autoFixEngine;
         this.scanService = scanService;
     }
@@ -39,24 +38,14 @@ public class FixController {
             @RequestBody List<FixRequest> requests) {
 
         try {
-
             autoFixEngine.applyFixes(
                     requests,
                     projectPath,
                     projectKey,
-
-
-                    null);
-
-                    null
+                    null   // no scanId → manual fix
             );
 
-                    null);
-
-
-
-            return ResponseEntity.ok(
-                    "Selected fixes applied successfully. Re-scan started.");
+            return ResponseEntity.ok("Selected fixes applied successfully. Re-scan started.");
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
@@ -69,11 +58,8 @@ public class FixController {
     public ResponseEntity<?> autoFixAll(@PathVariable String scanId) {
 
         try {
-
             String updatedScanId = scanService.autoFixAll(scanId);
-
-            return ResponseEntity.ok(
-                    "AutoFix ALL completed. ScanId: " + updatedScanId);
+            return ResponseEntity.ok("AutoFix ALL completed. ScanId: " + updatedScanId);
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
@@ -83,29 +69,20 @@ public class FixController {
 
     // ================= DOWNLOAD REFACTORED PROJECT =================
     @GetMapping("/download/{scanId}")
-    public ResponseEntity<Resource> downloadProject(
-            @PathVariable String scanId) throws IOException {
+    public ResponseEntity<Resource> downloadProject(@PathVariable String scanId) throws IOException {
 
         ScanTask task = scanService.getScanTask(scanId);
+        if (task == null) return ResponseEntity.notFound().build();
 
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String workspacePath = task.getProjectPath();
-        String zipPath = workspacePath + "-refactored.zip";
-
+        String zipPath = task.getProjectPath() + "-refactored.zip";
         File file = new File(zipPath);
-
-        if (!file.exists()) {
-            return ResponseEntity.notFound().build();
-        }
+        if (!file.exists()) return ResponseEntity.notFound().build();
 
         Resource resource = new UrlResource(file.toURI());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=" + file.getName())
+                        "attachment; filename=\"" + file.getName() + "\"")
                 .body(resource);
     }
 
@@ -115,15 +92,12 @@ public class FixController {
         return ResponseEntity.ok(scanService.getSuggestions(scanId));
     }
 
-    // ================= EXECUTION REPORT FOR UI =================
+    // ================= EXECUTION REPORT =================
     @GetMapping("/report/{scanId}")
     public ResponseEntity<?> getExecutionReport(@PathVariable String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
-
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        }
+        if (task == null) return ResponseEntity.notFound().build();
 
         Map<String, Object> response = new HashMap<>();
         response.put("report", task.getFixExecutionReport());

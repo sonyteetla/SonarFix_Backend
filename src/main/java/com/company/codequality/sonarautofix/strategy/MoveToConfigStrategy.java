@@ -20,10 +20,13 @@ public class MoveToConfigStrategy implements FixStrategy {
 
         for (StringLiteralExpr literal : cu.findAll(StringLiteralExpr.class)) {
 
-            if (literal.getValue().startsWith("http") ||
-                literal.getValue().contains("localhost")) {
+            String value = literal.getValue();
 
-                literal.replace(new StringLiteralExpr("${config.value}"));
+            if (value.startsWith("${")) continue;
+
+            if (value.matches("https?://.*") || value.contains("localhost")) {
+
+                literal.setString("${app.config.url}");
                 fixed = true;
             }
         }

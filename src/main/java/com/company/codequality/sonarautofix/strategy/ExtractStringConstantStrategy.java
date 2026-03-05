@@ -1,13 +1,12 @@
 package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.github.javaparser.ast.Modifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -25,6 +24,7 @@ public class ExtractStringConstantStrategy implements FixStrategy {
 
         try {
 
+            // Find string literal at given line
             Optional<StringLiteralExpr> literalOpt =
                     cu.findAll(StringLiteralExpr.class).stream()
                             .filter(l -> l.getBegin().isPresent()
@@ -38,44 +38,49 @@ public class ExtractStringConstantStrategy implements FixStrategy {
             StringLiteralExpr literal = literalOpt.get();
             String value = literal.getValue();
 
-            String generatedName = value
+            // Generate constant name
+            String constantName = value
                     .toUpperCase()
                     .replaceAll("[^A-Z0-9]", "_");
 
-            if (generatedName.isBlank()) {
-                generatedName = "EXTRACTED_CONSTANT";
+            if (constantName.isBlank()) {
+                constantName = "EXTRACTED_CONSTANT";
             }
 
-            final String constantName = generatedName;
-
-            // Find first class only
+            // Find first class in file
             Optional<ClassOrInterfaceDeclaration> classOpt =
                     cu.findFirst(ClassOrInterfaceDeclaration.class);
 
             if (classOpt.isEmpty()) {
-                return false; // Not a class file
+                return false;
             }
 
             ClassOrInterfaceDeclaration clazz = classOpt.get();
 
-            // Avoid duplicate constant creation
-            boolean alreadyExists = clazz.getFields().stream()
-                    .anyMatch(f -> f.getVariable(0).getNameAsString()
-                            .equals(constantName));
+            // Check if constant already exists (NO STREAMS → SAFE)
+            boolean exists = false;
 
-            if (alreadyExists) {
-                literal.replace(new NameExpr(constantName));
-                return true;
+            for (FieldDeclaration field : clazz.getFields()) {
+                if (!field.getVariables().isEmpty()) {
+                    String fieldName = field.getVariable(0).getNameAsString();
+                    if (fieldName.equals(constantName)) {
+                        exists = true;
+                        break;
+                    }
+                }
             }
 
-            FieldDeclaration field = clazz.addFieldWithInitializer(
-                    "String",
-                    constantName,
-                    new StringLiteralExpr(value),
-                    Modifier.Keyword.PRIVATE,
-                    Modifier.Keyword.STATIC,
-                    Modifier.Keyword.FINAL
-            );
+            // Add constant if not present
+            if (!exists) {
+                clazz.addFieldWithInitializer(
+                        "String",
+                        constantName,
+                        new StringLiteralExpr(value),
+                        Modifier.Keyword.PRIVATE,
+                        Modifier.Keyword.STATIC,
+                        Modifier.Keyword.FINAL
+                );
+            }
 
             // Replace literal usage
             literal.replace(new NameExpr(constantName));

@@ -1,12 +1,11 @@
 package com.company.codequality.sonarautofix.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.*;
-import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -15,21 +14,30 @@ public class ProjectUploadService {
 
     private static final String WORKSPACE = "C:/sonar-workspace/";
 
+    // ================= Ensure workspace exists =================
+    private void ensureWorkspace() throws IOException {
+        Files.createDirectories(Paths.get(WORKSPACE));
+    }
 
-    // ------------------ ZIP Upload ------------------
-
-    //  ZIP Upload
-
+    // ================= ZIP Upload =================
     public String handleZipUpload(MultipartFile file) {
         try {
+            ensureWorkspace();
+
             String projectDir = WORKSPACE + System.currentTimeMillis();
-            Files.createDirectories(Paths.get(projectDir));
+            Path projectPath = Paths.get(projectDir);
+            Files.createDirectories(projectPath);
 
             try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
                 ZipEntry entry;
 
                 while ((entry = zis.getNextEntry()) != null) {
-                    Path newFile = Paths.get(projectDir, entry.getName());
+                    Path newFile = projectPath.resolve(entry.getName()).normalize();
+
+                    // Prevent ZIP Slip attack
+                    if (!newFile.startsWith(projectPath)) {
+                        throw new IOException("Invalid ZIP entry: " + entry.getName());
+                    }
 
                     if (entry.isDirectory()) {
                         Files.createDirectories(newFile);
@@ -53,21 +61,28 @@ public class ProjectUploadService {
         }
     }
 
-
-    // ------------------ GitHub Clone ------------------
-
-    //  GitHub Clone
-
+    // ================= GitHub Clone =================
     public String cloneGithub(String repoUrl) {
         try {
+            ensureWorkspace();
+
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
             ProcessBuilder builder = new ProcessBuilder("git", "clone", repoUrl, projectDir);
-            Process process = builder.start();
-            process.waitFor();
+            builder.redirectErrorStream(true);
 
-            if (process.exitValue() != 0) {
-                throw new RuntimeException("Git clone failed, exit code: " + process.exitValue());
+            Process process = builder.start();
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()))) {
+                while (reader.readLine() != null) {
+                    // optional: log output
+                }
+            }
+
+            int exit = process.waitFor();
+            if (exit != 0) {
+                throw new RuntimeException("Git clone failed. Exit code: " + exit);
             }
 
             return projectDir;
@@ -77,11 +92,7 @@ public class ProjectUploadService {
         }
     }
 
-
-    // ------------------ Local Directory ------------------
-
-    //  Local Directory
-
+    // ================= Local Directory Copy =================
     public String useLocalDirectory(String localPath) {
         Path src = Paths.get(localPath);
 
@@ -89,16 +100,19 @@ public class ProjectUploadService {
             throw new RuntimeException("Invalid local directory");
         }
 
-        String projectDir = WORKSPACE + System.currentTimeMillis();
-        Path dest = Paths.get(projectDir);
-
         try {
+            ensureWorkspace();
+
+            String projectDir = WORKSPACE + System.currentTimeMillis();
+            Path dest = Paths.get(projectDir);
+
             Files.walk(src).forEach(source -> {
                 try {
                     Path target = dest.resolve(src.relativize(source));
                     if (Files.isDirectory(source)) {
                         Files.createDirectories(target);
                     } else {
+                        Files.createDirectories(target.getParent());
                         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     }
                 } catch (IOException e) {
@@ -107,49 +121,49 @@ public class ProjectUploadService {
             });
 
             return projectDir;
+
         } catch (IOException e) {
             throw new RuntimeException("Local directory copy failed: " + e.getMessage(), e);
         }
     }
 
-
-    // ------------------ Copy Project for Fixing ------------------
+    // ================= Copy Project for Fixing =================
     public String copyProject(String originalPath) throws IOException {
-
         Path sourcePath = Paths.get(originalPath);
 
-        // Determine fixed path safely (avoid _fixed duplication)
-        String fixedPathStr = originalPath.endsWith("_fixed") ? originalPath : originalPath + "_fixed";
+        String fixedPathStr = originalPath.endsWith("_fixed")
+                ? originalPath
+                : originalPath + "_fixed";
+
         Path fixedPath = Paths.get(fixedPathStr);
 
-        // Delete old fixed folder if exists
         if (Files.exists(fixedPath)) {
             deleteDirectory(fixedPath);
         }
 
-        // Copy project recursively
         Files.walk(sourcePath).forEach(source -> {
             try {
                 Path target = fixedPath.resolve(sourcePath.relativize(source));
                 if (Files.isDirectory(source)) {
                     Files.createDirectories(target);
                 } else {
+                    Files.createDirectories(target.getParent());
                     Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                 }
             } catch (IOException e) {
-                throw new RuntimeException("Failed to copy file: " + source, e);
+                throw new RuntimeException("Failed to copy: " + source, e);
             }
         });
 
         return fixedPath.toString();
     }
 
-    // ------------------ Helper: Delete directory recursively ------------------
+    // ================= Delete Directory =================
     private void deleteDirectory(Path path) throws IOException {
         if (!Files.exists(path)) return;
 
         Files.walk(path)
-                .sorted((a, b) -> b.compareTo(a)) // delete children first
+                .sorted(Comparator.reverseOrder())
                 .forEach(p -> {
                     try {
                         Files.delete(p);
@@ -158,11 +172,9 @@ public class ProjectUploadService {
                     }
                 });
     }
-    
-    //METADATA WRITER
 
+    // ================= Store Project Key =================
     public void registerProjectKey(String projectDir, String projectKey) {
-
         try {
             Path metadata = Paths.get(projectDir, ".project-key");
             Files.writeString(metadata, projectKey);
@@ -170,8 +182,4 @@ public class ProjectUploadService {
             throw new RuntimeException("Failed to store project key", e);
         }
     }
-    
 }
-
-
-
