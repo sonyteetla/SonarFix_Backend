@@ -2,7 +2,6 @@ package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;

@@ -174,7 +174,7 @@ public class SonarProfileSetupService {
             activateRules(profileKey);   // ALWAYS ensure rules
             setAsDefault();
 
-            System.out.println("Profile ensured with 14 rules.");
+            System.out.println("Profile ensured with 25 rules.");
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to setup Sonar profile", e);

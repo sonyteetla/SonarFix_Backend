@@ -1,9 +1,12 @@
 package com.company.codequality.sonarautofix.controller;
 
+import com.company.codequality.sonarautofix.model.FixExecutionReport;
 import com.company.codequality.sonarautofix.model.ScanTask;
+import java.util.List;
 import com.company.codequality.sonarautofix.service.ScanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Map;
 
@@ -18,113 +21,85 @@ public class ScanController {
         this.scanService = scanService;
     }
 
-    // =====================================
-    // START NEW PROJECT SCAN
-    // =====================================
+    // ================= START NEW SCAN =================
     @PostMapping("/start")
-    public ResponseEntity<?> startNewScan(
-            @RequestParam("projectPath") String projectPath) {
+    public ResponseEntity<?> startNewScan(@RequestParam("projectPath") String projectPath) {
 
         String scanId = scanService.startNewScan(projectPath);
         ScanTask task = scanService.getScanTask(scanId);
 
-        if (task == null) {
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Failed to create scan task"));
-        }
-
-        return ResponseEntity.ok(Map.of(
-                "scanId", scanId,
-                "projectKey", task.getProjectKey(),
-                "status", task.getStatus()
-        ));
+        return ResponseEntity.ok(
+                Map.of(
+                        "scanId", scanId,
+                        "projectKey", task.getProjectKey(),
+                        "status", task.getStatus()
+                )
+        );
     }
 
-    // =====================================
-    // RE-SCAN EXISTING PROJECT
-    // =====================================
+    // ================= RE-SCAN =================
     @PostMapping("/rescan")
     public ResponseEntity<?> reScan(
             @RequestParam("projectPath") String projectPath,
             @RequestParam("projectKey") String projectKey) {
 
         String scanId = scanService.reScan(projectPath, projectKey);
-        ScanTask task = scanService.getScanTask(scanId);
 
-        if (task == null) {
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Failed to create rescan task"));
-        }
-
-        return ResponseEntity.ok(Map.of(
-                "scanId", scanId,
-                "projectKey", task.getProjectKey(),
-                "status", task.getStatus()
-        ));
+        return ResponseEntity.ok(
+                Map.of(
+                        "scanId", scanId,
+                        "projectKey", projectKey,
+                        "status", "QUEUED"
+                )
+        );
     }
 
-    // =====================================
-    // CHECK SCAN STATUS
-    // =====================================
+    // ================= STATUS =================
     @GetMapping("/status/{scanId}")
-    public ResponseEntity<?> getStatus(
-            @PathVariable("scanId") String scanId) {
+    public ResponseEntity<?> getStatus(@PathVariable String scanId) {
 
-        ScanTask task = scanService.getScanTask(scanId);
+        String status = scanService.getStatus(scanId);
 
-        if (task == null) {
-            return ResponseEntity.notFound()
-                    .build();
+        if ("NOT_FOUND".equals(status)) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(Map.of(
-                "scanId", scanId,
-                "projectKey", task.getProjectKey(),
-                "status", task.getStatus()
-        ));
+        return ResponseEntity.ok(
+                Map.of(
+                        "scanId", scanId,
+                        "status", status
+                )
+        );
     }
 
-    // =====================================
-    // GET FINAL RESULT (WHEN COMPLETED)
-    // =====================================
+    // ================= RESULT =================
     @GetMapping("/result/{scanId}")
-    public ResponseEntity<?> getResult(
-            @PathVariable("scanId") String scanId) {
+    public ResponseEntity<?> getResult(@PathVariable String scanId) {
+        return ResponseEntity.ok(scanService.getResult(scanId));
+    }
+
+    // ================= BUILD LOG =================
+    @GetMapping("/build-log/{scanId}")
+    public ResponseEntity<?> getBuildLog(@PathVariable String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
-
         if (task == null) {
             return ResponseEntity.notFound().build();
         }
 
-        if (!"COMPLETED".equals(task.getStatus())) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Scan not completed yet"));
-        }
-
-        return ResponseEntity.ok(
-                scanService.getResult(scanId)
-        );
+        return ResponseEntity.ok(task.getBuildLog());
     }
-
-    // =====================================
-    // GET BUILD LOG
-    // =====================================
-    @GetMapping("/build-log/{scanId}")
-    public ResponseEntity<?> getBuildLog(
+    
+    @GetMapping("/scan/{scanId}/fix-report")
+    public List<FixExecutionReport> getFixReport(
             @PathVariable String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
 
         if (task == null) {
-            return ResponseEntity.notFound().build();
+            throw new RuntimeException("Scan not found");
         }
 
-        return ResponseEntity.ok(Map.of(
-                "scanId", scanId,
-                "projectKey", task.getProjectKey(),
-                "status", task.getStatus(),
-                "buildLog", task.getBuildLog()
-        ));
+        return task.getFixReports();
     }
 }

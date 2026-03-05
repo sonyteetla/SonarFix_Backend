@@ -18,12 +18,12 @@ public class SonarAutofixApplication {
         SpringApplication.run(SonarAutofixApplication.class, args);
     }
 
-    @PostConstruct
+   /* @PostConstruct
     public void init() {
         try {
             setupService.setupIfNotExists();
         } catch (Exception e) {
             System.out.println("Sonar setup failed: " + e.getMessage());
         }
-    }
+    }*/
 }

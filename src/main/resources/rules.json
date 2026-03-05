@@ -185,16 +185,16 @@
       "autofixSupported": true,
       "fixType": "REMOVE_DEAD_ASSIGNMENT"
     },
-    {
-      "ruleId": "java:S1905",
-      "title": "Redundant Casts Should Be Removed",
-      "description": "Remove unnecessary type casts that do not affect behavior.",
-      "severity": "MINOR",
-      "category": "CODE_SMELL",
-      "enabled": true,
-      "autofixSupported": true,
-      "fixType": "REMOVE_REDUNDANT_CAST"
-    },
+	{
+	  "ruleId": "java:S1125",
+	  "title": "Boolean literals should not be redundant",
+	  "description": "Remove redundant boolean literal comparisons such as '== true', '== false', '!= true', or '!= false' and simplify the expression.",
+	  "severity": "MINOR",
+	  "category": "CODE_SMELL",
+	  "enabled": true,
+	  "autofixSupported": true,
+	  "fixType": "REMOVE_REDUNDANT_BOOLEAN"
+	},
     {
       "ruleId": "java:S1698",
       "title": "String Comparison Should Use equals()",

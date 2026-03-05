@@ -1,5 +1,6 @@
 package com.company.codequality.sonarautofix.model;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class ScanTask {
@@ -9,9 +10,9 @@ public class ScanTask {
     private String status;
     private String result;
     private String projectKey;
-    private java.time.LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
-    private List<MappedIssue> mappedIssues;
+    private List<MappedIssue> mappedIssues = new ArrayList<>();
 
     // Suggestions
     private List<FixSuggestion> suggestions = new ArrayList<>();
@@ -19,24 +20,21 @@ public class ScanTask {
     // Build Log
     private String buildLog;
 
-    // Execution Report
+    // Execution Summary (existing)
     private Map<String, Integer> fixExecutionReport = new HashMap<>();
     private int totalFixesApplied;
 
-    // Default constructor
+    // 🔥 NEW: Detailed Fix Reports (Before / After)
+    private List<FixExecutionReport> fixReports = new ArrayList<>();
+
     public ScanTask() {
-        this.createdAt = java.time.LocalDateTime.now();
     }
 
     public ScanTask(String scanId, String projectPath) {
         this.scanId = scanId;
         this.projectPath = projectPath;
         this.status = "QUEUED";
-        this.createdAt = java.time.LocalDateTime.now();
-    }
-
-    public java.time.LocalDateTime getCreatedAt() {
-        return createdAt;
+        this.createdAt = LocalDateTime.now();
     }
 
     // ================= GETTERS =================
@@ -46,38 +44,49 @@ public class ScanTask {
     public String getStatus() { return status; }
     public String getResult() { return result; }
     public String getProjectKey() { return projectKey; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
     public List<MappedIssue> getMappedIssues() { return mappedIssues; }
     public List<FixSuggestion> getSuggestions() { return suggestions; }
     public String getBuildLog() { return buildLog; }
     public Map<String, Integer> getFixExecutionReport() { return fixExecutionReport; }
     public int getTotalFixesApplied() { return totalFixesApplied; }
+    public List<FixExecutionReport> getFixReports() { return fixReports; }
 
     // ================= SETTERS =================
 
     public void setStatus(String status) { this.status = status; }
     public void setResult(String result) { this.result = result; }
     public void setProjectKey(String projectKey) { this.projectKey = projectKey; }
-    public void setMappedIssues(List<MappedIssue> mappedIssues) { this.mappedIssues = mappedIssues; }
+
+    public void setMappedIssues(List<MappedIssue> mappedIssues) {
+        this.mappedIssues = mappedIssues != null ? mappedIssues : new ArrayList<>();
+    }
+
     public void setBuildLog(String buildLog) { this.buildLog = buildLog; }
 
     public void setFixExecutionReport(Map<String, Integer> report) {
-        this.fixExecutionReport = (report == null) ? new HashMap<>() : report;
+        this.fixExecutionReport = report != null ? report : new HashMap<>();
     }
 
     public void setTotalFixesApplied(int total) {
         this.totalFixesApplied = total;
     }
 
-    // ================= SUGGESTIONS =================
+    public void setFixReports(List<FixExecutionReport> reports) {
+        this.fixReports = reports != null ? reports : new ArrayList<>();
+    }
+
+    // ================= HELPERS =================
 
     public void addSuggestion(FixSuggestion suggestion) {
-        if (this.suggestions == null) {
-            this.suggestions = new ArrayList<>();
-        }
         this.suggestions.add(suggestion);
     }
 
+    public void addFixReport(FixExecutionReport report) {
+        this.fixReports.add(report);
+    }
+
     public void setSuggestions(List<FixSuggestion> suggestions) {
-        this.suggestions = (suggestions == null) ? new ArrayList<>() : suggestions;
+        this.suggestions = suggestions != null ? suggestions : new ArrayList<>();
     }
 }
