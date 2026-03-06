@@ -29,7 +29,6 @@ public class RuleEngineService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    // Cache rule metadata (avoid repeated API calls)
     private final Map<String, RuleDescriptionData> ruleCache =
             new ConcurrentHashMap<>();
 
@@ -40,8 +39,6 @@ public class RuleEngineService {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
-
-    // ================= ENRICH ISSUES =================
 
     public void enrichIssues(List<Issue> issues) {
 
@@ -80,8 +77,6 @@ public class RuleEngineService {
         }
     }
 
-    // ================= FETCH RULE METADATA =================
-
     private void fetchMissingRuleData(Set<String> ruleKeys) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -97,14 +92,29 @@ public class RuleEngineService {
                 String url = sonarUrl + "/api/rules/show?key=" + ruleKey;
 
                 ResponseEntity<String> response =
-                        restTemplate.exchange(
-                                url,
-                                HttpMethod.GET,
-                                entity,
-                                String.class
-                        );
+                        restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-                JsonNode root = objectMapper.readTree(response.getBody());
+                String body = response.getBody();
+
+                // ✅ SAFE JSON CHECK
+                if (body == null || body.trim().startsWith("<")) {
+
+                    System.out.println("⚠ Sonar returned HTML instead of JSON for rule: " + ruleKey);
+
+                    ruleCache.put(
+                            ruleKey,
+                            new RuleDescriptionData(
+                                    Collections.singletonList(
+                                            new ContentBlock("paragraph",
+                                                    "Description unavailable")
+                                    )
+                            )
+                    );
+
+                    continue;
+                }
+
+                JsonNode root = objectMapper.readTree(body);
                 JsonNode ruleNode = root.path("rule");
 
                 List<ContentBlock> whyBlocks = new ArrayList<>();
@@ -114,8 +124,7 @@ public class RuleEngineService {
                     for (JsonNode section :
                             ruleNode.get("descriptionSections")) {
 
-                        String html =
-                                section.path("content").asText();
+                        String html = section.path("content").asText();
 
                         if (html != null && !html.isBlank()) {
                             whyBlocks.addAll(parseHtmlToBlocks(html));
@@ -123,10 +132,8 @@ public class RuleEngineService {
                     }
                 }
 
-                ruleCache.put(
-                        ruleKey,
-                        new RuleDescriptionData(whyBlocks)
-                );
+                ruleCache.put(ruleKey,
+                        new RuleDescriptionData(whyBlocks));
 
             } catch (Exception e) {
 
@@ -145,8 +152,6 @@ public class RuleEngineService {
         }
     }
 
-    // ================= HTML → STRUCTURED BLOCKS =================
-
     private List<ContentBlock> parseHtmlToBlocks(String html) {
 
         List<ContentBlock> blocks = new ArrayList<>();
@@ -162,26 +167,20 @@ public class RuleEngineService {
                 case "h1":
                 case "h2":
                 case "h3":
-                    blocks.add(new ContentBlock(
-                            "heading",
-                            el.text()
-                    ));
+                    blocks.add(new ContentBlock("heading", el.text()));
                     break;
 
                 case "p":
-                    blocks.add(new ContentBlock(
-                            "paragraph",
-                            el.text()
-                    ));
+                    blocks.add(new ContentBlock("paragraph", el.text()));
                     break;
 
                 case "ul":
                     blocks.add(new ContentBlock(
                             "unordered_list",
                             el.select("li")
-                              .stream()
-                              .map(Element::text)
-                              .collect(Collectors.toList())
+                                    .stream()
+                                    .map(Element::text)
+                                    .collect(Collectors.toList())
                     ));
                     break;
 
@@ -189,16 +188,15 @@ public class RuleEngineService {
                     blocks.add(new ContentBlock(
                             "ordered_list",
                             el.select("li")
-                              .stream()
-                              .map(Element::text)
-                              .collect(Collectors.toList())
+                                    .stream()
+                                    .map(Element::text)
+                                    .collect(Collectors.toList())
                     ));
                     break;
 
                 case "pre":
 
-                    String diffType =
-                            el.attr("data-diff-type");
+                    String diffType = el.attr("data-diff-type");
 
                     if ("noncompliant".equals(diffType)) {
 

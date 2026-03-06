@@ -23,6 +23,11 @@ public class SimplifyReturnStrategy implements FixStrategy {
 
         for (IfStmt ifStmt : cu.findAll(IfStmt.class)) {
 
+            if (line != -1 && ifStmt.getBegin().isPresent()
+                    && ifStmt.getBegin().get().line != line) {
+                continue;
+            }
+
             if (!ifStmt.getElseStmt().isPresent())
                 continue;
 
@@ -42,14 +47,13 @@ public class SimplifyReturnStrategy implements FixStrategy {
             String thenExpr = thenReturn.getExpression().get().toString();
             String elseExpr = elseReturn.getExpression().get().toString();
 
-            // Case 1: if(cond) return true; else return false;
             if ("true".equals(thenExpr) && "false".equals(elseExpr)) {
+
                 ifStmt.replace(new ReturnStmt(ifStmt.getCondition().clone()));
                 fixed = true;
-            }
 
-            // Case 2: if(cond) return false; else return true;
-            else if ("false".equals(thenExpr) && "true".equals(elseExpr)) {
+            } else if ("false".equals(thenExpr) && "true".equals(elseExpr)) {
+
                 ifStmt.replace(
                         new ReturnStmt(
                                 new UnaryExpr(
@@ -58,6 +62,7 @@ public class SimplifyReturnStrategy implements FixStrategy {
                                 )
                         )
                 );
+
                 fixed = true;
             }
         }
@@ -67,18 +72,14 @@ public class SimplifyReturnStrategy implements FixStrategy {
 
     private Optional<ReturnStmt> extractReturn(Statement stmt) {
 
-        // Direct return (no braces)
-        if (stmt instanceof ReturnStmt) {
+        if (stmt instanceof ReturnStmt)
             return Optional.of((ReturnStmt) stmt);
-        }
 
-        // Block { return ...; }
-        if (stmt instanceof BlockStmt) {
-            BlockStmt block = (BlockStmt) stmt;
-            if (block.getStatements().size() == 1
-                    && block.getStatement(0) instanceof ReturnStmt) {
-                return Optional.of((ReturnStmt) block.getStatement(0));
-            }
+        if (stmt instanceof BlockStmt block
+                && block.getStatements().size() == 1
+                && block.getStatement(0) instanceof ReturnStmt) {
+
+            return Optional.of((ReturnStmt) block.getStatement(0));
         }
 
         return Optional.empty();

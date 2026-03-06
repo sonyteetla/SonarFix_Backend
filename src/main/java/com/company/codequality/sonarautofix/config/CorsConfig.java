@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.*;
 import org.springframework.web.filter.CorsFilter;
 
-<<<<<<< HEAD
 import java.util.List;
 
 @Configuration
@@ -37,19 +36,3 @@ public class CorsConfig {
         return new CorsFilter(source);
     }
 }
-=======
-@Configuration
-public class CorsConfig {
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("*");
-            }
-        };
-    }
-}
->>>>>>> 81a073899efb9a79f59a4116a97d354e09fba9a0

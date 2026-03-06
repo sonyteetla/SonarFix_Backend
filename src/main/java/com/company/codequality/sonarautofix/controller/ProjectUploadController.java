@@ -19,16 +19,9 @@ public class ProjectUploadController {
         this.uploadService = uploadService;
     }
 
-    // ZIP Upload
+    // ================= ZIP Upload =================
+
     @PostMapping(value = "/upload-zip", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-
-    public ResponseEntity<?> uploadZip(@RequestParam("file") MultipartFile file) {
-
-        String path = uploadService.handleZipUpload(file);
-
-        return ResponseEntity.ok(
-                Map.of("projectPath", path)
-
     public ResponseEntity<Map<String, String>> uploadZip(
             @RequestParam("file") MultipartFile file) {
 
@@ -39,20 +32,12 @@ public class ProjectUploadController {
                         "projectPath", projectDir,
                         "status", "UPLOADED"
                 )
-
         );
     }
 
-    // GitHub Clone
+    // ================= GitHub Clone =================
+
     @PostMapping("/upload-github")
-
-    public ResponseEntity<?> uploadGithub(@RequestParam("repoUrl") String repoUrl) {
-
-        String path = uploadService.cloneGithub(repoUrl);
-
-        return ResponseEntity.ok(
-                Map.of("projectPath", path)
-
     public ResponseEntity<Map<String, String>> uploadGithub(
             @RequestParam("repoUrl") String repoUrl) {
 
@@ -63,20 +48,12 @@ public class ProjectUploadController {
                         "projectPath", projectDir,
                         "status", "CLONED"
                 )
-
         );
     }
 
-    // Local Directory
+    // ================= Local Directory =================
+
     @PostMapping("/upload-local")
-
-    public ResponseEntity<?> uploadLocal(@RequestParam("localPath") String localPath) {
-
-        String path = uploadService.useLocalDirectory(localPath);
-
-        return ResponseEntity.ok(
-                Map.of("projectPath", path)
-
     public ResponseEntity<Map<String, String>> uploadLocal(
             @RequestParam("localPath") String localPath) {
 
@@ -87,7 +64,6 @@ public class ProjectUploadController {
                         "projectPath", projectDir,
                         "status", "LOADED"
                 )
-
         );
     }
 }

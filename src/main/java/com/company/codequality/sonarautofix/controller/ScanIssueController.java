@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/scan")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class ScanIssueController {
 
     private final ScanIssueService scanIssueService;
@@ -17,15 +17,19 @@ public class ScanIssueController {
         this.scanIssueService = scanIssueService;
     }
 
+    // ================= PAGINATED ISSUES =================
+
     @GetMapping("/{projectKey}/issues")
     public IssueResponse getIssues(
-            @PathVariable("projectKey") String projectKey,
-            @RequestParam(value = "softwareQualities", required = false) List<String> softwareQualities,
-            @RequestParam(value = "severities", required = false) List<String> severities,
-            @RequestParam(value = "rules", required = false) List<String> rules,
-            @RequestParam(value = "autoFixOnly", required = false) Boolean autoFixOnly,
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+            @PathVariable String projectKey,
+            @RequestParam(required = false) List<String> softwareQualities,
+            @RequestParam(required = false) List<String> severities,
+            @RequestParam(required = false) List<String> rules,
+            @RequestParam(required = false) Boolean autoFixOnly,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+
         return scanIssueService.fetchIssues(
                 projectKey,
                 softwareQualities,
@@ -33,16 +37,20 @@ public class ScanIssueController {
                 rules,
                 autoFixOnly,
                 page,
-                pageSize);
+                pageSize
+        );
     }
-    
+
+    // ================= ALL ISSUES (FOR VIEWER) =================
+
     @GetMapping("/{projectKey}/issues/all")
     public IssueResponse getAllIssues(
-            @PathVariable("projectKey") String projectKey,
-            @RequestParam(value = "softwareQualities", required = false) List<String> softwareQualities,
-            @RequestParam(value = "severities", required = false) List<String> severities,
-            @RequestParam(value = "rules", required = false) List<String> rules,
-            @RequestParam(value = "autoFixOnly", required = false) Boolean autoFixOnly) {
+            @PathVariable String projectKey,
+            @RequestParam(required = false) List<String> softwareQualities,
+            @RequestParam(required = false) List<String> severities,
+            @RequestParam(required = false) List<String> rules,
+            @RequestParam(required = false) Boolean autoFixOnly
+    ) {
 
         return scanIssueService.fetchAllIssuesForViewer(
                 projectKey,

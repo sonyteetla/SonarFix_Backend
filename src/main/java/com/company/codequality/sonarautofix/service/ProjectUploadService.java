@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ProjectUploadService {
 
-    private static final String WORKSPACE = "C:/sonar-workspace/";
+    private static final String WORKSPACE = "D:/sonar-workspace/";
 
     // ================= Ensure workspace exists =================
     private void ensureWorkspace() throws IOException {
@@ -29,9 +29,11 @@ public class ProjectUploadService {
             Files.createDirectories(projectPath);
 
             try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
+
                 ZipEntry entry;
 
                 while ((entry = zis.getNextEntry()) != null) {
+
                     Path newFile = projectPath.resolve(entry.getName()).normalize();
 
                     // Prevent ZIP Slip attack
@@ -42,10 +44,14 @@ public class ProjectUploadService {
                     if (entry.isDirectory()) {
                         Files.createDirectories(newFile);
                     } else {
+
                         Files.createDirectories(newFile.getParent());
+
                         try (OutputStream fos = Files.newOutputStream(newFile)) {
+
                             byte[] buffer = new byte[8192];
                             int len;
+
                             while ((len = zis.read(buffer)) > 0) {
                                 fos.write(buffer, 0, len);
                             }
@@ -63,30 +69,36 @@ public class ProjectUploadService {
 
     // ================= GitHub Clone =================
     public String cloneGithub(String repoUrl) {
+
         try {
+
             ensureWorkspace();
 
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
+            ProcessBuilder builder =
+                    new ProcessBuilder(
+                            "C:\\Program Files\\Git\\bin\\git.exe",
+                            "clone",
+                            repoUrl,
+                            projectDir
+                    );
 
-            ProcessBuilder builder = new ProcessBuilder("git", "clone", repoUrl, projectDir);
             builder.redirectErrorStream(true);
 
-            ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\Git\\bin\\git.exe", "clone", repoUrl, projectDir);
-            Process process = builder.start();
-            process.waitFor();
-
-
             Process process = builder.start();
 
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader reader =
+                         new BufferedReader(
+                                 new InputStreamReader(process.getInputStream()))) {
+
                 while (reader.readLine() != null) {
-                    // optional: log output
+                    // optional logging
                 }
             }
 
             int exit = process.waitFor();
+
             if (exit != 0) {
                 throw new RuntimeException("Git clone failed. Exit code: " + exit);
             }
@@ -100,6 +112,7 @@ public class ProjectUploadService {
 
     // ================= Local Directory Copy =================
     public String useLocalDirectory(String localPath) {
+
         Path src = Paths.get(localPath);
 
         if (!Files.exists(src) || !Files.isDirectory(src)) {
@@ -107,20 +120,31 @@ public class ProjectUploadService {
         }
 
         try {
+
             ensureWorkspace();
 
             String projectDir = WORKSPACE + System.currentTimeMillis();
             Path dest = Paths.get(projectDir);
 
             Files.walk(src).forEach(source -> {
+
                 try {
+
                     Path target = dest.resolve(src.relativize(source));
+
                     if (Files.isDirectory(source)) {
                         Files.createDirectories(target);
                     } else {
+
                         Files.createDirectories(target.getParent());
-                        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+
+                        Files.copy(
+                                source,
+                                target,
+                                StandardCopyOption.REPLACE_EXISTING
+                        );
                     }
+
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -135,11 +159,13 @@ public class ProjectUploadService {
 
     // ================= Copy Project for Fixing =================
     public String copyProject(String originalPath) throws IOException {
+
         Path sourcePath = Paths.get(originalPath);
 
-        String fixedPathStr = originalPath.endsWith("_fixed")
-                ? originalPath
-                : originalPath + "_fixed";
+        String fixedPathStr =
+                originalPath.endsWith("_fixed")
+                        ? originalPath
+                        : originalPath + "_fixed";
 
         Path fixedPath = Paths.get(fixedPathStr);
 
@@ -148,14 +174,24 @@ public class ProjectUploadService {
         }
 
         Files.walk(sourcePath).forEach(source -> {
+
             try {
+
                 Path target = fixedPath.resolve(sourcePath.relativize(source));
+
                 if (Files.isDirectory(source)) {
                     Files.createDirectories(target);
                 } else {
+
                     Files.createDirectories(target.getParent());
-                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+
+                    Files.copy(
+                            source,
+                            target,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
                 }
+
             } catch (IOException e) {
                 throw new RuntimeException("Failed to copy: " + source, e);
             }
@@ -166,11 +202,13 @@ public class ProjectUploadService {
 
     // ================= Delete Directory =================
     private void deleteDirectory(Path path) throws IOException {
+
         if (!Files.exists(path)) return;
 
         Files.walk(path)
                 .sorted(Comparator.reverseOrder())
                 .forEach(p -> {
+
                     try {
                         Files.delete(p);
                     } catch (IOException e) {
@@ -181,17 +219,16 @@ public class ProjectUploadService {
 
     // ================= Store Project Key =================
     public void registerProjectKey(String projectDir, String projectKey) {
+
         try {
+
             Path metadata = Paths.get(projectDir, ".project-key");
+
             Files.writeString(metadata, projectKey);
+
         } catch (IOException e) {
+
             throw new RuntimeException("Failed to store project key", e);
         }
     }
-
 }
-
-    
-}
-
-

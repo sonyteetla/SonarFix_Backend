@@ -16,8 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class ScanRepository {
+
     private static final String STORAGE_PATH = "data/scans.json";
+
     private final Map<String, ScanTask> scanStore = new ConcurrentHashMap<>();
+
     private final ObjectMapper objectMapper;
 
     public ScanRepository() {
@@ -44,28 +47,60 @@ public class ScanRepository {
     }
 
     private synchronized void saveScans() {
+
         try {
+
             File file = new File(STORAGE_PATH);
+
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
+
             objectMapper.writeValue(file, scanStore);
+
         } catch (IOException e) {
+
             System.err.println("Failed to save scans: " + e.getMessage());
         }
     }
 
+    // ✅ SAFE LOADING IMPLEMENTATION
     private void loadScans() {
+
         try {
+
             File file = new File(STORAGE_PATH);
-            if (file.exists()) {
-                Map<String, ScanTask> loaded = objectMapper.readValue(file, new TypeReference<Map<String, ScanTask>>() {
-                });
-                scanStore.putAll(loaded);
-                System.out.println("Loaded " + scanStore.size() + " scans from " + STORAGE_PATH);
+
+            if (!file.exists()) {
+                return;
             }
-        } catch (IOException e) {
-            System.err.println("Failed to load scans: " + e.getMessage());
+
+            try {
+
+                Map<String, ScanTask> loaded =
+                        objectMapper.readValue(
+                                file,
+                                new TypeReference<Map<String, ScanTask>>() {}
+                        );
+
+                scanStore.putAll(loaded);
+
+                System.out.println(
+                        "Loaded " + scanStore.size() + " scans from " + STORAGE_PATH
+                );
+
+            } catch (Exception ex) {
+
+                System.out.println(
+                        "⚠ Invalid scans.json detected. Starting with empty scan list."
+                );
+            }
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Failed to load scans: " + e.getMessage()
+            );
         }
     }
 }

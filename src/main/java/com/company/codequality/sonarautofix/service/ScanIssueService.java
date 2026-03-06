@@ -33,8 +33,6 @@ public class ScanIssueService {
     }
 
 
-    // ================= MAIN ENTRY =================
-
 
     public IssueResponse fetchIssues(String projectKey,
                                      List<String> softwareQualities,
@@ -46,10 +44,6 @@ public class ScanIssueService {
 
         int safePageSize = Math.min(pageSize, 500);
 
-
-        String url = buildSonarUrl(projectKey, softwareQualities, severities, rules, page, safePageSize);
-        ResponseEntity<String> response = callSonar(url);
-
         String pagedUrl = buildSonarUrl(
                 projectKey,
                 softwareQualities,
@@ -59,65 +53,7 @@ public class ScanIssueService {
                 safePageSize
         );
 
-
-        IssueResponse paged = processResponse(response.getBody(), autoFixOnly, page, safePageSize);
-
-        // Fetch all for counts
-        List<Issue> allIssues = fetchAllIssues(projectKey, softwareQualities, severities, rules);
-        FilterCounts counts = buildFilterCounts(allIssues);
-
-        return IssueResponse.builder()
-                .totalElements(paged.getTotalElements())
-                .page(paged.getPage())
-                .pageSize(paged.getPageSize())
-                .totalPages(paged.getTotalPages())
-                .content(paged.getContent())
-                .filterCounts(counts)
-                .build();
-    }
-
-    // ================= BUILD SONAR URL =================
-
-    private String buildSonarUrl(String projectKey,
-                                 List<String> softwareQualities,
-                                 List<String> severities,
-                                 List<String> rules,
-                                 int page,
-                                 int pageSize) {
-
-        StringBuilder url = new StringBuilder();
-
-        url.append(sonarUrl)
-                .append("/api/issues/search?")
-                .append("componentKeys=").append(projectKey)
-                .append("&resolved=false")
-                .append("&p=").append(page)
-                .append("&ps=").append(pageSize);
-
-        if (severities != null && !severities.isEmpty()) {
-            url.append("&severities=").append(String.join(",", severities));
-        }
-
-        if (softwareQualities != null && !softwareQualities.isEmpty()) {
-            List<String> types = mapSoftwareQualityToTypes(softwareQualities);
-            if (!types.isEmpty()) {
-                url.append("&types=").append(String.join(",", types));
-            }
-        }
-
-        if (rules != null && !rules.isEmpty()) {
-            url.append("&rules=").append(String.join(",", rules));
-        }
-
-        return url.toString();
-    }
-
-    // ================= PROCESS RESPONSE =================
-
-    private IssueResponse processResponse(String body,
-                                          Boolean autoFixOnly,
-                                          int page,
-                                          int pageSize) {
+        ResponseEntity<String> pagedResponse = callSonar(pagedUrl);
 
         IssueResponse pagedResult =
                 processPagedResponse(pagedResponse.getBody(),
@@ -186,32 +122,16 @@ public class ScanIssueService {
                                                int page,
                                                int pageSize) {
 
-
         try {
+
             JsonNode root = objectMapper.readTree(body);
             JsonNode issuesNode = root.path("issues");
 
             long total = root.path("paging").path("total").asLong();
             int sonarPageSize = root.path("paging").path("pageSize").asInt();
 
-            List<Issue> issues = parseIssuesFromSonar(issuesNode);
-
-
-            // Apply AutoFix filter
-            if (Boolean.TRUE.equals(autoFixOnly)) {
-                issues = issues.stream()
-                        .filter(Issue::isAutoFixable)
-                        .collect(Collectors.toList());
-                total = issues.size();
-            }
-
-            // Group by file
-            Map<String, List<Issue>> grouped = issues.stream()
-                    .collect(Collectors.groupingBy(Issue::getFilePath));
-
-            List<FileIssueGroup> content = grouped.entrySet().stream()
-                    .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
+            List<Issue> parsedIssues =
+                    parseIssuesFromSonar(issuesNode, autoFixOnly);
 
             Map<String, List<Issue>> grouped =
                     parsedIssues.stream()
@@ -222,8 +142,8 @@ public class ScanIssueService {
                             .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
                             .collect(Collectors.toList());
 
-
-            int totalPages = (int) Math.ceil((double) total / sonarPageSize);
+            int totalPages =
+                    (int) Math.ceil((double) total / sonarPageSize);
 
             return IssueResponse.builder()
                     .totalElements(total)
@@ -238,16 +158,13 @@ public class ScanIssueService {
         }
     }
 
-
-    // ================= FETCH ALL ISSUES =================
-
     // FETCH ALL FOR COUNTS
 
-
-    public List<Issue> fetchAllIssues(String projectKey,
-                                      List<String> softwareQualities,
-                                      List<String> severities,
-                                      List<String> rules) {
+    private List<Issue> fetchAllIssuesForCounts(String projectKey,
+                                                List<String> softwareQualities,
+                                                List<String> severities,
+                                                List<String> rules,
+                                                Boolean autoFixOnly) {
 
         int page = 1;
         int pageSize = 500;
@@ -256,23 +173,35 @@ public class ScanIssueService {
         List<Issue> allIssues = new ArrayList<>();
 
         while (hasMore) {
-            String url = buildSonarUrl(projectKey, softwareQualities, severities, rules, page, pageSize);
+
+            String url = buildSonarUrl(
+                    projectKey,
+                    softwareQualities,
+                    severities,
+                    rules,
+                    page,
+                    pageSize
+            );
+
             ResponseEntity<String> response = callSonar(url);
 
+            JsonNode root;
             try {
-                JsonNode root = objectMapper.readTree(response.getBody());
-                JsonNode issuesNode = root.path("issues");
-
-                List<Issue> pageIssues = parseIssuesFromSonar(issuesNode);
-                allIssues.addAll(pageIssues);
-
-                int total = root.path("paging").path("total").asInt();
-                hasMore = page * pageSize < total;
-                page++;
-
+                root = objectMapper.readTree(response.getBody());
             } catch (Exception e) {
-                throw new RuntimeException("Error parsing Sonar response", e);
+                throw new RuntimeException("Parsing error", e);
             }
+
+            JsonNode issuesNode = root.path("issues");
+
+            List<Issue> pageIssues =
+                    parseIssuesFromSonar(issuesNode, autoFixOnly);
+
+            allIssues.addAll(pageIssues);
+
+            int total = root.path("paging").path("total").asInt();
+            hasMore = page * pageSize < total;
+            page++;
         }
 
         return allIssues;
@@ -291,30 +220,24 @@ public class ScanIssueService {
                 restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("SonarQube API error: " + response.getStatusCode());
+            throw new RuntimeException("SonarQube API returned error");
         }
 
         return response;
     }
 
-
-    // ================= PARSE ISSUES =================
-
-    private List<Issue> parseIssuesFromSonar(JsonNode issuesNode) {
-
     //  ISSUE PARSER
     private List<Issue> parseIssuesFromSonar(JsonNode issuesNode,
                                              Boolean autoFixOnly) {
 
-
-        List<Issue> issues = new ArrayList<>();
+        List<Issue> parsedIssues = new ArrayList<>();
 
         if (issuesNode.isArray()) {
             for (JsonNode node : issuesNode) {
 
                 String type = node.path("type").asText();
-                String fullComponent = node.path("component").asText();
 
+                String fullComponent = node.path("component").asText();
                 String filePath = fullComponent.contains(":")
                         ? fullComponent.substring(fullComponent.indexOf(":") + 1)
                         : fullComponent;
@@ -330,45 +253,9 @@ public class ScanIssueService {
                         .line(node.has("line") ? node.get("line").asInt() : null)
                         .build();
 
-                issues.add(issue);
+                parsedIssues.add(issue);
             }
         }
-
-
-        // Enrich rules
-        ruleEngineService.enrichIssues(issues);
-
-        // Strip HTML
-        issues.forEach(issue -> {
-            if (issue.getDescription() != null) {
-                issue.setDescription(stripHtml(issue.getDescription()));
-            }
-        });
-
-        return issues;
-    }
-
-    // ================= FILTER COUNTS =================
-
-    private FilterCounts buildFilterCounts(List<Issue> issues) {
-
-        Map<String, Long> severityCounts =
-                issues.stream().collect(Collectors.groupingBy(Issue::getSeverity, Collectors.counting()));
-
-        Map<String, Long> qualityCounts =
-                issues.stream().collect(Collectors.groupingBy(Issue::getSoftwareQuality, Collectors.counting()));
-
-        Map<String, Long> ruleCounts =
-                issues.stream().collect(Collectors.groupingBy(Issue::getRule, Collectors.counting()));
-
-        return new FilterCounts(severityCounts, qualityCounts, ruleCounts);
-    }
-
-    // ================= UTIL =================
-
-    private String stripHtml(String html) {
-        return Jsoup.parse(html == null ? "" : html).text().trim();
-    }
 
         
         // Enrich AFTER parsing 
@@ -384,16 +271,24 @@ public class ScanIssueService {
     }
 
 
-
     private List<String> mapSoftwareQualityToTypes(List<String> qualities) {
+
         List<String> types = new ArrayList<>();
-        for (String q : qualities) {
-            switch (q.toUpperCase()) {
-                case "SECURITY": types.add("VULNERABILITY"); break;
-                case "RELIABILITY": types.add("BUG"); break;
-                case "MAINTAINABILITY": types.add("CODE_SMELL"); break;
+
+        for (String quality : qualities) {
+            switch (quality.toUpperCase()) {
+                case "SECURITY":
+                    types.add("VULNERABILITY");
+                    break;
+                case "RELIABILITY":
+                    types.add("BUG");
+                    break;
+                case "MAINTAINABILITY":
+                    types.add("CODE_SMELL");
+                    break;
             }
         }
+
         return types;
     }
 
@@ -405,10 +300,6 @@ public class ScanIssueService {
             default: return "Unknown";
         }
     }
-
-
-    // ================= MAPPING =================
-
 
     private String buildSonarUrl(String projectKey,
                                  List<String> softwareQualities,
@@ -483,21 +374,15 @@ public class ScanIssueService {
         return allIssues;
     }
 
-
     //DTO MAPPING 
 
     public List<MappedIssue> toMappedIssues(List<Issue> issues) {
-
-        if (issues == null) return new ArrayList<>();
-        return issues.stream().map(this::toMappedIssue).collect(Collectors.toList());
-
         if (issues == null)
             return new ArrayList<>();
 
         return issues.stream()
                 .map(this::toMappedIssue)
                 .collect(Collectors.toList());
-
     }
 
     public MappedIssue toMappedIssue(Issue issue) {

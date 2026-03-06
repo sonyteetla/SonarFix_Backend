@@ -18,23 +18,14 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
     }
 
     @Override
-    public boolean apply(CompilationUnit cu, int line)  {
+    public boolean apply(CompilationUnit cu, int line) {
 
-        List<MethodCallExpr> calls = cu.findAll(MethodCallExpr.class);
+        for (MethodCallExpr call : cu.findAll(MethodCallExpr.class)) {
 
-        // First pass: exact line match
-        for (MethodCallExpr call : calls) {
-
-            if (!call.getBegin().isPresent()) continue;
-            if (call.getBegin().get().line != line) continue;
-
-            if (transformIfSystemCall(cu, call)) {
-                return true;
+            if (line != -1 && call.getBegin().isPresent()
+                    && call.getBegin().get().line != line) {
+                continue;
             }
-        }
-
-        //  Second pass: fallback structural match
-        for (MethodCallExpr call : calls) {
 
             if (transformIfSystemCall(cu, call)) {
                 return true;
@@ -44,95 +35,70 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
         return false;
     }
 
-    private boolean transformIfSystemCall(CompilationUnit cu,
-                                          MethodCallExpr call) {
+    private boolean transformIfSystemCall(CompilationUnit cu, MethodCallExpr call) {
 
-        if (!call.getScope().isPresent()) return false;
+        if (call.getScope().isEmpty()) return false;
 
-        // Already converted? Treat as success
-        if (call.getScope().get().toString().equals("log")) {
-            return true;
-        }
+        if (!(call.getScope().get() instanceof FieldAccessExpr fieldAccess))
+            return false;
 
-        if (!(call.getScope().get() instanceof FieldAccessExpr)) return false;
+        if (!(fieldAccess.getScope() instanceof NameExpr nameExpr))
+            return false;
 
-        FieldAccessExpr fieldAccess =
-                (FieldAccessExpr) call.getScope().get();
-
-        if (!(fieldAccess.getScope() instanceof NameExpr)) return false;
-
-        String rootName =
-                ((NameExpr) fieldAccess.getScope()).getNameAsString();
-
-        if (!"System".equals(rootName)) return false;
+        if (!nameExpr.getNameAsString().equals("System"))
+            return false;
 
         String stream = fieldAccess.getNameAsString();
         String method = call.getNameAsString();
 
-        if (!("print".equals(method)
-                || "println".equals(method)
-                || "printf".equals(method))) {
+        if (!(method.equals("print") || method.equals("println") || method.equals("printf")))
             return false;
-        }
 
-        String logLevel;
-
-        if ("out".equals(stream)) {
-            logLevel = "info";
-        } else if ("err".equals(stream)) {
-            logLevel = "error";
-        } else {
-            return false;
-        }
-
-        //  Handle printf conversion
-        if ("printf".equals(method)) {
-            handlePrintf(call);
-        }
-
-        //  Handle string concatenation
-        else if (!call.getArguments().isEmpty()) {
-            handleStringConcatenation(call);
-        }
-
-        //  Replace with log
-        call.setScope(new NameExpr("log"));
-        call.setName(logLevel);
+        String level = stream.equals("err") ? "error" : "info";
 
         LoggerUtil.ensureSlf4jLoggerExists(cu);
+
+        if (method.equals("printf")) {
+            handlePrintf(call);
+        } else if (!call.getArguments().isEmpty()) {
+
+            Expression arg = call.getArgument(0);
+
+            if (arg instanceof BinaryExpr) {
+                handleStringConcatenation(call);
+            } else {
+
+                // convert println(x) -> log.info("{}", x)
+                call.getArguments().clear();
+                call.addArgument(new StringLiteralExpr("{}"));
+                call.addArgument(arg.clone());
+            }
+        }
+
+        call.setScope(new NameExpr("log"));
+        call.setName(level);
 
         return true;
     }
 
-    // Converts printf formatting to {}
     private void handlePrintf(MethodCallExpr call) {
 
         if (call.getArguments().isEmpty()) return;
 
-        Expression firstArg = call.getArgument(0);
+        Expression first = call.getArgument(0);
 
-        if (firstArg instanceof StringLiteralExpr) {
+        if (first instanceof StringLiteralExpr literal) {
 
-            StringLiteralExpr literal =
-                    (StringLiteralExpr) firstArg;
-
-            String original = literal.getValue();
-
-            String converted = original.replaceAll(
-                    "%(\\d+\\$)?[-+# 0,(]*\\d*(\\.\\d+)?[a-zA-Z]",
-                    "{}"
-            );
+            String converted =
+                    literal.getValue().replaceAll("%[a-zA-Z]", "{}");
 
             literal.setString(converted);
         }
     }
 
-    // Converts concatenation to {}
     private void handleStringConcatenation(MethodCallExpr call) {
 
         Expression arg = call.getArgument(0);
-
-        if (!(arg instanceof BinaryExpr)) return;
 
         BinaryExpr binary = (BinaryExpr) arg;
 
@@ -140,34 +106,29 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
         flattenBinary(binary, parts);
 
         StringBuilder message = new StringBuilder();
-        List<Expression> newArgs = new ArrayList<>();
+        List<Expression> params = new ArrayList<>();
 
         for (Expression part : parts) {
 
-            if (part instanceof StringLiteralExpr) {
-                message.append(((StringLiteralExpr) part).getValue());
+            if (part instanceof StringLiteralExpr literal) {
+                message.append(literal.getValue());
             } else {
                 message.append("{}");
-                newArgs.add(part);
+                params.add(part);
             }
         }
 
         call.getArguments().clear();
         call.addArgument(new StringLiteralExpr(message.toString()));
 
-        for (Expression expr : newArgs) {
-            call.addArgument(expr);
-        }
+        params.forEach(call::addArgument);
     }
 
-    private void flattenBinary(Expression expr,
-                               List<Expression> parts) {
+    private void flattenBinary(Expression expr, List<Expression> parts) {
 
-        if (expr instanceof BinaryExpr
-                && ((BinaryExpr) expr).getOperator()
-                == BinaryExpr.Operator.PLUS) {
+        if (expr instanceof BinaryExpr binary
+                && binary.getOperator() == BinaryExpr.Operator.PLUS) {
 
-            BinaryExpr binary = (BinaryExpr) expr;
             flattenBinary(binary.getLeft(), parts);
             flattenBinary(binary.getRight(), parts);
 

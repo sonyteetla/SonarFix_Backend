@@ -16,8 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class ProjectRepository {
+
     private static final String STORAGE_PATH = "data/projects.json";
+
     private final Map<String, Project> projects = new ConcurrentHashMap<>();
+
     private final ObjectMapper objectMapper;
 
     public ProjectRepository() {
@@ -49,28 +52,60 @@ public class ProjectRepository {
     }
 
     private synchronized void saveProjects() {
+
         try {
+
             File file = new File(STORAGE_PATH);
+
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
+
             objectMapper.writeValue(file, projects);
+
         } catch (IOException e) {
+
             System.err.println("Failed to save projects: " + e.getMessage());
         }
     }
 
+    // ✅ SAFE LOADING IMPLEMENTATION
     private void loadProjects() {
+
         try {
+
             File file = new File(STORAGE_PATH);
-            if (file.exists()) {
-                Map<String, Project> loaded = objectMapper.readValue(file, new TypeReference<Map<String, Project>>() {
-                });
-                projects.putAll(loaded);
-                System.out.println("Loaded " + projects.size() + " projects from " + STORAGE_PATH);
+
+            if (!file.exists()) {
+                return;
             }
-        } catch (IOException e) {
-            System.err.println("Failed to load projects: " + e.getMessage());
+
+            try {
+
+                Map<String, Project> loaded =
+                        objectMapper.readValue(
+                                file,
+                                new TypeReference<Map<String, Project>>() {}
+                        );
+
+                projects.putAll(loaded);
+
+                System.out.println(
+                        "Loaded " + projects.size() + " projects from " + STORAGE_PATH
+                );
+
+            } catch (Exception ex) {
+
+                System.out.println(
+                        "⚠ Invalid projects.json detected. Starting with empty project list."
+                );
+            }
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Failed to load projects: " + e.getMessage()
+            );
         }
     }
 }
