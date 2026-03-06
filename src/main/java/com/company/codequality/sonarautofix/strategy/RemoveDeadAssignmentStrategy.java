@@ -2,12 +2,7 @@ package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.*;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class RemoveDeadAssignmentStrategy implements FixStrategy {
@@ -18,79 +13,82 @@ public class RemoveDeadAssignmentStrategy implements FixStrategy {
     }
 
     @Override
-    public boolean apply(CompilationUnit cu, int startLine) {
-
-        for (VariableDeclarator var : cu.findAll(VariableDeclarator.class)) {
-
-            if (var.getRange().isEmpty())
-                continue;
-
-            var range = var.getRange().get();
-
-            if (range.begin.line > startLine || range.end.line < startLine)
-                continue;
-
-            if (var.getInitializer().isEmpty())
-                continue;
-
-            Optional<BlockStmt> blockOpt = var.findAncestor(BlockStmt.class);
-
-            if (blockOpt.isEmpty())
-                continue;
-
-            BlockStmt block = blockOpt.get();
-
-            Statement declStmt = var.findAncestor(Statement.class).orElse(null);
-
-            if (declStmt == null)
-                continue;
-
-            int index = block.getStatements().indexOf(declStmt);
-
-            if (index == -1 || index + 1 >= block.getStatements().size())
-                continue;
-
-            Statement next = block.getStatement(index + 1);
-
-            if (!(next instanceof ExpressionStmt exprStmt))
-                continue;
-
-            if (!(exprStmt.getExpression() instanceof AssignExpr assign))
-                continue;
-
-            if (assign.getOperator() != AssignExpr.Operator.ASSIGN)
-                continue;
-
-            if (!(assign.getTarget() instanceof NameExpr name))
-                continue;
-
-            if (!name.getNameAsString().equals(var.getNameAsString()))
-                continue;
-
-            // ensure RHS does not use old value
-            boolean selfUsage =
-                    assign.getValue()
-                          .findAll(NameExpr.class)
-                          .stream()
-                          .anyMatch(n -> n.getNameAsString()
-                          .equals(var.getNameAsString()));
-
-            if (selfUsage)
-                continue;
-
-            // Dead initializer detected
-
-            Expression newValue = assign.getValue().clone();
-
-            // Replace declaration initializer
-            var.setInitializer(newValue);
-
-            // Remove assignment statement
-            exprStmt.remove();
-
-            return true;
+    public boolean apply(CompilationUnit cu, int line) {
+        // Pattern 1: Initializer in declaration is overwritten
+        for (com.github.javaparser.ast.body.VariableDeclarator var : cu
+                .findAll(com.github.javaparser.ast.body.VariableDeclarator.class)) {
+            if (var.getRange().isPresent() && var.getRange().get().begin.line <= line
+                    && var.getRange().get().end.line >= line) {
+                if (var.getInitializer().isPresent()) {
+                    if (fixDeadInitializer(var))
+                        return true;
+                }
+            }
         }
 
+        // Pattern 2: Assignment is immediately overwritten
+        for (com.github.javaparser.ast.expr.AssignExpr assign : cu
+                .findAll(com.github.javaparser.ast.expr.AssignExpr.class)) {
+            if (assign.getRange().isPresent() && assign.getRange().get().begin.line <= line
+                    && assign.getRange().get().end.line >= line) {
+                if (fixDeadAssignment(assign))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean fixDeadInitializer(com.github.javaparser.ast.body.VariableDeclarator var) {
+        com.github.javaparser.ast.stmt.BlockStmt parent = (com.github.javaparser.ast.stmt.BlockStmt) var
+                .findAncestor(com.github.javaparser.ast.stmt.BlockStmt.class).orElse(null);
+        if (parent == null)
+            return false;
+
+        com.github.javaparser.ast.stmt.Statement stmt = var.findAncestor(com.github.javaparser.ast.stmt.Statement.class)
+                .orElse(null);
+        if (stmt == null)
+            return false;
+
+        int idx = parent.getStatements().indexOf(stmt);
+        if (idx != -1 && idx + 1 < parent.getStatements().size()) {
+            com.github.javaparser.ast.stmt.Statement next = parent.getStatement(idx + 1);
+            if (next instanceof com.github.javaparser.ast.stmt.ExpressionStmt es
+                    && es.getExpression() instanceof com.github.javaparser.ast.expr.AssignExpr nextAssign) {
+                if (nextAssign.getTarget().toString().equals(var.getNameAsString())) {
+                    // Overwritten!
+                    var.setInitializer(nextAssign.getValue().clone());
+                    next.remove();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean fixDeadAssignment(com.github.javaparser.ast.expr.AssignExpr assign) {
+        com.github.javaparser.ast.stmt.BlockStmt parent = (com.github.javaparser.ast.stmt.BlockStmt) assign
+                .findAncestor(com.github.javaparser.ast.stmt.BlockStmt.class).orElse(null);
+        if (parent == null)
+            return false;
+
+        com.github.javaparser.ast.stmt.Statement stmt = assign
+                .findAncestor(com.github.javaparser.ast.stmt.Statement.class).orElse(null);
+        if (stmt == null)
+            return false;
+
+        int idx = parent.getStatements().indexOf(stmt);
+        if (idx != -1 && idx + 1 < parent.getStatements().size()) {
+            com.github.javaparser.ast.stmt.Statement next = parent.getStatement(idx + 1);
+            if (next instanceof com.github.javaparser.ast.stmt.ExpressionStmt es
+                    && es.getExpression() instanceof com.github.javaparser.ast.expr.AssignExpr nextAssign) {
+                if (nextAssign.getTarget().toString().equals(assign.getTarget().toString())) {
+                    // The first assignment is dead
+                    stmt.remove();
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }

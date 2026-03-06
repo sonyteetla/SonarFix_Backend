@@ -3,6 +3,8 @@ package com.company.codequality.sonarautofix.config;
 import com.company.codequality.sonarautofix.model.RuleConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class RuleRegistry {
+
+    private static final Logger log = LoggerFactory.getLogger(RuleRegistry.class);
 
     private Map<String, RuleConfig> ruleMap;
 
@@ -29,16 +33,15 @@ public class RuleRegistry {
             throw new RuntimeException("rules.json NOT FOUND in resources folder");
         }
 
-        List<RuleConfig> rules =
-                mapper.readValue(is, new TypeReference<List<RuleConfig>>() {});
+        List<RuleConfig> rules = mapper.readValue(is, new TypeReference<List<RuleConfig>>() {
+        });
 
         ruleMap = rules.stream()
                 .collect(Collectors.toMap(
                         RuleConfig::getRuleId,
-                        r -> r
-                ));
+                        r -> r));
 
-        System.out.println("✔ Loaded Rules: " + ruleMap.size());
+        log.info("Loaded {} rule(s) from rules.json", ruleMap.size());
     }
 
     public RuleConfig getRule(String ruleId) {

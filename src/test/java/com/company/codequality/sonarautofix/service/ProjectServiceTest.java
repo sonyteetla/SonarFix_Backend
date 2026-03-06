@@ -23,9 +23,9 @@ class ProjectServiceTest {
 
     @Test
     void testRegisterProjectSequentialId() {
-        Project p1 = Project.builder().projectKey("P1").build();
-        Project p2 = Project.builder().projectKey("P2").build();
-        Project p3 = Project.builder().projectKey("P3").build();
+        Project p1 = Project.builder().name("P1").build();
+        Project p2 = Project.builder().name("P2").build();
+        Project p3 = Project.builder().name("P3").build();
 
         when(projectRepository.save(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(projectRepository.findAll()).thenReturn(new java.util.ArrayList<>());
@@ -45,9 +45,9 @@ class ProjectServiceTest {
 
     @Test
     void testRegisterProjectReuseId() {
-        Project p1 = Project.builder().projectKey("P1").build();
-        Project p2 = Project.builder().projectKey("P2").build();
-        Project p3 = Project.builder().projectKey("P3").build();
+        Project p1 = Project.builder().name("P1").build();
+        Project p2 = Project.builder().name("P2").build();
+        Project p3 = Project.builder().name("P3").build();
 
         // Simulate behavior where findAll returns the current list
         java.util.List<Project> store = new java.util.ArrayList<>();

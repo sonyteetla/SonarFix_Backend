@@ -9,7 +9,7 @@ public class NoOpFixStrategy implements FixStrategy {
 
     @Override
     public FixType getFixType() {
-        return null; // not mapped
+        return FixType.NONE; // intentional no-op fallback
     }
 
     @Override

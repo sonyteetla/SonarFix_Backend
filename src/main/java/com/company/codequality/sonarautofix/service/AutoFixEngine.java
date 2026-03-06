@@ -2,13 +2,17 @@ package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.*;
 import com.company.codequality.sonarautofix.strategy.FixStrategy;
+import com.company.codequality.sonarautofix.util.ProjectZipUtil;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -21,23 +25,25 @@ import java.util.*;
 @Service
 public class AutoFixEngine {
 
+    private static final Logger log = LoggerFactory.getLogger(AutoFixEngine.class);
+
     private final Map<FixType, FixStrategy> strategyMap = new HashMap<>();
     private final ScanService scanService;
 
     public AutoFixEngine(List<FixStrategy> strategies,
-                         @Lazy ScanService scanService) {
+            @Lazy ScanService scanService) {
 
         for (FixStrategy strategy : strategies) {
             strategyMap.put(strategy.getFixType(), strategy);
         }
-        System.out.println("Registered strategies: " + strategyMap.keySet());
+        log.info("Registered strategies: {}", strategyMap.keySet());
         this.scanService = scanService;
     }
 
     public int applyFixes(List<FixRequest> requests,
-                          String projectPath,
-                          String projectKey,
-                          String scanId) {
+            String projectPath,
+            String projectKey,
+            String scanId) {
 
         if (requests == null || requests.isEmpty()) {
             throw new IllegalArgumentException("No fixes provided");
@@ -57,38 +63,32 @@ public class AutoFixEngine {
 
             for (FixRequest request : requests) {
                 if (request.getFilePath() == null ||
-                        request.getFilePath().isBlank()) continue;
+                        request.getFilePath().isBlank())
+                    continue;
 
                 grouped.computeIfAbsent(request.getFilePath(),
                         k -> new ArrayList<>()).add(request);
             }
-            
+
             initSymbolSolver(projectPath);
-            System.out.println("Incoming fix requests: " + requests.size());
+            log.info("Processing {} fix request(s) across {} file(s)", requests.size(), grouped.size());
             for (Map.Entry<String, List<FixRequest>> entry : grouped.entrySet()) {
 
                 String filePath = entry.getKey();
                 List<FixRequest> fileFixes = entry.getValue();
-                System.out.println("Incoming fix requests: " + requests.size());
-                fileFixes.sort((a, b) ->
-                        Integer.compare(b.getLine(), a.getLine()));
+                fileFixes.sort((a, b) -> Integer.compare(b.getLine(), a.getLine()));
 
                 Path path = Path.of(projectPath, filePath);
-                System.out.println("---- FILE DEBUG ----");
-                System.out.println("projectPath = " + projectPath);
-                System.out.println("filePath = " + filePath);
-                System.out.println("resolved path = " + path);
-                System.out.println("exists = " + Files.exists(path));
-                if (!Files.exists(path)) continue;
+                log.debug("Applying fixes to file: {} (exists={})", path, Files.exists(path));
+                if (!Files.exists(path))
+                    continue;
 
-                List<String> originalLines =
-                        Files.readAllLines(path);
+                List<String> originalLines = Files.readAllLines(path);
 
                 CompilationUnit cu;
-
                 try {
-                	
                     cu = StaticJavaParser.parse(path);
+                    LexicalPreservingPrinter.setup(cu);
                 } catch (Exception e) {
                     continue;
                 }
@@ -103,7 +103,8 @@ public class AutoFixEngine {
                     }
 
                     FixStrategy strategy = strategyMap.get(type);
-                    if (strategy == null) continue;
+                    if (strategy == null)
+                        continue;
 
                     try {
 
@@ -114,8 +115,7 @@ public class AutoFixEngine {
                             beforeCode = originalLines.get(lineIndex).trim();
                         }
 
-                        boolean applied =
-                                strategy.apply(cu, request.getLine());
+                        boolean applied = strategy.apply(cu, request.getLine());
 
                         if (applied) {
 
@@ -123,8 +123,7 @@ public class AutoFixEngine {
                             fixReport.put(type,
                                     fixReport.getOrDefault(type, 0) + 1);
 
-                            List<String> modifiedLines =
-                                    Arrays.asList(cu.toString().split("\n"));
+                            List<String> modifiedLines = Arrays.asList(LexicalPreservingPrinter.print(cu).split("\\R"));
 
                             String afterCode = "";
                             if (lineIndex >= 0 && lineIndex < modifiedLines.size()) {
@@ -133,16 +132,14 @@ public class AutoFixEngine {
 
                             if (task != null) {
 
-                                FixExecutionReport report =
-                                        new FixExecutionReport(
-                                                request.getRuleId(),
-                                                filePath,
-                                                request.getLine(),
-                                                beforeCode,
-                                                afterCode,
-                                                true,
-                                                "Fix applied successfully"
-                                        );
+                                FixExecutionReport report = new FixExecutionReport(
+                                        request.getRuleId(),
+                                        filePath,
+                                        request.getLine(),
+                                        beforeCode,
+                                        afterCode,
+                                        true,
+                                        "Fix applied successfully");
 
                                 task.addFixReport(report);
                             }
@@ -157,15 +154,23 @@ public class AutoFixEngine {
                                             request.getLine(),
                                             request.getFixType(),
                                             "Manual fix required. AutoFix skipped.",
-                                            "Review rule: " + request.getFixType()
-                                    )
-                            );
+                                            "Review rule: " + request.getFixType()));
                         }
                     }
                 }
 
                 Files.write(path,
-                        cu.toString().getBytes(StandardCharsets.UTF_8));
+                        LexicalPreservingPrinter.print(cu).getBytes(StandardCharsets.UTF_8));
+            }
+
+            // ================= ZIP REFACTORED PROJECT =================
+            // Always zip after fixes so GET /api/fix/download/{scanId} works
+            // regardless of whether this was triggered by Fix-All or selective fix.
+            try {
+                String zipPath = ProjectZipUtil.zipProject(projectPath);
+                log.info("Refactored project zipped at: {}", zipPath);
+            } catch (Exception e) {
+                log.warn("Could not zip refactored project: {}", e.getMessage());
             }
 
             // ================= RE-SCAN =================
@@ -176,7 +181,7 @@ public class AutoFixEngine {
                     scanService.reScan(projectPath, projectKey);
                 }
             } catch (Exception e) {
-                System.out.println("⚠ Re-scan failed: " + e.getMessage());
+                log.warn("Re-scan failed: {}", e.getMessage());
             }
 
             // ================= STORE SUMMARY =================
@@ -192,12 +197,11 @@ public class AutoFixEngine {
                 task.setTotalFixesApplied(totalFixed);
             }
 
-            System.out.println("\n====== AutoFix Execution Report ======");
+            log.info("====== AutoFix Execution Report ======");
             for (Map.Entry<FixType, Integer> entry : fixReport.entrySet()) {
-                System.out.println(entry.getKey() + " -> " + entry.getValue() + " fixes");
+                log.info("{} -> {} fix(es)", entry.getKey(), entry.getValue());
             }
-            System.out.println("Total fixes applied: " + totalFixed);
-            System.out.println("======================================\n");
+            log.info("Total fixes applied: {}", totalFixed);
 
             return totalFixed;
 
@@ -205,7 +209,7 @@ public class AutoFixEngine {
             throw new RuntimeException("Auto fix failed", e);
         }
     }
-    
+
     private void initSymbolSolver(String projectPath) {
 
         CombinedTypeSolver solver = new CombinedTypeSolver();
@@ -218,8 +222,7 @@ public class AutoFixEngine {
             solver.add(new JavaParserTypeSolver(srcMainJava));
         }
 
-        JavaSymbolSolver symbolSolver =
-                new JavaSymbolSolver(solver);
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(solver);
 
         StaticJavaParser.getConfiguration()
                 .setSymbolResolver(symbolSolver);

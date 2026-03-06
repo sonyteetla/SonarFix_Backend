@@ -4,6 +4,8 @@ import com.company.codequality.sonarautofix.model.ScanTask;
 import com.company.codequality.sonarautofix.model.SonarIssue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,32 +20,36 @@ import java.util.List;
 @Service
 public class SonarService {
 
+    private static final Logger log = LoggerFactory.getLogger(SonarService.class);
+
     @Value("${sonar.token}")
     private String token;
 
     @Value("${sonar.host.url}")
     private String sonarHost;
 
+    @Value("${maven.path}")
+    private String mavenPath;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ================= RUN SONAR SCAN =================
     public void runSonarScan(String projectPath,
-                             String projectKey,
-                             ScanTask task) {
+            String projectKey,
+            ScanTask task) {
 
         try {
 
             ProcessBuilder builder = new ProcessBuilder(
-                    "C:\\Program Files\\Apache\\Maven\\bin\\mvn.cmd",
+                    mavenPath,
                     "clean",
                     "verify",
                     "-DskipTests=true",
                     "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.host.url=" + sonarHost,
-                    "-Dsonar.token=" + token
-            );
+                    "-Dsonar.token=" + token);
 
             builder.directory(new java.io.File(projectPath));
             builder.redirectErrorStream(true);
@@ -53,15 +59,14 @@ public class SonarService {
             StringBuilder logBuffer = new StringBuilder();
             String ceTaskId = null;
 
-            try (BufferedReader reader =
-                         new BufferedReader(new InputStreamReader(
-                                 process.getInputStream(),
-                                 StandardCharsets.UTF_8))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    process.getInputStream(),
+                    StandardCharsets.UTF_8))) {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
 
-                    System.out.println(line);
+                    log.debug("[SONAR BUILD] {}", line);
                     logBuffer.append(line).append("\n");
 
                     // Extract CE task ID
@@ -79,11 +84,16 @@ public class SonarService {
             if (ceTaskId != null) {
                 waitForCeTaskCompletion(ceTaskId);
             } else {
+                // Check if process failed
+                if (process.exitValue() != 0) {
+                    throw new RuntimeException("Sonar scan process failed with exit code " + process.exitValue());
+                }
                 throw new RuntimeException("CE Task ID not found in Sonar logs");
             }
 
         } catch (Exception e) {
-            task.setBuildLog("Scan failed: " + e.getMessage());
+            log.error("Sonar scan error: {}", e.getMessage());
+            task.setBuildLog(task.getBuildLog() + "\n\nScan failed: " + e.getMessage());
             throw new RuntimeException("Sonar scan failed", e);
         }
     }
@@ -91,7 +101,7 @@ public class SonarService {
     // ================= WAIT FOR SONAR BACKGROUND PROCESS =================
     private void waitForCeTaskCompletion(String ceTaskId) throws Exception {
 
-        System.out.println("Waiting for Sonar CE task: " + ceTaskId);
+        log.info("Waiting for Sonar CE task: {}", ceTaskId);
 
         String url = sonarHost + "/api/ce/task?id=" + ceTaskId;
 
@@ -102,14 +112,13 @@ public class SonarService {
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             JsonNode root = objectMapper.readTree(response.getBody());
             String status = root.path("task").path("status").asText();
 
             if ("SUCCESS".equalsIgnoreCase(status)) {
-                System.out.println("Sonar analysis completed successfully.");
+                log.info("Sonar analysis completed successfully.");
                 break;
             }
 
@@ -132,16 +141,14 @@ public class SonarService {
                     projectKey +
                     "&resolved=false&ps=500";
 
-            System.out.println("Fetching issues for projectKey = " + projectKey);
-            System.out.println("URL = " + url);
+            log.info("Fetching issues for projectKey={}, url={}", projectKey, url);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setBasicAuth(token, "");
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode issuesNode = root.path("issues");
@@ -166,12 +173,12 @@ public class SonarService {
                 }
             }
 
-            System.out.println("Total issues fetched: " + issues.size());
+            log.info("Total issues fetched: {}", issues.size());
 
             return issues;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to fetch issues for projectKey={}: {}", projectKey, e.getMessage(), e);
             return new ArrayList<>();
         }
     }

@@ -1,5 +1,7 @@
 package com.company.codequality.sonarautofix.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -9,8 +11,10 @@ import java.util.List;
 @Service
 public class FixService {
 
+    private static final Logger log = LoggerFactory.getLogger(FixService.class);
+
     /**
-     * Apply fixes on the project copy. 
+     * Apply fixes on the project copy.
      * Assumes projectPath is already a copy, do NOT append "_fixed" here.
      */
     public void applyFixes(String projectPath) throws IOException {
@@ -42,6 +46,6 @@ public class FixService {
                     }
                 });
 
-        System.out.println("Fixes applied to project at: " + projectDir);
+        log.info("Fixes applied to project at: {}", projectDir);
     }
 }

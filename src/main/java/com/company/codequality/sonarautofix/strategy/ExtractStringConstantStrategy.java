@@ -25,11 +25,10 @@ public class ExtractStringConstantStrategy implements FixStrategy {
 
         try {
 
-            Optional<StringLiteralExpr> literalOpt =
-                    cu.findAll(StringLiteralExpr.class).stream()
-                            .filter(l -> l.getBegin().isPresent()
-                                    && l.getBegin().get().line == line)
-                            .findFirst();
+            Optional<StringLiteralExpr> literalOpt = cu.findAll(StringLiteralExpr.class).stream()
+                    .filter(l -> l.getBegin().isPresent()
+                            && l.getBegin().get().line == line)
+                    .findFirst();
 
             if (literalOpt.isEmpty()) {
                 return false;
@@ -49,8 +48,7 @@ public class ExtractStringConstantStrategy implements FixStrategy {
             final String constantName = generatedName;
 
             // Find first class only
-            Optional<ClassOrInterfaceDeclaration> classOpt =
-                    cu.findFirst(ClassOrInterfaceDeclaration.class);
+            Optional<ClassOrInterfaceDeclaration> classOpt = cu.findFirst(ClassOrInterfaceDeclaration.class);
 
             if (classOpt.isEmpty()) {
                 return false; // Not a class file
@@ -74,11 +72,15 @@ public class ExtractStringConstantStrategy implements FixStrategy {
                     new StringLiteralExpr(value),
                     Modifier.Keyword.PRIVATE,
                     Modifier.Keyword.STATIC,
-                    Modifier.Keyword.FINAL
-            );
+                    Modifier.Keyword.FINAL);
 
-            // Replace literal usage
-            literal.replace(new NameExpr(constantName));
+            // Replace ALL duplicate literals in the class EXCEPT the one in the constant's
+            // initializer
+            cu.findAll(com.github.javaparser.ast.expr.StringLiteralExpr.class).stream()
+                    .filter(l -> l.getValue().equals(value))
+                    .filter(l -> !l.findAncestor(com.github.javaparser.ast.body.FieldDeclaration.class)
+                            .map(f -> f.equals(field)).orElse(false))
+                    .forEach(l -> l.replace(new com.github.javaparser.ast.expr.NameExpr(constantName)));
 
             return true;
 

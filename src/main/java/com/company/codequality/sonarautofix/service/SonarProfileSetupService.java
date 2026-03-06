@@ -2,6 +2,8 @@ package com.company.codequality.sonarautofix.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class SonarProfileSetupService {
+
+    private static final Logger log = LoggerFactory.getLogger(SonarProfileSetupService.class);
 
     @Value("${sonar.host.url}")
     private String sonarUrl;
@@ -28,7 +32,7 @@ public class SonarProfileSetupService {
     private final ObjectMapper objectMapper;
 
     public SonarProfileSetupService(RestTemplate restTemplate,
-                                    ObjectMapper objectMapper) {
+            ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
@@ -37,10 +41,9 @@ public class SonarProfileSetupService {
 
         String url = sonarUrl + "/api/qualityprofiles/search?language=" + language;
 
-        ResponseEntity<String> response =
-                restTemplate.exchange(url, HttpMethod.GET,
-                        new HttpEntity<>(authHeaders()),
-                        String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
+                new HttpEntity<>(authHeaders()),
+                String.class);
 
         JsonNode root = objectMapper.readTree(response.getBody());
 
@@ -63,18 +66,16 @@ public class SonarProfileSetupService {
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(body, formHeaders()),
-                String.class
-        );
+                String.class);
     }
 
     private String getProfileKey() throws Exception {
 
         String url = sonarUrl + "/api/qualityprofiles/search?language=" + language;
 
-        ResponseEntity<String> response =
-                restTemplate.exchange(url, HttpMethod.GET,
-                        new HttpEntity<>(authHeaders()),
-                        String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET,
+                new HttpEntity<>(authHeaders()),
+                String.class);
 
         JsonNode root = objectMapper.readTree(response.getBody());
 
@@ -92,14 +93,13 @@ public class SonarProfileSetupService {
         String url = sonarUrl + "/api/qualityprofiles/set_default";
 
         String body = "language=" + language +
-                      "&qualityProfile=" + profileName;
+                "&qualityProfile=" + profileName;
 
         restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(body, formHeaders()),
-                String.class
-        );
+                String.class);
     }
 
     private HttpHeaders authHeaders() {
@@ -113,36 +113,36 @@ public class SonarProfileSetupService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return headers;
     }
-    
+
     private void activateRules(String profileKey) {
 
-    	List<String> rules = List.of(
-    	        "java:S3749",
-    	        "java:S3626",
-    	        "java:S106",
-    	        "java:S1128",
-    	        "java:S108",
-    	        "java:S1643",
-    	        "java:S109",
-    	        "java:S1874",
-    	        "java:S6833",
-    	        "java:S1075",
-    	        "java:S2129",
-    	        "java:S112",
-    	        "java:S1118",
-    	        "java:S1192",
-    	        "java:S2095",
-    	        "java:S3655",
-    	        "java:S1656",
-    	        "java:S1481",
-    	        "java:S1854",
-    	        "java:S1905",
-    	        "java:S1698",
-    	        "java:S1132",
-    	        "java:S1604",
-    	        "java:S1612",
-    	        "java:S1319"
-    	);
+        List<String> rules = List.of(
+                "java:S3749",
+                "java:S3626",
+                "java:S106",
+                "java:S1128",
+                "java:S108",
+                "java:S1643",
+                "java:S109",
+                "java:S1874",
+                "java:S6833",
+                "java:S1075",
+                "java:S2129",
+                "java:S112",
+                "java:S1118",
+                "java:S1192",
+                "java:S2095",
+                "java:S3655",
+                "java:S1656",
+                "java:S1481",
+                "java:S1854",
+                "java:S1905",
+                "java:S1698",
+                "java:S1132",
+                "java:S1604",
+                "java:S1612",
+                "java:S1319",
+                "java:S1125");
 
         for (String rule : rules) {
 
@@ -154,11 +154,10 @@ public class SonarProfileSetupService {
                     url,
                     HttpMethod.POST,
                     new HttpEntity<>(body, formHeaders()),
-                    String.class
-            );
+                    String.class);
         }
     }
-    
+
     public void setupIfNotExists() {
 
         try {
@@ -171,10 +170,10 @@ public class SonarProfileSetupService {
 
             profileKey = getProfileKey();
 
-            activateRules(profileKey);   // ALWAYS ensure rules
+            activateRules(profileKey); // ALWAYS ensure rules
             setAsDefault();
 
-            System.out.println("Profile ensured with 25 rules.");
+            log.info("Profile '{}' ensured with rules activated.", profileName);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to setup Sonar profile", e);

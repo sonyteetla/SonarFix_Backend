@@ -19,17 +19,20 @@ public class HideUtilityConstructorStrategy implements FixStrategy {
         boolean fixed = false;
 
         for (ClassOrInterfaceDeclaration clazz : cu.findAll(ClassOrInterfaceDeclaration.class)) {
+            if (clazz.getBegin().isPresent() && clazz.getBegin().get().line == line) {
+                if (!clazz.isPublic() || clazz.isInterface() || !clazz.getConstructors().isEmpty()) {
+                    continue;
+                }
 
-            if (!clazz.isPublic()) continue;
-
-            if (clazz.getMethods().isEmpty()) continue;
-
-            // Add private constructor if missing
-            clazz.addConstructor()
-                 .setPrivate(true)
-                 .setBody(new com.github.javaparser.ast.stmt.BlockStmt());
-
-            fixed = true;
+                // Actually check if all methods are static
+                boolean allMethodsStatic = clazz.getMethods().stream().allMatch(m -> m.isStatic());
+                if (allMethodsStatic) {
+                    clazz.addConstructor()
+                            .setPrivate(true)
+                            .setBody(new com.github.javaparser.ast.stmt.BlockStmt());
+                    fixed = true;
+                }
+            }
         }
 
         return fixed;

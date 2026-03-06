@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/quality/sonar")
+@CrossOrigin("*")
 public class SonarProfileSetupController {
 
     private final SonarProfileSetupService sonarProfileSetupService;

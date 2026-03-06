@@ -1,68 +1,90 @@
 package com.company.codequality.sonarautofix.service;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.*;
-import java.time.LocalDateTime;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.UUID;
 
 @Service
 public class ProjectUploadService {
 
-    private static final String WORKSPACE = "C:/sonar-workspace/";
+    @Value("${workspace.path}")
+    private String workspace;
 
+    @Value("${git.path}")
+    private String gitPath;
 
     // ------------------ ZIP Upload ------------------
 
-    //  ZIP Upload
+    // ZIP Upload
 
     public String handleZipUpload(MultipartFile file) {
+        String projectDir = "";
         try {
-            String projectDir = WORKSPACE + System.currentTimeMillis();
-            Files.createDirectories(Paths.get(projectDir));
+            // Use UUID for unique project directory
+            Path projectPath = Paths.get(workspace, UUID.randomUUID().toString());
+            Files.createDirectories(projectPath);
+            projectDir = projectPath.toAbsolutePath().toString();
+            System.out.println("Extracting ZIP to: " + projectDir);
 
             try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
                 ZipEntry entry;
 
                 while ((entry = zis.getNextEntry()) != null) {
-                    Path newFile = Paths.get(projectDir, entry.getName());
+                    String name = entry.getName();
+                    if (name == null || name.trim().isEmpty())
+                        continue;
 
-                    if (entry.isDirectory()) {
+                    Path newFile = projectPath.resolve(name).normalize();
+
+                    // Security check: ensure entry is within project directory
+                    if (!newFile.startsWith(projectPath)) {
+                        throw new IOException("Entry is outside of the target directory: " + name);
+                    }
+
+                    // On Windows, some ZIP tools don't set isDirectory but end with /
+                    boolean representsDirectory = entry.isDirectory() || name.endsWith("/") || name.endsWith("\\");
+
+                    if (representsDirectory) {
                         Files.createDirectories(newFile);
                     } else {
-                        Files.createDirectories(newFile.getParent());
-                        try (OutputStream fos = Files.newOutputStream(newFile)) {
-                            byte[] buffer = new byte[8192];
-                            int len;
-                            while ((len = zis.read(buffer)) > 0) {
-                                fos.write(buffer, 0, len);
-                            }
+                        // It's a file. Ensure its parent directory exists.
+                        Path parent = newFile.getParent();
+                        if (parent != null && !Files.exists(parent)) {
+                            Files.createDirectories(parent);
                         }
+
+                        // Extract file content safely
+                        System.out.println("Copying file entry: " + name);
+                        Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
                     }
+                    zis.closeEntry();
                 }
             }
-
             return projectDir;
 
         } catch (Exception e) {
+            System.err.println("Upload failed at project directory: " + projectDir);
+            e.printStackTrace();
             throw new RuntimeException("ZIP Upload failed: " + e.getMessage(), e);
         }
     }
 
-
     // ------------------ GitHub Clone ------------------
 
-    //  GitHub Clone
+    // GitHub Clone
 
     public String cloneGithub(String repoUrl) {
         try {
-            String projectDir = WORKSPACE + System.currentTimeMillis();
+            String projectDir = workspace + System.currentTimeMillis();
 
-            ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\Git\\bin\\git.exe", "clone", repoUrl, projectDir);
+            ProcessBuilder builder = new ProcessBuilder(gitPath, "clone", repoUrl, projectDir);
             Process process = builder.start();
             process.waitFor();
 
@@ -77,10 +99,9 @@ public class ProjectUploadService {
         }
     }
 
-
     // ------------------ Local Directory ------------------
 
-    //  Local Directory
+    // Local Directory
 
     public String useLocalDirectory(String localPath) {
         Path src = Paths.get(localPath);
@@ -89,8 +110,9 @@ public class ProjectUploadService {
             throw new RuntimeException("Invalid local directory");
         }
 
-        String projectDir = WORKSPACE + System.currentTimeMillis();
-        Path dest = Paths.get(projectDir);
+        Path projectPath = Paths.get(workspace, UUID.randomUUID().toString());
+        String projectDir = projectPath.toAbsolutePath().toString();
+        Path dest = projectPath;
 
         try {
             Files.walk(src).forEach(source -> {
@@ -111,7 +133,6 @@ public class ProjectUploadService {
             throw new RuntimeException("Local directory copy failed: " + e.getMessage(), e);
         }
     }
-
 
     // ------------------ Copy Project for Fixing ------------------
     public String copyProject(String originalPath) throws IOException {
@@ -146,7 +167,8 @@ public class ProjectUploadService {
 
     // ------------------ Helper: Delete directory recursively ------------------
     private void deleteDirectory(Path path) throws IOException {
-        if (!Files.exists(path)) return;
+        if (!Files.exists(path))
+            return;
 
         Files.walk(path)
                 .sorted((a, b) -> b.compareTo(a)) // delete children first
@@ -158,8 +180,8 @@ public class ProjectUploadService {
                     }
                 });
     }
-    
-    //METADATA WRITER
+
+    // METADATA WRITER
 
     public void registerProjectKey(String projectDir, String projectKey) {
 
@@ -170,6 +192,5 @@ public class ProjectUploadService {
             throw new RuntimeException("Failed to store project key", e);
         }
     }
-    
-}
 
+}

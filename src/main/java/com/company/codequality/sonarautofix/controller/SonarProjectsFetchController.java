@@ -8,6 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sonar")
+@CrossOrigin("*")
 public class SonarProjectsFetchController {
 
     private final SonarProjectsFetchService sonarProjectsFetch;

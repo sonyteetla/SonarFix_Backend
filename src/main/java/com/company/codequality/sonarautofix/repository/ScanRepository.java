@@ -4,6 +4,8 @@ import com.company.codequality.sonarautofix.model.ScanTask;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.PostConstruct;
@@ -16,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class ScanRepository {
+    private static final Logger log = LoggerFactory.getLogger(ScanRepository.class);
+    // Triggering restart to apply model changes
     private static final String STORAGE_PATH = "data/scans.json";
     private final Map<String, ScanTask> scanStore = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
@@ -51,7 +55,7 @@ public class ScanRepository {
             }
             objectMapper.writeValue(file, scanStore);
         } catch (IOException e) {
-            System.err.println("Failed to save scans: " + e.getMessage());
+            log.error("Failed to save scans: {}", e.getMessage());
         }
     }
 
@@ -62,10 +66,10 @@ public class ScanRepository {
                 Map<String, ScanTask> loaded = objectMapper.readValue(file, new TypeReference<Map<String, ScanTask>>() {
                 });
                 scanStore.putAll(loaded);
-                System.out.println("Loaded " + scanStore.size() + " scans from " + STORAGE_PATH);
+                log.info("Loaded {} scan(s) from {}", scanStore.size(), STORAGE_PATH);
             }
         } catch (IOException e) {
-            System.err.println("Failed to load scans: " + e.getMessage());
+            log.error("Failed to load scans: {}", e.getMessage());
         }
     }
 }

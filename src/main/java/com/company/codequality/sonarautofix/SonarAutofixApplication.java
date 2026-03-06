@@ -1,11 +1,12 @@
 package com.company.codequality.sonarautofix;
 
 import com.company.codequality.sonarautofix.service.SonarProfileSetupService;
-import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
+@EnableAsync
 public class SonarAutofixApplication {
 
     private final SonarProfileSetupService setupService;
@@ -18,12 +19,14 @@ public class SonarAutofixApplication {
         SpringApplication.run(SonarAutofixApplication.class, args);
     }
 
-   /* @PostConstruct
-    public void init() {
-        try {
-            setupService.setupIfNotExists();
-        } catch (Exception e) {
-            System.out.println("Sonar setup failed: " + e.getMessage());
-        }
-    }*/
+    /*
+     * @PostConstruct
+     * public void init() {
+     * try {
+     * setupService.setupIfNotExists();
+     * } catch (Exception e) {
+     * System.out.println("Sonar setup failed: " + e.getMessage());
+     * }
+     * }
+     */
 }

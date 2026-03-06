@@ -42,7 +42,7 @@ public class FixController {
                     requests,
                     projectPath,
                     projectKey,
-                    null   // no scanId → manual fix
+                    null // no scanId → manual fix
             );
 
             return ResponseEntity.ok("Selected fixes applied successfully. Re-scan started.");
@@ -55,7 +55,7 @@ public class FixController {
 
     // ================= AUTO FIX ALL =================
     @PostMapping("/apply/{scanId}")
-    public ResponseEntity<?> autoFixAll(@PathVariable String scanId) {
+    public ResponseEntity<?> autoFixAll(@PathVariable("scanId") String scanId) {
 
         try {
             String updatedScanId = scanService.autoFixAll(scanId);
@@ -69,14 +69,16 @@ public class FixController {
 
     // ================= DOWNLOAD REFACTORED PROJECT =================
     @GetMapping("/download/{scanId}")
-    public ResponseEntity<Resource> downloadProject(@PathVariable String scanId) throws IOException {
+    public ResponseEntity<Resource> downloadProject(@PathVariable("scanId") String scanId) throws IOException {
 
         ScanTask task = scanService.getScanTask(scanId);
-        if (task == null) return ResponseEntity.notFound().build();
+        if (task == null)
+            return ResponseEntity.notFound().build();
 
         String zipPath = task.getProjectPath() + "-refactored.zip";
         File file = new File(zipPath);
-        if (!file.exists()) return ResponseEntity.notFound().build();
+        if (!file.exists())
+            return ResponseEntity.notFound().build();
 
         Resource resource = new UrlResource(file.toURI());
 
@@ -88,16 +90,17 @@ public class FixController {
 
     // ================= GET SUGGESTIONS =================
     @GetMapping("/suggestions/{scanId}")
-    public ResponseEntity<?> getSuggestions(@PathVariable String scanId) {
+    public ResponseEntity<?> getSuggestions(@PathVariable("scanId") String scanId) {
         return ResponseEntity.ok(scanService.getSuggestions(scanId));
     }
 
     // ================= EXECUTION REPORT =================
     @GetMapping("/report/{scanId}")
-    public ResponseEntity<?> getExecutionReport(@PathVariable String scanId) {
+    public ResponseEntity<?> getExecutionReport(@PathVariable("scanId") String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
-        if (task == null) return ResponseEntity.notFound().build();
+        if (task == null)
+            return ResponseEntity.notFound().build();
 
         Map<String, Object> response = new HashMap<>();
         response.put("report", task.getFixExecutionReport());
