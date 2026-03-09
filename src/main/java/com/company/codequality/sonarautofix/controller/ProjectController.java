@@ -1,4 +1,4 @@
-package com.company.codequality.sonarautofix.controller;
+/**package com.company.codequality.sonarautofix.controller;
 
 import com.company.codequality.sonarautofix.model.Project;
 import com.company.codequality.sonarautofix.service.ProjectService;
@@ -39,3 +39,4 @@ public class ProjectController {
         return ResponseEntity.ok("Project removed successfully");
     }
 }
+**/

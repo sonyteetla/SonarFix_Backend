@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ProjectUploadService {
 
-    private static final String WORKSPACE = "D:/sonar-workspace/";
+    private static final String WORKSPACE = "C:/sonar-workspace/";
 
     // ================= Ensure workspace exists =================
     private void ensureWorkspace() throws IOException {

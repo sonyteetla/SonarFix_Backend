@@ -57,7 +57,7 @@ public class SonarProjectsFetchService {
 
             List<Project> projects = components.stream().map(component -> {
                 Project project = new Project();
-                project.setId((String) component.get("key"));     // Use Sonar key
+                project.setProjectKey((String) component.get("key"));     // Use Sonar key
                 project.setName((String) component.get("name"));
                 return project;
             }).collect(Collectors.toList());

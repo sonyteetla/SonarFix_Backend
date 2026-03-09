@@ -106,4 +106,10 @@ public class ScanController {
 
         return task.getFixReports();
     }
+    
+    // ================= LIST ALL SCANS =================
+    @GetMapping("/list")
+    public List<ScanTask> getAllScans() {
+        return scanService.getAllScans();
+    }
 }

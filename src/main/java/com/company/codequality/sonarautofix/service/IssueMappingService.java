@@ -33,14 +33,15 @@ public class IssueMappingService {
 
             // Create mapped issue using your 8-field constructor
             MappedIssue mapped = new MappedIssue(
-                    issue.getRule(),            // ruleId
-                    issue.getComponent(),       // file path
-                    issue.getLine(),            // line number
-                    rule.getTitle(),            // rule title
-                    rule.getSeverity(),         // severity (from RuleConfig)
-                    rule.getCategory(),         // category (from RuleConfig)
-                    rule.isAutoFixable(),       // autofix flag
-                    rule.getFixType()           // fix type
+                    issue.getKey(),            // key
+                    issue.getRule(),           // ruleId
+                    issue.getComponent(),      // file
+                    issue.getLine(),           // line
+                    rule.getTitle(),           // title
+                    rule.getSeverity(),        // severity
+                    rule.getCategory(),        // category
+                    rule.isAutoFixable(),     // autoFixable
+                    rule.getFixType()
             );
 
             mappedIssues.add(mapped);

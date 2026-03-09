@@ -34,16 +34,17 @@ public class SonarService {
 
         try {
 
-        	 ProcessBuilder builder = new ProcessBuilder(
-                     "C:\\Program Files\\apache-maven-3.9.12-bin\\apache-maven-3.9.12\\bin\\mvn.cmd",
-                     "clean",
-                     "verify",
-                     "-DskipTests=true",
-                     "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
-                     "-Dsonar.projectKey=" + projectKey,
-                     "-Dsonar.host.url=http://localhost:9000",
-                     "-Dsonar.token=" + token
-             );
+         ProcessBuilder builder = new ProcessBuilder(
+                    "C:\\Program Files\\Apache\\Maven\\bin\\mvn.cmd",
+                    "clean",
+                    "verify",
+                    "-DskipTests=true",
+                    "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
+                    "-Dsonar.projectKey=" + projectKey,
+                    "-Dsonar.host.url=" + sonarHost,
+                    "-Dsonar.token=" + token
+            );
+
 
 
 

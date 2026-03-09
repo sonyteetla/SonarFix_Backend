@@ -20,14 +20,18 @@ public class ScanTask {
     // Build Log
     private String buildLog;
 
-    // Execution Summary (existing)
+    // Execution Summary
     private Map<String, Integer> fixExecutionReport = new HashMap<>();
     private int totalFixesApplied;
 
-    // 🔥 NEW: Detailed Fix Reports (Before / After)
+    // Detailed Fix Reports
     private List<FixExecutionReport> fixReports = new ArrayList<>();
 
+    // ================= CONSTRUCTORS =================
+
     public ScanTask() {
+        this.createdAt = LocalDateTime.now();
+        this.status = "QUEUED";
     }
 
     public ScanTask(String scanId, String projectPath) {
@@ -40,29 +44,66 @@ public class ScanTask {
     // ================= GETTERS =================
 
     public String getScanId() { return scanId; }
+
     public String getProjectPath() { return projectPath; }
+
     public String getStatus() { return status; }
+
     public String getResult() { return result; }
+
     public String getProjectKey() { return projectKey; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
+
     public List<MappedIssue> getMappedIssues() { return mappedIssues; }
+
     public List<FixSuggestion> getSuggestions() { return suggestions; }
+
     public String getBuildLog() { return buildLog; }
+
     public Map<String, Integer> getFixExecutionReport() { return fixExecutionReport; }
+
     public int getTotalFixesApplied() { return totalFixesApplied; }
+
     public List<FixExecutionReport> getFixReports() { return fixReports; }
 
     // ================= SETTERS =================
 
-    public void setStatus(String status) { this.status = status; }
-    public void setResult(String result) { this.result = result; }
-    public void setProjectKey(String projectKey) { this.projectKey = projectKey; }
+    public void setScanId(String scanId) {
+        this.scanId = scanId;
+    }
+
+    public void setProjectPath(String projectPath) {
+        this.projectPath = projectPath;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public void setProjectKey(String projectKey) {
+        this.projectKey = projectKey;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+    }
 
     public void setMappedIssues(List<MappedIssue> mappedIssues) {
         this.mappedIssues = mappedIssues != null ? mappedIssues : new ArrayList<>();
     }
 
-    public void setBuildLog(String buildLog) { this.buildLog = buildLog; }
+    public void setSuggestions(List<FixSuggestion> suggestions) {
+        this.suggestions = suggestions != null ? suggestions : new ArrayList<>();
+    }
+
+    public void setBuildLog(String buildLog) {
+        this.buildLog = buildLog;
+    }
 
     public void setFixExecutionReport(Map<String, Integer> report) {
         this.fixExecutionReport = report != null ? report : new HashMap<>();
@@ -79,14 +120,14 @@ public class ScanTask {
     // ================= HELPERS =================
 
     public void addSuggestion(FixSuggestion suggestion) {
-        this.suggestions.add(suggestion);
+        if (suggestion != null) {
+            suggestions.add(suggestion);
+        }
     }
 
     public void addFixReport(FixExecutionReport report) {
-        this.fixReports.add(report);
-    }
-
-    public void setSuggestions(List<FixSuggestion> suggestions) {
-        this.suggestions = suggestions != null ? suggestions : new ArrayList<>();
+        if (report != null) {
+            fixReports.add(report);
+        }
     }
 }

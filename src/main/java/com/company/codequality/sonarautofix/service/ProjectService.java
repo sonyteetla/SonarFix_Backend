@@ -2,58 +2,96 @@ package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.Project;
 import com.company.codequality.sonarautofix.repository.ProjectRepository;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Base64;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 public class ProjectService {
+
     private final ProjectRepository projectRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${sonar.host.url}")
+    private String sonarUrl;
+
+    @Value("${sonar.token}")
+    private String sonarToken;
 
     public ProjectService(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
     }
 
-    public Project registerProject(Project project) {
-        List<Project> projects = projectRepository.findAll();
-        Set<Integer> existingIds = projects.stream()
-                .map(p -> {
-                    try {
-                        return Integer.parseInt(p.getId());
-                    } catch (NumberFormatException e) {
-                        return -1;
-                    }
-                })
-                .filter(id -> id > 0)
-                .collect(Collectors.toSet());
+    // ================= REGISTER PROJECT =================
 
-        int nextId = 1;
-        while (existingIds.contains(nextId)) {
-            nextId++;
-        }
+    public void registerProject(String projectKey, String workspacePath) {
 
-        project.setId(String.valueOf(nextId));
-        return projectRepository.save(project);
+        Project project =
+                Project.builder()
+                        .projectKey(projectKey)
+                        .workspacePath(workspacePath)
+                        .name(projectKey)
+                        .description("Uploaded Project")
+                        .createdAt(System.currentTimeMillis())
+                        .build();
+
+        projectRepository.save(project);
     }
+
+    // ================= GET PROJECT =================
+
+    public Project getProject(String projectKey) {
+
+        Project project = projectRepository.findByKey(projectKey);
+
+        if (project == null)
+            throw new RuntimeException("Project not found: " + projectKey);
+
+        return project;
+    }
+
+    // ================= LOCAL PROJECTS =================
 
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
 
-    public Project getProjectById(String id) {
-        return projectRepository.findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id));
-    }
+    // ================= SONAR PROJECT COUNT =================
 
-    public void deleteProject(String id) {
-        if (projectRepository.findById(id).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
+    public int getSonarProjectCount() {
+
+        try {
+
+            String url = sonarUrl + "/api/projects/search";
+
+            String auth = sonarToken + ":";
+            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Basic " + encodedAuth);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+
+            Map body = response.getBody();
+
+            if (body == null) return 0;
+
+            Map paging = (Map) body.get("paging");
+
+            return (int) paging.get("total");
+
+        } catch (Exception e) {
+
+            System.out.println("Failed to fetch Sonar project count: " + e.getMessage());
+            return 0;
         }
-        projectRepository.deleteById(id);
     }
 }

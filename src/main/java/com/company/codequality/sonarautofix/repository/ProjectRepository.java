@@ -3,109 +3,83 @@ package com.company.codequality.sonarautofix.repository;
 import com.company.codequality.sonarautofix.model.Project;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 @Repository
 public class ProjectRepository {
 
     private static final String STORAGE_PATH = "data/projects.json";
 
-    private final Map<String, Project> projects = new ConcurrentHashMap<>();
+    private final Map<String, Project> projectStore = new HashMap<>();
 
-    private final ObjectMapper objectMapper;
-
-    public ProjectRepository() {
-        this.objectMapper = new ObjectMapper();
-    }
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @PostConstruct
     public void init() {
         loadProjects();
     }
 
-    public Project save(Project project) {
-        projects.put(project.getId(), project);
+    public synchronized void save(Project project) {
+
+        projectStore.put(project.getProjectKey(), project);
         saveProjects();
-        return project;
+
+    }
+
+    public Project findByKey(String projectKey) {
+        return projectStore.get(projectKey);
     }
 
     public List<Project> findAll() {
-        return new ArrayList<>(projects.values());
+        return new ArrayList<>(projectStore.values());
     }
 
-    public Optional<Project> findById(String id) {
-        return Optional.ofNullable(projects.get(id));
-    }
-
-    public void deleteById(String id) {
-        projects.remove(id);
-        saveProjects();
-    }
-
-    private synchronized void saveProjects() {
+    private void saveProjects() {
 
         try {
 
             File file = new File(STORAGE_PATH);
 
-            if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().exists())
                 file.getParentFile().mkdirs();
-            }
 
-            objectMapper.writeValue(file, projects);
+            objectMapper.writeValue(file, projectStore);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
 
             System.err.println("Failed to save projects: " + e.getMessage());
+
         }
     }
 
-    // ✅ SAFE LOADING IMPLEMENTATION
     private void loadProjects() {
 
         try {
 
             File file = new File(STORAGE_PATH);
 
-            if (!file.exists()) {
-                return;
-            }
+            if (!file.exists()) return;
 
-            try {
+            Map<String, Project> loaded =
+                    objectMapper.readValue(
+                            file,
+                            new TypeReference<Map<String, Project>>() {}
+                    );
 
-                Map<String, Project> loaded =
-                        objectMapper.readValue(
-                                file,
-                                new TypeReference<Map<String, Project>>() {}
-                        );
+            projectStore.putAll(loaded);
 
-                projects.putAll(loaded);
-
-                System.out.println(
-                        "Loaded " + projects.size() + " projects from " + STORAGE_PATH
-                );
-
-            } catch (Exception ex) {
-
-                System.out.println(
-                        "⚠ Invalid projects.json detected. Starting with empty project list."
-                );
-            }
+            System.out.println("Loaded " + projectStore.size() + " projects");
 
         } catch (Exception e) {
 
-            System.err.println(
-                    "Failed to load projects: " + e.getMessage()
-            );
+            System.out.println("Invalid projects.json detected");
+
         }
     }
 }

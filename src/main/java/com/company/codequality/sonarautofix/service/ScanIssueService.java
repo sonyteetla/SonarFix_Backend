@@ -387,6 +387,7 @@ public class ScanIssueService {
 
     public MappedIssue toMappedIssue(Issue issue) {
         return new MappedIssue(
+        		 issue.getKey(),
                 issue.getRule(),
                 issue.getFilePath(),
                 issue.getLine() != null ? issue.getLine() : 0,

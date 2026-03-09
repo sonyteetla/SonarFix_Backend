@@ -219,20 +219,7 @@ public class AutoFixEngine {
                         cu.toString().getBytes(StandardCharsets.UTF_8));
             }
 
-            // ================= RE-SCAN =================
-
-            try {
-
-                if (scanId != null && !scanId.isBlank()) {
-                    scanService.reScan(projectPath, projectKey, scanId);
-                } else {
-                    scanService.reScan(projectPath, projectKey);
-                }
-
-            } catch (Exception e) {
-                System.out.println("⚠ Re-scan failed: " + e.getMessage());
-            }
-
+           
             // ================= STORE SUMMARY =================
 
             if (task != null) {

@@ -1,14 +1,17 @@
 package com.company.codequality.sonarautofix.controller;
 
-import com.company.codequality.sonarautofix.model.FixRequest;
+
 import com.company.codequality.sonarautofix.model.ScanTask;
-import com.company.codequality.sonarautofix.service.AutoFixEngine;
+import com.company.codequality.sonarautofix.repository.ScanRepository;
 import com.company.codequality.sonarautofix.service.ScanService;
+import com.company.codequality.sonarautofix.util.ProjectZipUtil;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -22,35 +25,23 @@ import java.util.Map;
 @CrossOrigin("*")
 public class FixController {
 
-    private final AutoFixEngine autoFixEngine;
-    private final ScanService scanService;
 
-    public FixController(AutoFixEngine autoFixEngine, ScanService scanService) {
-        this.autoFixEngine = autoFixEngine;
+    private final ScanService scanService;
+    private final ScanRepository scanRepository;
+    
+    public FixController(ScanService scanService,ScanRepository scanRepository) {
+        
         this.scanService = scanService;
+        this.scanRepository=scanRepository;
     }
 
     // ================= APPLY SELECTED FIXES =================
-    @PostMapping("/apply")
-    public ResponseEntity<?> applySelectedFixes(
-            @RequestParam("projectPath") String projectPath,
-            @RequestParam("projectKey") String projectKey,
-            @RequestBody List<FixRequest> requests) {
-
-        try {
-            autoFixEngine.applyFixes(
-                    requests,
-                    projectPath,
-                    projectKey,
-                    null   // no scanId → manual fix
-            );
-
-            return ResponseEntity.ok("Selected fixes applied successfully. Re-scan started.");
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Auto fix failed: " + e.getMessage());
-        }
+    @PostMapping("/apply/selected")
+    public int fixSelected(
+            @RequestParam String scanId,
+            @RequestBody List<String> issueKeys
+    ) {
+        return scanService.autoFixSelected(scanId, issueKeys);
     }
 
     // ================= AUTO FIX ALL =================
@@ -71,21 +62,29 @@ public class FixController {
     @GetMapping("/download/{scanId}")
     public ResponseEntity<Resource> downloadProject(@PathVariable String scanId) throws IOException {
 
-        ScanTask task = scanService.getScanTask(scanId);
-        if (task == null) return ResponseEntity.notFound().build();
+        ScanTask task = scanRepository.findById(scanId);
 
-        String zipPath = task.getProjectPath() + "-refactored.zip";
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String projectPath = task.getProjectPath();
+
+        // ZIP CREATED ONLY HERE
+        String zipPath = ProjectZipUtil.zipProject(projectPath);
+
         File file = new File(zipPath);
-        if (!file.exists()) return ResponseEntity.notFound().build();
 
         Resource resource = new UrlResource(file.toURI());
 
         return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + file.getName() + "\"")
+                .contentLength(file.length())
                 .body(resource);
     }
-
+    
     // ================= GET SUGGESTIONS =================
     @GetMapping("/suggestions/{scanId}")
     public ResponseEntity<?> getSuggestions(@PathVariable String scanId) {
@@ -96,7 +95,7 @@ public class FixController {
     @GetMapping("/report/{scanId}")
     public ResponseEntity<?> getExecutionReport(@PathVariable String scanId) {
 
-        ScanTask task = scanService.getScanTask(scanId);
+        ScanTask task =  scanRepository.findById(scanId);
         if (task == null) return ResponseEntity.notFound().build();
 
         Map<String, Object> response = new HashMap<>();

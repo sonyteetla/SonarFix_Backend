@@ -1,77 +1,103 @@
 package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.*;
+import com.company.codequality.sonarautofix.repository.ScanRepository;
 import com.company.codequality.sonarautofix.util.ProjectZipUtil;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 @Service
 public class ScanService {
 
-    private final Map<String, ScanTask> scanStore = new ConcurrentHashMap<>();
-
+	private final ScanRepository scanRepository;
+	 private final ProjectService projectService;
     private final SonarService sonarService;
     private final IssueMappingService issueMappingService;
     private final AutoFixEngine autoFixEngine;
+    private final ProjectUploadService projectUploadService;   
 
-    public ScanService(SonarService sonarService,
-                       IssueMappingService issueMappingService,
-                       AutoFixEngine autoFixEngine) {
-        this.sonarService = sonarService;
-        this.issueMappingService = issueMappingService;
-        this.autoFixEngine = autoFixEngine;
-    }
+    public ScanService(SonarService sonarService, ProjectService projectService,
+            IssueMappingService issueMappingService,
+            AutoFixEngine autoFixEngine,
+            ProjectUploadService projectUploadService,
+            ScanRepository scanRepository) {
+
+      this.sonarService = sonarService;
+     this.projectService=projectService;
+      this.issueMappingService = issueMappingService;
+      this.autoFixEngine = autoFixEngine;
+      this.projectUploadService = projectUploadService;
+      this.scanRepository = scanRepository;
+   }
 
     // ================= GET ALL SCANS =================
     public List<ScanTask> getAllScans() {
-        return new ArrayList<>(scanStore.values());
+    	return scanRepository.findAll();
     }
 
     // ================= NEW PROJECT SCAN =================
     public String startNewScan(String projectPath) {
+
         String executionId = UUID.randomUUID().toString();
         String projectKey = "auto-project-" + executionId;
+
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
     // ================= RE-SCAN =================
     public String reScan(String projectPath, String projectKey) {
+
         String executionId = UUID.randomUUID().toString();
         return startScanInternal(projectPath, projectKey, executionId);
     }
 
     public void reScan(String projectPath, String projectKey, String scanId) {
-        ScanTask task = scanStore.get(scanId);
+
+    	ScanTask task = scanRepository.findById(scanId);
+    	
         if (task == null) {
             throw new IllegalArgumentException("Scan not found");
         }
         task.setStatus("QUEUED");
+        scanRepository.update(task);
         runScanAsync(task);
     }
 
     private String startScanInternal(String projectPath,
-                                     String projectKey,
-                                     String executionId) {
+            String projectKey,
+            String executionId) {
 
-        ScanTask task = new ScanTask(executionId, projectPath);
-        task.setProjectKey(projectKey);
-        task.setStatus("QUEUED");
+if (projectPath == null || projectPath.isEmpty()) {
+throw new IllegalArgumentException("Project path cannot be null");
+}
 
-        scanStore.put(executionId, task);
-        runScanAsync(task);
+ScanTask task = new ScanTask();
 
-        return executionId;
-    }
+task.setScanId(executionId);       
+task.setProjectKey(projectKey);
+task.setProjectPath(projectPath); 
+task.setStatus("QUEUED");
+
+scanRepository.save(task);
+
+projectService.registerProject(projectKey, projectPath);
+
+runScanAsync(task);
+
+return executionId;
+}
 
     // ================= RUN SCAN =================
     @Async
     public void runScanAsync(ScanTask task) {
 
         try {
-            task.setStatus("RUNNING");
+
+        	task.setStatus("RUNNING");
+        	scanRepository.update(task);
 
             sonarService.runSonarScan(
                     task.getProjectPath(),
@@ -86,17 +112,21 @@ public class ScanService {
                     issueMappingService.mapIssues(issues);
 
             task.setMappedIssues(mappedIssues);
-
+        
             if (task.getSuggestions() == null) {
                 task.setSuggestions(new ArrayList<>());
             }
-
+            scanRepository.update(task);
             task.setStatus("COMPLETED");
-
+        
+            scanRepository.update(task);
         } catch (Exception e) {
+
             System.out.println("⚠ Scan completed with build issues (tolerated)");
+
             task.setStatus("COMPLETED");
             task.setResult("Scan completed with compilation errors in target project.");
+            scanRepository.update(task);
         }
     }
 
@@ -104,7 +134,7 @@ public class ScanService {
     public int applyAutoFix(String scanId,
                             List<FixRequest> requests) {
 
-        ScanTask task = scanStore.get(scanId);
+    	ScanTask task = scanRepository.findById(scanId);
 
         if (task == null) {
             throw new IllegalArgumentException("Scan not found");
@@ -120,14 +150,16 @@ public class ScanService {
 
     // ================= STATUS =================
     public String getStatus(String scanId) {
-        ScanTask task = scanStore.get(scanId);
+
+    	ScanTask task = scanRepository.findById(scanId);
+
         return task == null ? "NOT_FOUND" : task.getStatus();
     }
 
     // ================= RESULT =================
     public ScanResultResponse getResult(String scanId) {
 
-        ScanTask task = scanStore.get(scanId);
+    	ScanTask task = scanRepository.findById(scanId);
         if (task == null) return null;
 
         List<MappedIssue> issues = task.getMappedIssues();
@@ -152,13 +184,13 @@ public class ScanService {
     }
 
     public ScanTask getScanTask(String scanId) {
-        return scanStore.get(scanId);
+        return scanRepository.findById(scanId);
     }
 
     // ================= AUTO FIX ALL =================
     public String autoFixAll(String scanId) {
 
-        ScanTask task = scanStore.get(scanId);
+    	ScanTask task = scanRepository.findById(scanId);
 
         if (task == null) {
             throw new IllegalArgumentException("Scan not found");
@@ -191,7 +223,7 @@ public class ScanService {
                         .filePath(realPath)
                         .line(issue.getLine())
                         .fixType(issue.getFixType())
-                        .ruleId(issue.getRuleId())   // ✅ IMPORTANT FIX
+                        .ruleId(issue.getRuleId())
                         .build();
 
                 requests.add(request);
@@ -202,15 +234,30 @@ public class ScanService {
             throw new IllegalStateException("No auto-fixable issues");
         }
 
-        autoFixEngine.applyFixes(
-                requests,
-                task.getProjectPath(),
-                task.getProjectKey(),
-                scanId
-        );
+        try {
 
-        String zipPath = ProjectZipUtil.zipProject(task.getProjectPath());
-        System.out.println("📦 Refactored project zipped at: " + zipPath);
+            // ✅ COPY PROJECT FIRST
+            String originalPath = task.getProjectPath();
+
+            String fixedProjectPath =
+                    projectUploadService.copyProject(originalPath);
+
+            System.out.println("📂 Fixed project created at: " + fixedProjectPath);
+
+            // ✅ RUN FIXES ON COPY
+            autoFixEngine.applyFixes(
+                    requests,
+                    fixedProjectPath,
+                    task.getProjectKey(),
+                    scanId
+            );
+         // run scan once
+            reScan(fixedProjectPath, task.getProjectKey());
+           
+        } catch (Exception e) {
+
+            throw new RuntimeException("AutoFix failed", e);
+        }
 
         return scanId;
     }
@@ -218,12 +265,126 @@ public class ScanService {
     // ================= GET SUGGESTIONS =================
     public List<FixSuggestion> getSuggestions(String scanId) {
 
-        ScanTask task = scanStore.get(scanId);
+    	ScanTask task = scanRepository.findById(scanId);
 
         if (task == null || task.getSuggestions() == null) {
             return Collections.emptyList();
         }
 
         return task.getSuggestions();
+    }
+    
+    public int autoFixSelected(String scanId, List<String> issueKeys) {
+
+        ScanTask task = scanRepository.findById(scanId);
+
+        if (task == null) {
+            throw new IllegalArgumentException("Scan not found");
+        }
+
+        List<MappedIssue> issues = task.getMappedIssues();
+        List<FixRequest> requests = new ArrayList<>();
+
+        for (MappedIssue issue : issues) {
+
+            if (!issueKeys.contains(issue.getKey())) continue;
+            if (!issue.isAutoFixable()) continue;
+
+            String realPath = issue.getFile();
+
+            int idx = realPath.indexOf(":");
+            if (idx != -1) {
+                realPath = realPath.substring(idx + 1);
+            }
+
+            FixRequest request = FixRequest.builder()
+                    .filePath(realPath)
+                    .line(issue.getLine())
+                    .fixType(issue.getFixType())
+                    .ruleId(issue.getRuleId())
+                    .build();
+
+            requests.add(request);
+        }
+
+        if (requests.isEmpty()) {
+            throw new IllegalStateException("No selected issues are auto-fixable");
+        }
+
+        int fixed = autoFixEngine.applyFixes(
+                requests,
+                task.getProjectPath(),
+                task.getProjectKey(),
+                scanId
+        );
+
+        // run scan AFTER fixes
+        reScan(task.getProjectPath(), task.getProjectKey(), scanId);
+
+        return fixed;
+    }
+    
+    public String previewFixes(String scanId) {
+
+        ScanTask task = scanRepository.findById(scanId);
+
+        if (task == null) {
+            throw new IllegalArgumentException("Scan not found");
+        }
+
+        List<MappedIssue> issues = task.getMappedIssues();
+
+        if (issues == null || issues.isEmpty()) {
+            return task.getProjectPath();
+        }
+
+        List<FixRequest> requests = new ArrayList<>();
+
+        for (MappedIssue issue : issues) {
+
+            if (!issue.isAutoFixable() || issue.getFixType() == null) continue;
+
+            String realPath = issue.getFile();
+
+            int idx = realPath.indexOf(":");
+            if (idx != -1) {
+                realPath = realPath.substring(idx + 1);
+            }
+
+            FixRequest request = FixRequest.builder()
+                    .filePath(realPath)
+                    .line(issue.getLine())
+                    .fixType(issue.getFixType())
+                    .ruleId(issue.getRuleId())
+                    .build();
+
+            requests.add(request);
+        }
+
+        if (requests.isEmpty()) {
+            return task.getProjectPath();
+        }
+
+        try {
+
+            String originalPath = task.getProjectPath();
+
+            // create preview copy
+            String previewPath =
+                    projectUploadService.copyProject(originalPath);
+
+            // apply fixes to preview
+            autoFixEngine.applyFixes(
+                    requests,
+                    previewPath,
+                    task.getProjectKey(),
+                    scanId
+            );
+
+            return previewPath;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Preview generation failed", e);
+        }
     }
 }

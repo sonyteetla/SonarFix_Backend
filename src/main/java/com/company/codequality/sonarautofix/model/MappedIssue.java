@@ -10,7 +10,7 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 public class MappedIssue {
-
+	 private String key;
     private String ruleId;
     private String file;
     private int line;
@@ -18,7 +18,7 @@ public class MappedIssue {
     private String title;
     private String severity;
     private String category;
-
+   
     private boolean autoFixable;
     private String fixType;
 }

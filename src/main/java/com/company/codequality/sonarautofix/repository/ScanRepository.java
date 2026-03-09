@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -24,8 +22,8 @@ public class ScanRepository {
     private final ObjectMapper objectMapper;
 
     public ScanRepository() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @PostConstruct
@@ -33,10 +31,29 @@ public class ScanRepository {
         loadScans();
     }
 
-    public void save(ScanTask task) {
+    /* ---------------- SAVE ---------------- */
+
+    public synchronized void save(ScanTask task) {
+
         scanStore.put(task.getScanId(), task);
-        saveScans();
+        persist();
+
     }
+
+    /* ---------------- UPDATE ---------------- */
+
+    public synchronized void update(ScanTask task) {
+
+        if (!scanStore.containsKey(task.getScanId())) {
+            throw new IllegalArgumentException("Scan not found: " + task.getScanId());
+        }
+
+        scanStore.put(task.getScanId(), task);
+
+        persist();
+    }
+
+    /* ---------------- FIND ---------------- */
 
     public ScanTask findById(String scanId) {
         return scanStore.get(scanId);
@@ -46,7 +63,9 @@ public class ScanRepository {
         return new ArrayList<>(scanStore.values());
     }
 
-    private synchronized void saveScans() {
+    /* ---------------- PERSIST ---------------- */
+
+    private void persist() {
 
         try {
 
@@ -56,15 +75,18 @@ public class ScanRepository {
                 file.getParentFile().mkdirs();
             }
 
-            objectMapper.writeValue(file, scanStore);
+            objectMapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(file, scanStore);
 
         } catch (IOException e) {
 
-            System.err.println("Failed to save scans: " + e.getMessage());
+            System.err.println("Failed to save scans.json");
+            e.printStackTrace();
         }
     }
 
-    // ✅ SAFE LOADING IMPLEMENTATION
+    /* ---------------- LOAD ---------------- */
+
     private void loadScans() {
 
         try {
@@ -75,32 +97,27 @@ public class ScanRepository {
                 return;
             }
 
-            try {
+            Map<String, ScanTask> loaded =
+                    objectMapper.readValue(
+                            file,
+                            new TypeReference<Map<String, ScanTask>>() {}
+                    );
 
-                Map<String, ScanTask> loaded =
-                        objectMapper.readValue(
-                                file,
-                                new TypeReference<Map<String, ScanTask>>() {}
-                        );
+            scanStore.putAll(loaded);
 
-                scanStore.putAll(loaded);
-
-                System.out.println(
-                        "Loaded " + scanStore.size() + " scans from " + STORAGE_PATH
-                );
-
-            } catch (Exception ex) {
-
-                System.out.println(
-                        "⚠ Invalid scans.json detected. Starting with empty scan list."
-                );
-            }
+            System.out.println(
+                    "Loaded " + scanStore.size() + " scans"
+            );
 
         } catch (Exception e) {
 
-            System.err.println(
-                    "Failed to load scans: " + e.getMessage()
+            System.out.println(
+                    "⚠ scans.json corrupted. Resetting storage."
             );
+
+            scanStore.clear();
         }
     }
+    
+    
 }
