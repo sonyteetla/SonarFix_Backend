@@ -288,13 +288,28 @@ return executionId;
             throw new IllegalStateException("No issues found in scan");
         }
 
+        System.out.println("Selected keys from UI: " + issueKeys);
+
         List<FixRequest> requests = new ArrayList<>();
 
         for (MappedIssue issue : issues) {
 
-            if (!issueKeys.contains(issue.getKey())) continue;
-            if (!issue.isAutoFixable()) continue;
-            if (issue.getFixType() == null) continue;
+            // DEBUG
+            System.out.println("Checking mapped issue: " + issue.getKey());
+
+            if (!issueKeys.contains(issue.getKey())) {
+                continue;
+            }
+
+            if (!issue.isAutoFixable()) {
+                System.out.println("Skipping non-autofixable issue: " + issue.getKey());
+                continue;
+            }
+
+            if (issue.getFixType() == null) {
+                System.out.println("Skipping issue with null fixType: " + issue.getKey());
+                continue;
+            }
 
             String realPath = issue.getFile();
 

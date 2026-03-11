@@ -23,6 +23,10 @@ public class IssueMappingService {
 
         for (SonarIssue issue : sonarIssues) {
 
+            if (issue.getKey() == null) {
+                continue;
+            }
+
             String ruleId = issue.getRule();
             RuleConfig rule = ruleRegistry.getRule(ruleId);
 
@@ -30,14 +34,7 @@ public class IssueMappingService {
                 continue;
             }
 
-            // FIX COMPONENT PATH
-            String component = issue.getComponent();
-            String filePath = component;
-
-            int idx = component.indexOf(":");
-            if (idx != -1) {
-                filePath = component.substring(idx + 1);
-            }
+            String filePath = issue.getComponent();
 
             MappedIssue mapped = new MappedIssue(
                     issue.getKey(),

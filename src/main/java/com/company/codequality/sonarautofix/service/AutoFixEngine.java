@@ -75,8 +75,7 @@ public class AutoFixEngine {
 
                 fileFixes.sort((a, b) ->
                         Integer.compare(b.getLine(), a.getLine()));
-
-                Path path = Path.of(projectPath, filePath);
+                Path path = Path.of(projectPath).resolve(filePath).normalize();
 
                 System.out.println("---- FILE DEBUG ----");
                 System.out.println("projectPath = " + projectPath);

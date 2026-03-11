@@ -95,17 +95,30 @@ public class FixController {
 
         String projectPath = task.getProjectPath();
 
-        // ZIP CREATED ONLY HERE
+        // Create ZIP
         String zipPath = ProjectZipUtil.zipProject(projectPath);
 
         File file = new File(zipPath);
 
         Resource resource = new UrlResource(file.toURI());
 
+        // Extract original project name
+        String projectName = new File(projectPath).getName();
+
+        // Remove "_fixed" if present
+        if (projectName.endsWith("_fixed")) {
+            projectName = projectName.replace("_fixed", "");
+        }
+
+        // Create final download name
+        String downloadName = projectName + "-refactored.zip";
+
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + file.getName() + "\"")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + downloadName + "\""
+                )
                 .contentLength(file.length())
                 .body(resource);
     }

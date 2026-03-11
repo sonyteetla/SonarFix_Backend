@@ -33,8 +33,7 @@ public class ProjectDiffService {
                             Path fixedFile =
                                     Paths.get(fixedDir, relative);
 
-                            if (!Files.exists(fixedFile))
-                                return;
+                            if (!Files.exists(fixedFile)) return;
 
                             List<String> originalLines =
                                     Files.readAllLines(file);
@@ -45,20 +44,22 @@ public class ProjectDiffService {
                             Patch<String> patch =
                                     DiffUtils.diff(originalLines, fixedLines);
 
-                            if (patch.getDeltas().isEmpty())
-                                return;
+                            if (patch.getDeltas().isEmpty()) return;
 
                             List<DiffLine> diffLines =
                                     generateDiffLines(originalLines, fixedLines, patch);
 
-                            result.add(
-                                    new FileDiff(relative, diffLines)
-                            );
+                            result.add(new FileDiff(relative, diffLines));
 
-                        } catch (Exception ignored) {}
+                        } catch (Exception e) {
+
+                            System.err.println("Diff failed for file: " + file);
+                            e.printStackTrace();
+                        }
                     });
 
         } catch (Exception e) {
+
             throw new RuntimeException("Project diff failed", e);
         }
 
@@ -121,6 +122,21 @@ public class ProjectDiffService {
 
             originalIndex += src.size();
             modifiedIndex += tgt.size();
+        }
+
+        // add remaining unchanged lines
+        while (originalIndex < original.size()
+                && modifiedIndex < modified.size()) {
+
+            lines.add(new DiffLine(
+                    originalIndex + 1,
+                    original.get(originalIndex),
+                    modified.get(modifiedIndex),
+                    "UNCHANGED"
+            ));
+
+            originalIndex++;
+            modifiedIndex++;
         }
 
         return lines;

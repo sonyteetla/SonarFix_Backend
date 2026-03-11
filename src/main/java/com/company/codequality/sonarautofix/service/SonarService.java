@@ -163,6 +163,9 @@ public class SonarService {
 
                     SonarIssue issue = new SonarIssue();
 
+                    /* FIX: read issue key */
+                    issue.setKey(node.path("key").asText());
+
                     issue.setRule(node.path("rule").asText());
 
                     String fullComponent = node.path("component").asText();
@@ -172,9 +175,17 @@ public class SonarService {
                             : fullComponent;
 
                     issue.setComponent(filePath);
-                    issue.setLine(node.has("line") ? node.get("line").asInt() : 0);
+
+                    int line = node.has("line") ? node.get("line").asInt() : -1;
+                    issue.setLine(line);
 
                     issues.add(issue);
+
+                    System.out.println(
+                            "ISSUE -> key=" + issue.getKey() +
+                            " rule=" + issue.getRule() +
+                            " line=" + issue.getLine()
+                    );
                 }
             }
 

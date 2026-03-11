@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -14,18 +16,20 @@ public class ProjectUploadService {
 
     private static final String WORKSPACE = "C:/sonar-workspace/";
 
-    // ================= Ensure workspace exists =================
     private void ensureWorkspace() throws IOException {
         Files.createDirectories(Paths.get(WORKSPACE));
     }
 
     // ================= ZIP Upload =================
     public String handleZipUpload(MultipartFile file) {
+
         try {
+
             ensureWorkspace();
 
             String projectDir = WORKSPACE + System.currentTimeMillis();
             Path projectPath = Paths.get(projectDir);
+
             Files.createDirectories(projectPath);
 
             try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
@@ -36,13 +40,14 @@ public class ProjectUploadService {
 
                     Path newFile = projectPath.resolve(entry.getName()).normalize();
 
-                    // Prevent ZIP Slip attack
                     if (!newFile.startsWith(projectPath)) {
                         throw new IOException("Invalid ZIP entry: " + entry.getName());
                     }
 
                     if (entry.isDirectory()) {
+
                         Files.createDirectories(newFile);
+
                     } else {
 
                         Files.createDirectories(newFile.getParent());
@@ -60,9 +65,27 @@ public class ProjectUploadService {
                 }
             }
 
-            return projectDir;
+            // ===== Detect if ZIP has a single root folder =====
+
+            Path projectRoot = projectPath;
+
+            try (var stream = Files.list(projectPath)) {
+
+                List<Path> children =
+                        stream.collect(Collectors.toList());
+
+                if (children.size() == 1 && Files.isDirectory(children.get(0))) {
+
+                    projectRoot = children.get(0);
+
+                    System.out.println("Detected root folder inside ZIP: " + projectRoot);
+                }
+            }
+
+            return projectRoot.toString();
 
         } catch (Exception e) {
+
             throw new RuntimeException("ZIP Upload failed: " + e.getMessage(), e);
         }
     }
@@ -92,9 +115,7 @@ public class ProjectUploadService {
                          new BufferedReader(
                                  new InputStreamReader(process.getInputStream()))) {
 
-                while (reader.readLine() != null) {
-                    // optional logging
-                }
+                while (reader.readLine() != null) {}
             }
 
             int exit = process.waitFor();
@@ -106,6 +127,7 @@ public class ProjectUploadService {
             return projectDir;
 
         } catch (Exception e) {
+
             throw new RuntimeException("Git clone failed: " + e.getMessage(), e);
         }
     }
@@ -133,7 +155,9 @@ public class ProjectUploadService {
                     Path target = dest.resolve(src.relativize(source));
 
                     if (Files.isDirectory(source)) {
+
                         Files.createDirectories(target);
+
                     } else {
 
                         Files.createDirectories(target.getParent());
@@ -146,6 +170,7 @@ public class ProjectUploadService {
                     }
 
                 } catch (IOException e) {
+
                     throw new RuntimeException(e);
                 }
             });
@@ -153,11 +178,12 @@ public class ProjectUploadService {
             return projectDir;
 
         } catch (IOException e) {
+
             throw new RuntimeException("Local directory copy failed: " + e.getMessage(), e);
         }
     }
 
-    // ================= Copy Project for Fixing =================
+    // ================= Copy Project =================
     public String copyProject(String originalPath) throws IOException {
 
         Path sourcePath = Paths.get(originalPath);
@@ -177,10 +203,13 @@ public class ProjectUploadService {
 
             try {
 
-                Path target = fixedPath.resolve(sourcePath.relativize(source));
+                Path target =
+                        fixedPath.resolve(sourcePath.relativize(source));
 
                 if (Files.isDirectory(source)) {
+
                     Files.createDirectories(target);
+
                 } else {
 
                     Files.createDirectories(target.getParent());
@@ -193,6 +222,7 @@ public class ProjectUploadService {
                 }
 
             } catch (IOException e) {
+
                 throw new RuntimeException("Failed to copy: " + source, e);
             }
         });
@@ -222,7 +252,8 @@ public class ProjectUploadService {
 
         try {
 
-            Path metadata = Paths.get(projectDir, ".project-key");
+            Path metadata =
+                    Paths.get(projectDir, ".project-key");
 
             Files.writeString(metadata, projectKey);
 
