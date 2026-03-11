@@ -37,11 +37,36 @@ public class FixController {
 
     // ================= APPLY SELECTED FIXES =================
     @PostMapping("/apply/selected")
-    public int fixSelected(
+    public ResponseEntity<?> fixSelected(
             @RequestParam String scanId,
             @RequestBody List<String> issueKeys
     ) {
-        return scanService.autoFixSelected(scanId, issueKeys);
+
+        try {
+
+            if (scanId == null || scanId.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body("scanId is missing");
+            }
+
+            if (issueKeys == null || issueKeys.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body("No issue keys provided");
+            }
+
+            int fixed = scanService.autoFixSelected(scanId, issueKeys);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("scanId", scanId);
+            response.put("fixesApplied", fixed);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+
+            return ResponseEntity.internalServerError()
+                    .body("AutoFix Selected failed: " + e.getMessage());
+        }
     }
 
     // ================= AUTO FIX ALL =================

@@ -283,12 +283,18 @@ return executionId;
         }
 
         List<MappedIssue> issues = task.getMappedIssues();
+
+        if (issues == null || issues.isEmpty()) {
+            throw new IllegalStateException("No issues found in scan");
+        }
+
         List<FixRequest> requests = new ArrayList<>();
 
         for (MappedIssue issue : issues) {
 
             if (!issueKeys.contains(issue.getKey())) continue;
             if (!issue.isAutoFixable()) continue;
+            if (issue.getFixType() == null) continue;
 
             String realPath = issue.getFile();
 
@@ -311,17 +317,27 @@ return executionId;
             throw new IllegalStateException("No selected issues are auto-fixable");
         }
 
-        int fixed = autoFixEngine.applyFixes(
-                requests,
-                task.getProjectPath(),
-                task.getProjectKey(),
-                scanId
-        );
+        try {
 
-        // run scan AFTER fixes
-        reScan(task.getProjectPath(), task.getProjectKey(), scanId);
+            String originalPath = task.getProjectPath();
 
-        return fixed;
+            String fixedProjectPath =
+                    projectUploadService.copyProject(originalPath);
+
+            int fixed = autoFixEngine.applyFixes(
+                    requests,
+                    fixedProjectPath,
+                    task.getProjectKey(),
+                    scanId
+            );
+
+            reScan(fixedProjectPath, task.getProjectKey());
+
+            return fixed;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Selected AutoFix failed", e);
+        }
     }
     
     public String previewFixes(String scanId) {

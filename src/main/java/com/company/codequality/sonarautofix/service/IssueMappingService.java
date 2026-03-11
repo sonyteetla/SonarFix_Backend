@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 public class IssueMappingService {
 
@@ -24,23 +23,31 @@ public class IssueMappingService {
 
         for (SonarIssue issue : sonarIssues) {
 
-            // Get rule from your custom rule registry
-            RuleConfig rule = ruleRegistry.getRule(issue.getRule());
+            String ruleId = issue.getRule();
+            RuleConfig rule = ruleRegistry.getRule(ruleId);
 
-            if (rule == null) {
-                continue; // Skip rules not in your custom rules.json
+            if (rule == null || !Boolean.TRUE.equals(rule.getEnabled())) {
+                continue;
             }
 
-            // Create mapped issue using your 8-field constructor
+            // FIX COMPONENT PATH
+            String component = issue.getComponent();
+            String filePath = component;
+
+            int idx = component.indexOf(":");
+            if (idx != -1) {
+                filePath = component.substring(idx + 1);
+            }
+
             MappedIssue mapped = new MappedIssue(
-                    issue.getKey(),            // key
-                    issue.getRule(),           // ruleId
-                    issue.getComponent(),      // file
-                    issue.getLine(),           // line
-                    rule.getTitle(),           // title
-                    rule.getSeverity(),        // severity
-                    rule.getCategory(),        // category
-                    rule.isAutoFixable(),     // autoFixable
+                    issue.getKey(),
+                    ruleId,
+                    filePath,
+                    issue.getLine(),
+                    rule.getTitle(),
+                    rule.getSeverity(),
+                    rule.getCategory(),
+                    rule.isAutoFixable(),
                     rule.getFixType()
             );
 
