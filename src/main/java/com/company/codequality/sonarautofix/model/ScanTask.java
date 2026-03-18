@@ -10,6 +10,7 @@ public class ScanTask {
     private String status;
     private String result;
     private String projectKey;
+    private String fixedPath;
     private LocalDateTime createdAt;
 
     private List<MappedIssue> mappedIssues = new ArrayList<>();
@@ -53,6 +54,8 @@ public class ScanTask {
 
     public String getProjectKey() { return projectKey; }
 
+    public String getFixedPath() { return fixedPath; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     public List<MappedIssue> getMappedIssues() { return mappedIssues; }
@@ -87,6 +90,10 @@ public class ScanTask {
 
     public void setProjectKey(String projectKey) {
         this.projectKey = projectKey;
+    }
+
+    public void setFixedPath(String fixedPath) {
+        this.fixedPath = fixedPath;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

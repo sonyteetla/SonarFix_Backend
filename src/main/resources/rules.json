@@ -206,7 +206,7 @@
       "fixType": "USE_EQUALS_FOR_STRING"
     },
     {
-      "ruleId": "java:S1132",
+      "ruleId": "java:S131",
       "title": "Switch Statements Should Have a Default Case",
       "description": "Add a default case to switch statements.",
       "severity": "MINOR",

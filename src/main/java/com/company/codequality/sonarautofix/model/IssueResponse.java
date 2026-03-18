@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 public class IssueResponse {
 
+    private String scanId;
     private long totalElements;
     private int page;
     private int pageSize;

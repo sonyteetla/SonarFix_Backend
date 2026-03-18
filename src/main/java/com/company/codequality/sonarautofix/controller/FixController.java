@@ -93,7 +93,9 @@ public class FixController {
             return ResponseEntity.notFound().build();
         }
 
-        String projectPath = task.getProjectPath();
+        String projectPath = task.getFixedPath() != null && new File(task.getFixedPath()).exists()
+                ? task.getFixedPath()
+                : task.getProjectPath();
 
         // Create ZIP
         String zipPath = ProjectZipUtil.zipProject(projectPath);
@@ -127,6 +129,41 @@ public class FixController {
     @GetMapping("/suggestions/{scanId}")
     public ResponseEntity<?> getSuggestions(@PathVariable String scanId) {
         return ResponseEntity.ok(scanService.getSuggestions(scanId));
+    }
+
+    // ================= APPLY FIX BY RULE =================
+    @PostMapping("/apply/rule")
+    public ResponseEntity<?> fixByRule(
+            @RequestParam String scanId,
+            @RequestParam String ruleId
+    ) {
+
+        try {
+
+            if (scanId == null || scanId.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body("scanId is missing");
+            }
+
+            if (ruleId == null || ruleId.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body("ruleId is missing");
+            }
+
+            int fixed = scanService.autoFixByRule(scanId, ruleId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("scanId", scanId);
+            response.put("fixesApplied", fixed);
+            response.put("ruleId", ruleId);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+
+            return ResponseEntity.internalServerError()
+                    .body("AutoFix by Rule failed: " + e.getMessage());
+        }
     }
 
     // ================= EXECUTION REPORT =================

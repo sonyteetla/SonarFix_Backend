@@ -63,6 +63,13 @@ public class ScanRepository {
         return new ArrayList<>(scanStore.values());
     }
 
+    public ScanTask findLatestByProjectKey(String projectKey) {
+        return scanStore.values().stream()
+                .filter(t -> projectKey.equals(t.getProjectKey()))
+                .max(Comparator.comparing(ScanTask::getCreatedAt)) 
+                .orElse(null);
+    }
+
     /* ---------------- PERSIST ---------------- */
 
     private void persist() {

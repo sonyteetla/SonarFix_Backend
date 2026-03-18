@@ -19,6 +19,7 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
 
     @Override
     public boolean apply(CompilationUnit cu, int line) {
+        boolean fixedAny = false;
 
         for (MethodCallExpr call : cu.findAll(MethodCallExpr.class)) {
 
@@ -28,11 +29,12 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
             }
 
             if (transformIfSystemCall(cu, call)) {
-                return true;
+                fixedAny = true;
+                if (line != -1) return true;
             }
         }
 
-        return false;
+        return fixedAny;
     }
 
     private boolean transformIfSystemCall(CompilationUnit cu, MethodCallExpr call) {

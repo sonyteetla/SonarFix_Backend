@@ -1,6 +1,7 @@
 package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.*;
+import com.company.codequality.sonarautofix.repository.ScanRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +24,16 @@ public class ScanIssueService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final RuleEngineService ruleEngineService;
+    private final ScanRepository scanRepository;
 
     public ScanIssueService(RestTemplate restTemplate,
                             ObjectMapper objectMapper,
-                            RuleEngineService ruleEngineService) {
+                            RuleEngineService ruleEngineService,
+                            ScanRepository scanRepository) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.ruleEngineService = ruleEngineService;
+        this.scanRepository = scanRepository;
     }
 
 
@@ -97,15 +101,25 @@ public class ScanIssueService {
                         Issue::getSoftwareQuality,
                         Collectors.counting()));
 
-        Map<String, Long> ruleCounts = ruleBase.stream()
-                .collect(Collectors.groupingBy(
-                        Issue::getRule,
-                        Collectors.counting()));
+        Map<String, RuleCountInfo> ruleCounts = new HashMap<>();
+        for (Issue issue : ruleBase) {
+            String ruleKey = issue.getRule();
+            RuleCountInfo info = ruleCounts.getOrDefault(ruleKey, new RuleCountInfo(0, issue.isAutoFixable()));
+            info.setCount(info.getCount() + 1);
+            ruleCounts.put(ruleKey, info);
+        }
 
         FilterCounts filterCounts =
                 new FilterCounts(severityCounts, qualityCounts, ruleCounts);
 
+        String currentScanId = null;
+        ScanTask latestTask = scanRepository.findLatestByProjectKey(projectKey);
+        if (latestTask != null) {
+            currentScanId = latestTask.getScanId();
+        }
+
         return IssueResponse.builder()
+                .scanId(currentScanId)
                 .totalElements(pagedResult.getTotalElements())
                 .page(pagedResult.getPage())
                 .pageSize(pagedResult.getPageSize())
@@ -441,7 +455,14 @@ public class ScanIssueService {
         		   .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
         		   .collect(Collectors.toList());
            
+           String currentScanId = null;
+           ScanTask latestTask = scanRepository.findLatestByProjectKey(projectKey);
+           if (latestTask != null) {
+               currentScanId = latestTask.getScanId();
+           }
+
            return IssueResponse.builder()
+        		   .scanId(currentScanId)
         		   .totalElements(allIssues.size())
         		   .page(1)
         		   .pageSize(allIssues.size())
