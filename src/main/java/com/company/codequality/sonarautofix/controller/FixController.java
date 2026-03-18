@@ -38,7 +38,7 @@ public class FixController {
     // ================= APPLY SELECTED FIXES =================
     @PostMapping("/apply/selected")
     public ResponseEntity<?> fixSelected(
-            @RequestParam String scanId,
+            @RequestParam("scanId") String scanId,
             @RequestBody List<String> issueKeys
     ) {
 
@@ -71,7 +71,7 @@ public class FixController {
 
     // ================= AUTO FIX ALL =================
     @PostMapping("/apply/{scanId}")
-    public ResponseEntity<?> autoFixAll(@PathVariable String scanId) {
+    public ResponseEntity<?> autoFixAll(@PathVariable("scanId") String scanId) {
 
         try {
             String updatedScanId = scanService.autoFixAll(scanId);
@@ -85,7 +85,7 @@ public class FixController {
 
     // ================= DOWNLOAD REFACTORED PROJECT =================
     @GetMapping("/download/{scanId}")
-    public ResponseEntity<Resource> downloadProject(@PathVariable String scanId) throws IOException {
+    public ResponseEntity<Resource> downloadProject(@PathVariable("scanId") String scanId) throws IOException {
 
         ScanTask task = scanRepository.findById(scanId);
 
@@ -104,16 +104,8 @@ public class FixController {
 
         Resource resource = new UrlResource(file.toURI());
 
-        // Extract original project name
-        String projectName = new File(projectPath).getName();
-
-        // Remove "_fixed" if present
-        if (projectName.endsWith("_fixed")) {
-            projectName = projectName.replace("_fixed", "");
-        }
-
-        // Create final download name
-        String downloadName = projectName + "-refactored.zip";
+        // ── Determine clean original project name ──────────────────────────
+        String downloadName = resolveProjectName(task, projectPath) + "-refactored.zip";
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -124,18 +116,66 @@ public class FixController {
                 .contentLength(file.length())
                 .body(resource);
     }
-    
+
+    /** Resolves the clean, human-readable project name for the download filename. */
+    private String resolveProjectName(ScanTask task, String fixedProjectPath) {
+
+        // 1) Check for .original-name metadata file in the fixed copy
+        try {
+            java.nio.file.Path nameFile =
+                    java.nio.file.Path.of(fixedProjectPath).resolve(".original-name");
+            if (java.nio.file.Files.exists(nameFile)) {
+                String name = java.nio.file.Files.readString(nameFile).trim();
+                if (!name.isBlank()) return name;
+            }
+        } catch (Exception ignored) {}
+
+        // 2) Check the original (pre-fix) project path for .original-name
+        try {
+            String origPath = task.getProjectPath();
+            if (origPath != null) {
+                java.nio.file.Path nameFile =
+                        java.nio.file.Path.of(origPath).resolve(".original-name");
+                if (java.nio.file.Files.exists(nameFile)) {
+                    String name = java.nio.file.Files.readString(nameFile).trim();
+                    if (!name.isBlank()) return name;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // 3) Use the original project path's folder name (no timestamp for ZIP inner folders)
+        try {
+            String origPath = task.getProjectPath();
+            if (origPath != null) {
+                String name = new File(origPath).getName();
+                // Strip _fixed suffix
+                if (name.endsWith("_fixed")) name = name.substring(0, name.length() - 6);
+                // Strip any trailing 13-digit timestamp (with or without underscore prefix)
+                name = name.replaceAll("[_-]?\\d{13}$", "").trim();
+                if (!name.isBlank() && !name.matches("\\d+")) return name;
+            }
+        } catch (Exception ignored) {}
+
+        // 4) Last resort: parse the fixed directory name
+        String name = new File(fixedProjectPath).getName();
+        if (name.endsWith("_fixed")) name = name.substring(0, name.length() - 6);
+        name = name.replaceAll("[_-]?\\d{13}$", "").trim();
+        if (name.isBlank() || name.matches("\\d+")) name = "project";
+
+        return name;
+    }
+
     // ================= GET SUGGESTIONS =================
     @GetMapping("/suggestions/{scanId}")
-    public ResponseEntity<?> getSuggestions(@PathVariable String scanId) {
+    public ResponseEntity<?> getSuggestions(@PathVariable("scanId") String scanId) {
         return ResponseEntity.ok(scanService.getSuggestions(scanId));
     }
 
     // ================= APPLY FIX BY RULE =================
     @PostMapping("/apply/rule")
     public ResponseEntity<?> fixByRule(
-            @RequestParam String scanId,
-            @RequestParam String ruleId
+            @RequestParam("scanId") String scanId,
+            @RequestParam("ruleId") String ruleId
     ) {
 
         try {
@@ -168,7 +208,7 @@ public class FixController {
 
     // ================= EXECUTION REPORT =================
     @GetMapping("/report/{scanId}")
-    public ResponseEntity<?> getExecutionReport(@PathVariable String scanId) {
+    public ResponseEntity<?> getExecutionReport(@PathVariable("scanId") String scanId) {
 
         ScanTask task =  scanRepository.findById(scanId);
         if (task == null) return ResponseEntity.notFound().build();

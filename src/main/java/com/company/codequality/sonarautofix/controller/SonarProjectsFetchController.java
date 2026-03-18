@@ -30,7 +30,7 @@ public class SonarProjectsFetchController {
     }
 
     @DeleteMapping("/projects/{projectKey}")
-    public String deleteProject(@PathVariable String projectKey) {
+    public String deleteProject(@PathVariable("projectKey") String projectKey) {
         return sonarProjectDeleteService.deleteProject(projectKey);
     }
 }

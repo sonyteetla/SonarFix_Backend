@@ -37,7 +37,16 @@ public class ProjectUploadService {
 
             ensureWorkspace();
 
-            String projectDir = WORKSPACE + System.currentTimeMillis();
+            String originalName = file.getOriginalFilename();
+            if (originalName != null && originalName.toLowerCase().endsWith(".zip")) {
+                originalName = originalName.substring(0, originalName.length() - 4);
+                // Remove any unsafe characters
+                originalName = originalName.replaceAll("[^a-zA-Z0-9-_\\.]", "_");
+            } else {
+                originalName = "project";
+            }
+
+            String projectDir = WORKSPACE + originalName + "_" + System.currentTimeMillis();
             Path projectPath = Paths.get(projectDir);
 
             Files.createDirectories(projectPath);
@@ -90,6 +99,9 @@ public class ProjectUploadService {
                 }
             }
 
+            // Store original clean name so download can use it
+            Files.writeString(projectRoot.resolve(".original-name"), originalName);
+
             return projectRoot.toString();
 
         } catch (Exception e) {
@@ -127,6 +139,19 @@ public class ProjectUploadService {
             if (exit != 0) {
                 throw new RuntimeException("Git clone failed. Exit code: " + exit);
             }
+
+            // Extract repo name from URL to use as original name
+            String originalName = "project";
+            try {
+                String temp = repoUrl.trim();
+                if (temp.endsWith(".git")) temp = temp.substring(0, temp.length() - 4);
+                int lastSlash = temp.lastIndexOf("/");
+                if (lastSlash != -1) {
+                    originalName = temp.substring(lastSlash + 1);
+                }
+            } catch (Exception ignored) {}
+
+            Files.writeString(Paths.get(projectDir).resolve(".original-name"), originalName);
 
             return projectDir;
 
@@ -174,6 +199,10 @@ public class ProjectUploadService {
                             throw new RuntimeException(e);
                         }
                     });
+
+            // Store original clean name so download can use it
+            String originalName = src.getFileName().toString();
+            Files.writeString(dest.resolve(".original-name"), originalName);
 
             return projectDir;
 

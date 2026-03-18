@@ -25,8 +25,8 @@ public class FileContentController {
 
     @GetMapping("/{projectKey}")
     public FileContentResponse getFileContent(
-            @PathVariable String projectKey,
-            @RequestParam String filePath) {
+            @PathVariable("projectKey") String projectKey,
+            @RequestParam("filePath") String filePath) {
 
         List<String> rawLines =
                 fileContentService.getFileContent(projectKey, filePath);

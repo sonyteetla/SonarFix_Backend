@@ -1,14 +1,14 @@
 {
-  "fdcecc63-5bb4-41b9-8795-a222a6a2a329" : {
-    "scanId" : "fdcecc63-5bb4-41b9-8795-a222a6a2a329",
-    "projectPath" : "C:/sonar-workspace/1773811372068",
+  "42af8bce-2593-45a2-aa77-132674e2c874" : {
+    "scanId" : "42af8bce-2593-45a2-aa77-132674e2c874",
+    "projectPath" : "C:/sonar-workspace/1773840815649",
     "status" : "COMPLETED",
     "result" : null,
-    "projectKey" : "auto-project-fdcecc63-5bb4-41b9-8795-a222a6a2a329",
-    "fixedPath" : "C:\\sonar-workspace\\1773811372068_fixed",
-    "createdAt" : [ 2026, 3, 18, 10, 52, 52, 106329700 ],
+    "projectKey" : "auto-project-42af8bce-2593-45a2-aa77-132674e2c874",
+    "fixedPath" : "C:\\sonar-workspace\\1773840815649_fixed",
+    "createdAt" : [ 2026, 3, 18, 19, 3, 35, 673578400 ],
     "mappedIssues" : [ {
-      "key" : "96573649-7894-4ad5-9584-13f2d56dd4be",
+      "key" : "e2567a9a-eefb-43a3-b7bc-89e98a54d568",
       "ruleId" : "java:S1128",
       "file" : "src/main/java/com/example/Calculator.java",
       "line" : 3,
@@ -18,7 +18,7 @@
       "autoFixable" : true,
       "fixType" : "REMOVE_UNUSED_IMPORT"
     }, {
-      "key" : "3af3108b-09ca-498a-b75d-66410981d383",
+      "key" : "f6aaceca-dca9-400d-8118-294fd63a05ce",
       "ruleId" : "java:S106",
       "file" : "src/main/java/com/example/Calculator.java",
       "line" : 14,
@@ -28,7 +28,7 @@
       "autoFixable" : true,
       "fixType" : "REPLACE_SYSTEM_OUT"
     }, {
-      "key" : "7a37341e-c42a-44d4-82df-8d6bb3a346d1",
+      "key" : "010875be-5b56-4afe-957e-c690dc6bdef5",
       "ruleId" : "java:S109",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 5,
@@ -38,7 +38,7 @@
       "autoFixable" : true,
       "fixType" : "EXTRACT_CONSTANT"
     }, {
-      "key" : "341c0e30-879e-471f-a120-859fe2255d71",
+      "key" : "dca43fc5-4b2c-4962-9ab2-3347006780ee",
       "ruleId" : "java:S109",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 8,
@@ -48,7 +48,7 @@
       "autoFixable" : true,
       "fixType" : "EXTRACT_CONSTANT"
     }, {
-      "key" : "95647c95-fd8b-48cb-a6a8-3014e3ff11e7",
+      "key" : "e42113fc-2a75-4c0a-9bea-8de2530ad874",
       "ruleId" : "java:S106",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 9,
@@ -59,21 +59,119 @@
       "fixType" : "REPLACE_SYSTEM_OUT"
     } ],
     "suggestions" : [ ],
-    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773811372068\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773811372068\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773811372068\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=419ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=72ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=114ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=82ms\n[INFO] Project key: auto-project-fdcecc63-5bb4-41b9-8795-a222a6a2a329\n[INFO] Base dir: C:\\sonar-workspace\\1773811372068\n[INFO] Working dir: C:\\sonar-workspace\\1773811372068\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-fdcecc63-5bb4-41b9-8795-a222a6a2a329'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=235ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=949ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=14ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=83ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=44ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=16ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=51ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=65ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=3662ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773811372068\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=7ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=404ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=7ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=6ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=26ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=4ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=1490ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=10ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=40ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=47ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=30ms\n[INFO] Analysis report generated in 622ms, dir size=224.9 kB\n[INFO] Analysis report compressed in 389ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 3467ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-fdcecc63-5bb4-41b9-8795-a222a6a2a329\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=298dd5b3-daaf-4a00-8de6-7a54b3b2b9b5\n[INFO] Analysis total time: 17.693 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  53.179 s\n[INFO] Finished at: 2026-03-18T10:53:48+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773840815649\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773840815649\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773840815649\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=142ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=21ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=60ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=33ms\n[INFO] Project key: auto-project-42af8bce-2593-45a2-aa77-132674e2c874\n[INFO] Base dir: C:\\sonar-workspace\\1773840815649\n[INFO] Working dir: C:\\sonar-workspace\\1773840815649\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-42af8bce-2593-45a2-aa77-132674e2c874'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=83ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=460ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=8ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=34ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=14ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=10ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=22ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=45ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1676ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773840815649\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=4ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=191ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=8ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=3ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=8ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=2ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=829ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=4ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=14ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=22ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=10ms\n[INFO] Analysis report generated in 349ms, dir size=224.8 kB\n[INFO] Analysis report compressed in 283ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 2232ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-42af8bce-2593-45a2-aa77-132674e2c874\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=a3a46f3c-a070-486f-b987-90c0563cd38a\n[INFO] Analysis total time: 9.162 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  24.139 s\n[INFO] Finished at: 2026-03-18T19:04:01+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : {
+      "java:S109" : 2,
+      "EXTRACT_CONSTANT" : 2
+    },
+    "totalFixesApplied" : 4,
+    "fixReports" : [ {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "Calculator calc = new Calculator(myNum);",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNum = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    } ]
+  },
+  "5454dd1e-1e95-4107-aba0-f6ea8fe2518d" : {
+    "scanId" : "5454dd1e-1e95-4107-aba0-f6ea8fe2518d",
+    "projectPath" : "C:\\sonar-workspace\\1773842594375_fixed",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d",
+    "fixedPath" : null,
+    "createdAt" : [ 2026, 3, 18, 19, 34, 29, 86214300 ],
+    "mappedIssues" : [ ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.3.2:clean (default-clean) @ test-project ---\n[INFO] Deleting C:\\sonar-workspace\\1773842594375_fixed\\target\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375_fixed\\src\\main\\resources\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375_fixed\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:compile (default-compile) @ test-project ---\n[INFO] Changes detected - recompiling the module! :source\n[INFO] Compiling 4 source files with javac [debug release 17] to target\\classes\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375_fixed\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ test-project ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.1.2:test (default-test) @ test-project ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.3.0:jar (default-jar) @ test-project ---\n[INFO] Building jar: C:\\sonar-workspace\\1773842594375_fixed\\target\\test-project-0.0.1-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ test-project ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=196ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=29ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=65ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=48ms\n[INFO] Project key: auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d\n[INFO] Base dir: C:\\sonar-workspace\\1773842594375_fixed\n[INFO] Working dir: C:\\sonar-workspace\\1773842594375_fixed\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d'\n[INFO] Load project settings for component key: 'auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d' (done) | time=24ms\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=104ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=755ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (280 bytes) | time=27ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 5 preprocessed files (done) | time=70ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=16ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=139ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 5 files indexed (done) | time=28ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module test-project\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=37ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 4 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 4 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=2163ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773842594375_fixed\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=4ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=281ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=7ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=5ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=20ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=1ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 5 source files to be analyzed for the text and secrets analysis\n[INFO] 5/5 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=942ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=13ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=29ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=39ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 2 files had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 2 files\n[INFO] CPD Executor CPD calculation finished (done) | time=16ms\n[INFO] Analysis report generated in 205ms, dir size=233.9 kB\n[INFO] Analysis report compressed in 513ms, zip size=32.8 kB\n[INFO] Analysis report uploaded in 123ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=b7c18b87-3a9c-4012-b937-d394cf87befd\n[INFO] Analysis total time: 8.740 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  26.766 s\n[INFO] Finished at: 2026-03-18T19:34:57+05:30\n[INFO] ------------------------------------------------------------------------\n",
     "fixExecutionReport" : { },
     "totalFixesApplied" : 0,
     "fixReports" : [ ]
   },
-  "240356f1-1cbf-44f9-a173-cd0ce3401d48" : {
-    "scanId" : "240356f1-1cbf-44f9-a173-cd0ce3401d48",
-    "projectPath" : "C:\\sonar-workspace\\1773811372068_fixed",
+  "79cc57ef-9360-4897-992a-b4053a44dfc9" : {
+    "scanId" : "79cc57ef-9360-4897-992a-b4053a44dfc9",
+    "projectPath" : "C:/sonar-workspace/1773841381220",
     "status" : "COMPLETED",
-    "result" : "Scan completed with compilation errors in target project.",
-    "projectKey" : "auto-project-fdcecc63-5bb4-41b9-8795-a222a6a2a329",
-    "fixedPath" : "C:\\sonar-workspace\\1773811372068_fixed",
-    "createdAt" : [ 2026, 3, 18, 12, 9, 35, 352957400 ],
+    "result" : null,
+    "projectKey" : "auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9",
+    "fixedPath" : "C:\\sonar-workspace\\1773841381220_fixed",
+    "createdAt" : [ 2026, 3, 18, 19, 13, 1, 251827400 ],
     "mappedIssues" : [ {
-      "key" : "96573649-7894-4ad5-9584-13f2d56dd4be",
+      "key" : "a346518c-273d-4977-a575-9d4bc431c531",
       "ruleId" : "java:S1128",
       "file" : "src/main/java/com/example/Calculator.java",
       "line" : 3,
@@ -83,7 +181,7 @@
       "autoFixable" : true,
       "fixType" : "REMOVE_UNUSED_IMPORT"
     }, {
-      "key" : "3af3108b-09ca-498a-b75d-66410981d383",
+      "key" : "5617c372-28cf-4630-8d91-29560ad2ecfa",
       "ruleId" : "java:S106",
       "file" : "src/main/java/com/example/Calculator.java",
       "line" : 14,
@@ -93,7 +191,7 @@
       "autoFixable" : true,
       "fixType" : "REPLACE_SYSTEM_OUT"
     }, {
-      "key" : "7a37341e-c42a-44d4-82df-8d6bb3a346d1",
+      "key" : "1f35005f-d855-4533-af1e-bd091453b599",
       "ruleId" : "java:S109",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 5,
@@ -103,7 +201,7 @@
       "autoFixable" : true,
       "fixType" : "EXTRACT_CONSTANT"
     }, {
-      "key" : "341c0e30-879e-471f-a120-859fe2255d71",
+      "key" : "30192435-0edd-4772-bb9b-ed2595a5fbed",
       "ruleId" : "java:S109",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 8,
@@ -113,7 +211,7 @@
       "autoFixable" : true,
       "fixType" : "EXTRACT_CONSTANT"
     }, {
-      "key" : "95647c95-fd8b-48cb-a6a8-3014e3ff11e7",
+      "key" : "a0f1c8ed-abdc-4ffa-b9fa-c9cf87b30477",
       "ruleId" : "java:S106",
       "file" : "src/main/java/com/example/Main.java",
       "line" : 9,
@@ -124,7 +222,594 @@
       "fixType" : "REPLACE_SYSTEM_OUT"
     } ],
     "suggestions" : [ ],
-    "buildLog" : "Scan failed: CE Task ID not found in Sonar logs",
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773841381220\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773841381220\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773841381220\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=199ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=45ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=85ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=38ms\n[INFO] Project key: auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9\n[INFO] Base dir: C:\\sonar-workspace\\1773841381220\n[INFO] Working dir: C:\\sonar-workspace\\1773841381220\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=103ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=430ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=5ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=63ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=33ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=2ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=24ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=52ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1644ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773841381220\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=5ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=234ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=3ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=6ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=11ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=5ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=905ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=5ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=16ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=44ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=32ms\n[INFO] Analysis report generated in 379ms, dir size=224.8 kB\n[INFO] Analysis report compressed in 229ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 2250ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=4f565806-0971-4490-b123-b1e83e29c9b9\n[INFO] Analysis total time: 9.603 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  25.112 s\n[INFO] Finished at: 2026-03-18T19:13:28+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : {
+      "EXTRACT_CONSTANT" : 2,
+      "REPLACE_SYSTEM_OUT" : 2
+    },
+    "totalFixesApplied" : 4,
+    "fixReports" : [ {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNum = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    } ]
+  },
+  "31cfa6a8-da5e-42c5-93c4-0b8bf68244aa" : {
+    "scanId" : "31cfa6a8-da5e-42c5-93c4-0b8bf68244aa",
+    "projectPath" : "C:\\sonar-workspace\\test-project-refactored_1773842773443",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-31cfa6a8-da5e-42c5-93c4-0b8bf68244aa",
+    "fixedPath" : null,
+    "createdAt" : [ 2026, 3, 18, 19, 36, 13, 464538600 ],
+    "mappedIssues" : [ ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.3.2:clean (default-clean) @ test-project ---\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\test-project-refactored_1773842773443\\src\\main\\resources\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\test-project-refactored_1773842773443\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:compile (default-compile) @ test-project ---\n[INFO] Changes detected - recompiling the module! :source\n[INFO] Compiling 4 source files with javac [debug release 17] to target\\classes\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\test-project-refactored_1773842773443\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ test-project ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.1.2:test (default-test) @ test-project ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.3.0:jar (default-jar) @ test-project ---\n[INFO] Building jar: C:\\sonar-workspace\\test-project-refactored_1773842773443\\target\\test-project-0.0.1-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ test-project ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=150ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=19ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=70ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=31ms\n[INFO] Project key: auto-project-31cfa6a8-da5e-42c5-93c4-0b8bf68244aa\n[INFO] Base dir: C:\\sonar-workspace\\test-project-refactored_1773842773443\n[INFO] Working dir: C:\\sonar-workspace\\test-project-refactored_1773842773443\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-31cfa6a8-da5e-42c5-93c4-0b8bf68244aa'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=112ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=511ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=6ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 5 preprocessed files (done) | time=77ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=23ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=8ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 5 files indexed (done) | time=44ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module test-project\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=32ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 4 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 4 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1922ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\test-project-refactored_1773842773443\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=13ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=280ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=7ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=0ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=14ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=4ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 5 source files to be analyzed for the text and secrets analysis\n[INFO] 5/5 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=737ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=5ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=22ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=38ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 2 files had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 2 files\n[INFO] CPD Executor CPD calculation finished (done) | time=22ms\n[INFO] Analysis report generated in 400ms, dir size=232.8 kB\n[INFO] Analysis report compressed in 368ms, zip size=32.7 kB\n[INFO] Analysis report uploaded in 2438ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-31cfa6a8-da5e-42c5-93c4-0b8bf68244aa\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=685111b9-bd4f-47fe-b7b6-c72a366be285\n[INFO] Analysis total time: 9.899 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  25.708 s\n[INFO] Finished at: 2026-03-18T19:36:40+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : { },
+    "totalFixesApplied" : 0,
+    "fixReports" : [ ]
+  },
+  "2a008f42-3ff3-4a7d-b23f-abd3f5399eab" : {
+    "scanId" : "2a008f42-3ff3-4a7d-b23f-abd3f5399eab",
+    "projectPath" : "C:/sonar-workspace/1773842094039",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab",
+    "fixedPath" : "C:\\sonar-workspace\\1773842094039_fixed",
+    "createdAt" : [ 2026, 3, 18, 19, 24, 54, 62802300 ],
+    "mappedIssues" : [ {
+      "key" : "a23268ce-f17a-4f6f-94af-57e872bbe1d9",
+      "ruleId" : "java:S1128",
+      "file" : "src/main/java/com/example/Calculator.java",
+      "line" : 3,
+      "title" : "Unused Imports",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REMOVE_UNUSED_IMPORT"
+    }, {
+      "key" : "1f6dfcc6-1da3-4a20-acf9-72f79437a80b",
+      "ruleId" : "java:S106",
+      "file" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "title" : "Use of System.out.println",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_SYSTEM_OUT"
+    }, {
+      "key" : "636a0552-a1ba-469b-bd06-fda7d71fe7df",
+      "ruleId" : "java:S109",
+      "file" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "title" : "Magic Numbers",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "EXTRACT_CONSTANT"
+    }, {
+      "key" : "627c34ef-1ed3-4df5-92b5-1d0dd6afdc9d",
+      "ruleId" : "java:S109",
+      "file" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "title" : "Magic Numbers",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "EXTRACT_CONSTANT"
+    }, {
+      "key" : "544d9ce7-d249-4a2c-9ee9-dc51928812b3",
+      "ruleId" : "java:S106",
+      "file" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "title" : "Use of System.out.println",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_SYSTEM_OUT"
+    } ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842094039\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842094039\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773842094039\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=148ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=19ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=55ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=36ms\n[INFO] Project key: auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab\n[INFO] Base dir: C:\\sonar-workspace\\1773842094039\n[INFO] Working dir: C:\\sonar-workspace\\1773842094039\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=106ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=610ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=7ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=44ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=15ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=10ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=39ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=43ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1592ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773842094039\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=0ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=186ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=4ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=0ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=10ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=0ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=786ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=6ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=19ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=31ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=14ms\n[INFO] Analysis report generated in 268ms, dir size=224.8 kB\n[INFO] Analysis report compressed in 239ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 2161ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=f05b93a4-68d1-40aa-8ca9-d09ef1dc2f72\n[INFO] Analysis total time: 8.965 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  23.567 s\n[INFO] Finished at: 2026-03-18T19:25:19+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : {
+      "java:S109" : 2
+    },
+    "totalFixesApplied" : 0,
+    "fixReports" : [ {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 9,
+      "beforeCode" : "System.out.println(\"Sum is \" + sumResult);",
+      "afterCode" : "public static void main(String[] args) {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 8,
+      "beforeCode" : "int sumResult = calc.add(20);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/Main.java",
+      "line" : 5,
+      "beforeCode" : "int myNumber = 10;",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "beforeCode" : "System.out.println(\"Result: \" + result);",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    } ]
+  },
+  "381d7509-6134-4da3-8e84-00be604da08f" : {
+    "scanId" : "381d7509-6134-4da3-8e84-00be604da08f",
+    "projectPath" : "C:\\sonar-workspace\\1773840815649_fixed",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-42af8bce-2593-45a2-aa77-132674e2c874",
+    "fixedPath" : null,
+    "createdAt" : [ 2026, 3, 18, 19, 5, 32, 37737100 ],
+    "mappedIssues" : [ {
+      "key" : "e2567a9a-eefb-43a3-b7bc-89e98a54d568",
+      "ruleId" : "java:S1128",
+      "file" : "src/main/java/com/example/Calculator.java",
+      "line" : 3,
+      "title" : "Unused Imports",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REMOVE_UNUSED_IMPORT"
+    }, {
+      "key" : "f6aaceca-dca9-400d-8118-294fd63a05ce",
+      "ruleId" : "java:S106",
+      "file" : "src/main/java/com/example/Calculator.java",
+      "line" : 14,
+      "title" : "Use of System.out.println",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_SYSTEM_OUT"
+    }, {
+      "key" : "e42113fc-2a75-4c0a-9bea-8de2530ad874",
+      "ruleId" : "java:S106",
+      "file" : "src/main/java/com/example/Main.java",
+      "line" : 13,
+      "title" : "Use of System.out.println",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_SYSTEM_OUT"
+    } ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] Deleting C:\\sonar-workspace\\1773840815649_fixed\\target\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773840815649_fixed\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773840815649_fixed\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773840815649_fixed\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=188ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=46ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=93ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=39ms\n[INFO] Project key: auto-project-42af8bce-2593-45a2-aa77-132674e2c874\n[INFO] Base dir: C:\\sonar-workspace\\1773840815649_fixed\n[INFO] Working dir: C:\\sonar-workspace\\1773840815649_fixed\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-42af8bce-2593-45a2-aa77-132674e2c874'\n[INFO] Load project settings for component key: 'auto-project-42af8bce-2593-45a2-aa77-132674e2c874' (done) | time=30ms\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=100ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=732ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (178 bytes) | time=48ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=48ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=28ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=384ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=48ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=88ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1977ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773840815649_fixed\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=8ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=300ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=0ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=11ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=15ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=0ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=870ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=6ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=13ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=27ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=19ms\n[INFO] Analysis report generated in 154ms, dir size=226.1 kB\n[INFO] Analysis report compressed in 387ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 150ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-42af8bce-2593-45a2-aa77-132674e2c874\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=868734f1-17cb-4da9-bd00-169117506cce\n[INFO] Analysis total time: 8.767 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  25.692 s\n[INFO] Finished at: 2026-03-18T19:05:59+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : { },
+    "totalFixesApplied" : 0,
+    "fixReports" : [ ]
+  },
+  "696b439b-85cb-4a61-a5a7-484f25f940c9" : {
+    "scanId" : "696b439b-85cb-4a61-a5a7-484f25f940c9",
+    "projectPath" : "C:\\sonar-workspace\\1773841381220_fixed",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9",
+    "fixedPath" : null,
+    "createdAt" : [ 2026, 3, 18, 19, 15, 3, 604195000 ],
+    "mappedIssues" : [ ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] Deleting C:\\sonar-workspace\\1773841381220_fixed\\target\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773841381220_fixed\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773841381220_fixed\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773841381220_fixed\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=234ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=23ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=63ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=36ms\n[INFO] Project key: auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9\n[INFO] Base dir: C:\\sonar-workspace\\1773841381220_fixed\n[INFO] Working dir: C:\\sonar-workspace\\1773841381220_fixed\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9'\n[INFO] Load project settings for component key: 'auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9' (done) | time=32ms\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=102ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=641ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (178 bytes) | time=36ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=50ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=26ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=396ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=44ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=50ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1831ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773841381220_fixed\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=0ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=372ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=15ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=3ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=16ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=0ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=787ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=11ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=39ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=41ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=19ms\n[INFO] Analysis report generated in 228ms, dir size=227.8 kB\n[INFO] Analysis report compressed in 301ms, zip size=29.0 kB\n[INFO] Analysis report uploaded in 130ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-79cc57ef-9360-4897-992a-b4053a44dfc9\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=f9b4122d-e2b6-4c36-9dd5-d2bace8f872b\n[INFO] Analysis total time: 8.570 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  21.137 s\n[INFO] Finished at: 2026-03-18T19:15:26+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : { },
+    "totalFixesApplied" : 0,
+    "fixReports" : [ ]
+  },
+  "b9f00af7-25bb-441d-bd78-f7984fb1d04d" : {
+    "scanId" : "b9f00af7-25bb-441d-bd78-f7984fb1d04d",
+    "projectPath" : "C:/sonar-workspace/1773842594375",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d",
+    "fixedPath" : "C:\\sonar-workspace\\1773842594375_fixed",
+    "createdAt" : [ 2026, 3, 18, 19, 33, 14, 417334800 ],
+    "mappedIssues" : [ {
+      "key" : "758ffc4e-3df9-48a2-92b2-39ca4970735d",
+      "ruleId" : "java:S1128",
+      "file" : "src/main/java/com/example/demo/DemoApplication.java",
+      "line" : 5,
+      "title" : "Unused Imports",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REMOVE_UNUSED_IMPORT"
+    }, {
+      "key" : "c210a982-8f75-48f6-9e26-a4221612b602",
+      "ruleId" : "java:S106",
+      "file" : "src/main/java/com/example/demo/controller/TestController.java",
+      "line" : 16,
+      "title" : "Use of System.out.println",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_SYSTEM_OUT"
+    }, {
+      "key" : "6ae88125-64dc-4c2c-9e69-310989b7a8a5",
+      "ruleId" : "java:S109",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 10,
+      "title" : "Magic Numbers",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "EXTRACT_CONSTANT"
+    }, {
+      "key" : "bb546a35-dc0d-4a0b-822a-f1b662a5a2a7",
+      "ruleId" : "java:S109",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 16,
+      "title" : "Magic Numbers",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "EXTRACT_CONSTANT"
+    }, {
+      "key" : "7006dd03-5167-4b7f-b589-430055299abe",
+      "ruleId" : "java:S112",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 17,
+      "title" : "Throwing Raw Exception",
+      "severity" : "MAJOR",
+      "category" : "LOGGING",
+      "autoFixable" : true,
+      "fixType" : "REPLACE_GENERIC_EXCEPTION"
+    }, {
+      "key" : "7aa20321-7097-49e4-a42b-357f3bd2f99b",
+      "ruleId" : "java:S1481",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "title" : "Unused Local Variables Should Be Removed",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REMOVE_UNUSED_VARIABLE"
+    }, {
+      "key" : "c2a8021d-57f8-456e-b02d-488df5b8404d",
+      "ruleId" : "java:S1854",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "title" : "Dead Store Should Be Removed",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "REMOVE_DEAD_ASSIGNMENT"
+    }, {
+      "key" : "e92e4219-4cd9-49ef-ad1e-fb371b56683e",
+      "ruleId" : "java:S109",
+      "file" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "title" : "Magic Numbers",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "EXTRACT_CONSTANT"
+    }, {
+      "key" : "c00af6cb-066d-4678-8eae-8f2cb94f523d",
+      "ruleId" : "java:S1118",
+      "file" : "src/main/java/com/example/demo/util/StringUtils.java",
+      "line" : 3,
+      "title" : "Utility Class Should Not Have Public Constructor",
+      "severity" : "MINOR",
+      "category" : "CODE_SMELL",
+      "autoFixable" : true,
+      "fixType" : "HIDE_UTILITY_CONSTRUCTOR"
+    } ],
+    "suggestions" : [ {
+      "file" : "src/main/java/com/example/demo/DemoApplication.java",
+      "line" : 5,
+      "ruleId" : "REMOVE_UNUSED_IMPORT",
+      "message" : "Manual fix required. AutoFix skipped. Error: null",
+      "suggestedCode" : "Review rule: REMOVE_UNUSED_IMPORT"
+    }, {
+      "file" : "src/main/java/com/example/demo/DemoApplication.java",
+      "line" : 5,
+      "ruleId" : "REMOVE_UNUSED_IMPORT",
+      "message" : "Manual fix required. AutoFix skipped. Error: null",
+      "suggestedCode" : "Review rule: REMOVE_UNUSED_IMPORT"
+    } ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.3.2:clean (default-clean) @ test-project ---\n[INFO] Deleting C:\\sonar-workspace\\1773842594375\\target\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375\\src\\main\\resources\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:compile (default-compile) @ test-project ---\n[INFO] Changes detected - recompiling the module! :source\n[INFO] Compiling 4 source files with javac [debug release 17] to target\\classes\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ test-project ---\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842594375\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ test-project ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.1.2:test (default-test) @ test-project ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.3.0:jar (default-jar) @ test-project ---\n[INFO] Building jar: C:\\sonar-workspace\\1773842594375\\target\\test-project-0.0.1-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:test-project >----------------------\n[INFO] Building test-project 0.0.1-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ test-project ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=146ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=19ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=94ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=33ms\n[INFO] Project key: auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d\n[INFO] Base dir: C:\\sonar-workspace\\1773842594375\n[INFO] Working dir: C:\\sonar-workspace\\1773842594375\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d'\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=111ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=459ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (404) | time=9ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 5 preprocessed files (done) | time=50ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=17ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=6ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 5 files indexed (done) | time=45ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module test-project\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=43ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 4 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 4 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1901ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773842594375\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=4ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=318ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=4ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=5ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=18ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=4ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 5 source files to be analyzed for the text and secrets analysis\n[INFO] 5/5 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=981ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=5ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=18ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=29ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 2 files had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 2 files\n[INFO] CPD Executor CPD calculation finished (done) | time=15ms\n[INFO] Analysis report generated in 329ms, dir size=232.3 kB\n[INFO] Analysis report compressed in 442ms, zip size=33.4 kB\n[INFO] Analysis report uploaded in 2250ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-b9f00af7-25bb-441d-bd78-f7984fb1d04d\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=98a735d8-1328-4a3d-9cf4-984c4173aa2f\n[INFO] Analysis total time: 9.932 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  25.821 s\n[INFO] Finished at: 2026-03-18T19:33:41+05:30\n[INFO] ------------------------------------------------------------------------\n",
+    "fixExecutionReport" : {
+      "REMOVE_UNUSED_VARIABLE" : 1,
+      "HIDE_UTILITY_CONSTRUCTOR" : 1,
+      "REPLACE_GENERIC_EXCEPTION" : 1,
+      "EXTRACT_CONSTANT" : 2,
+      "REPLACE_SYSTEM_OUT" : 1
+    },
+    "totalFixesApplied" : 6,
+    "fixReports" : [ {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/demo/controller/TestController.java",
+      "line" : 16,
+      "beforeCode" : "System.out.println(\"Processing test request\"); // java:S106 (System.out)",
+      "afterCode" : "private TestService testService;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/demo/controller/TestController.java",
+      "line" : 16,
+      "beforeCode" : "System.out.println(\"Processing test request\"); // java:S106 (System.out)",
+      "afterCode" : "private TestService testService;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1481",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "beforeCode" : "double discount = 0.15;",
+      "afterCode" : "return result;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1481",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "beforeCode" : "double discount = 0.15;",
+      "afterCode" : "return result;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S112",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 17,
+      "beforeCode" : "throw new Exception(\"Data too long\");",
+      "afterCode" : "throw new IllegalStateException(\"Data too long\");",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S112",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 17,
+      "beforeCode" : "throw new Exception(\"Data too long\");",
+      "afterCode" : "throw new IllegalStateException(\"Data too long\");",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 16,
+      "beforeCode" : "if (result.length() > 5) {",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 16,
+      "beforeCode" : "if (result.length() > 5) {",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 10,
+      "beforeCode" : "for (int i = 0; i < 10; i++) {",
+      "afterCode" : "private static final int CONST__5 = 5;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 10,
+      "beforeCode" : "for (int i = 0; i < 10; i++) {",
+      "afterCode" : "private static final int CONST__5 = 5;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1118",
+      "filePath" : "src/main/java/com/example/demo/util/StringUtils.java",
+      "line" : 3,
+      "beforeCode" : "public class StringUtils {",
+      "afterCode" : "public class StringUtils {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1118",
+      "filePath" : "src/main/java/com/example/demo/util/StringUtils.java",
+      "line" : 3,
+      "beforeCode" : "public class StringUtils {",
+      "afterCode" : "public class StringUtils {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S106",
+      "filePath" : "src/main/java/com/example/demo/controller/TestController.java",
+      "line" : 16,
+      "beforeCode" : "System.out.println(\"Processing test request\"); // java:S106 (System.out)",
+      "afterCode" : "private TestService test;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1481",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 23,
+      "beforeCode" : "double discount = 0.15;",
+      "afterCode" : "return result;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S112",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 17,
+      "beforeCode" : "throw new Exception(\"Data too long\");",
+      "afterCode" : "throw new IllegalStateException(\"Data too long\");",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 16,
+      "beforeCode" : "if (result.length() > 5) {",
+      "afterCode" : "",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S109",
+      "filePath" : "src/main/java/com/example/demo/service/TestService.java",
+      "line" : 10,
+      "beforeCode" : "for (int i = 0; i < 10; i++) {",
+      "afterCode" : "private static final int CONST__5 = 5;",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    }, {
+      "ruleId" : "java:S1118",
+      "filePath" : "src/main/java/com/example/demo/util/StringUtils.java",
+      "line" : 3,
+      "beforeCode" : "public class StringUtils {",
+      "afterCode" : "public class StringUtils {",
+      "success" : true,
+      "message" : "Fix applied successfully"
+    } ]
+  },
+  "0517aa09-97be-4cc0-b392-af461cb29476" : {
+    "scanId" : "0517aa09-97be-4cc0-b392-af461cb29476",
+    "projectPath" : "C:\\sonar-workspace\\1773842094039_fixed",
+    "status" : "COMPLETED",
+    "result" : null,
+    "projectKey" : "auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab",
+    "fixedPath" : null,
+    "createdAt" : [ 2026, 3, 18, 19, 26, 59, 999801700 ],
+    "mappedIssues" : [ ],
+    "suggestions" : [ ],
+    "buildLog" : "[INFO] Scanning for projects...\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- clean:3.2.0:clean (default-clean) @ rename-test ---\n[INFO] Deleting C:\\sonar-workspace\\1773842094039_fixed\\target\n[INFO] \n[INFO] --- resources:3.3.1:resources (default-resources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842094039_fixed\\src\\main\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:compile (default-compile) @ rename-test ---\n[INFO] Recompiling the module because of changed source code.\n[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!\n[INFO] Compiling 2 source files with javac [debug target 17] to target\\classes\n[WARNING] system modules path not set in conjunction with -source 17\n[INFO] \n[INFO] --- resources:3.3.1:testResources (default-testResources) @ rename-test ---\n[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!\n[INFO] skip non existing resourceDirectory C:\\sonar-workspace\\1773842094039_fixed\\src\\test\\resources\n[INFO] \n[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ rename-test ---\n[INFO] No sources to compile\n[INFO] \n[INFO] --- surefire:3.2.5:test (default-test) @ rename-test ---\n[INFO] Tests are skipped.\n[INFO] \n[INFO] --- jar:3.4.1:jar (default-jar) @ rename-test ---\n[INFO] Building jar: C:\\sonar-workspace\\1773842094039_fixed\\target\\rename-test-1.0-SNAPSHOT.jar\n[INFO] \n[INFO] ----------------------< com.example:rename-test >-----------------------\n[INFO] Building rename-test 1.0-SNAPSHOT\n[INFO]   from pom.xml\n[INFO] --------------------------------[ jar ]---------------------------------\n[INFO] \n[INFO] --- sonar:5.5.0.6356:sonar (default-cli) @ rename-test ---\n[WARNING] Using an unspecified version instead of an explicit plugin version may introduce breaking analysis changes at an unwanted time. It is highly recommended to use an explicit version, e.g. 'org.sonarsource.scanner.maven:sonar-maven-plugin:5.5.0.6356'.\n[INFO] Java 21.0.10 Eclipse Adoptium (64-bit)\n[INFO] Windows 11 10.0 (amd64)\n[INFO] Communicating with SonarQube Community Build 26.2.0.119303\n[INFO] JRE provisioning: os[windows], arch[amd64]\n[INFO] Starting SonarScanner Engine...\n[INFO] Java 21.0.9 Eclipse Adoptium (64-bit)\n[INFO] Load global settings\n[INFO] Load global settings (done) | time=213ms\n[INFO] Server id: 147B411E-AZxvgE68Jnql0SmG-YaI\n[INFO] Loading required plugins\n[INFO] Load plugins index\n[INFO] Load plugins index (done) | time=22ms\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=57ms\n[INFO] Process project properties\n[INFO] Process project properties (done) | time=39ms\n[INFO] Project key: auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab\n[INFO] Base dir: C:\\sonar-workspace\\1773842094039_fixed\n[INFO] Working dir: C:\\sonar-workspace\\1773842094039_fixed\\target\\sonar\n[INFO] Load project settings for component key: 'auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab'\n[INFO] Load project settings for component key: 'auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab' (done) | time=20ms\n[INFO] Load quality profiles\n[INFO] Load quality profiles (done) | time=91ms\n[WARNING] SCM provider autodetection failed. Please use \"sonar.scm.provider\" to define SCM of your project, or disable the SCM Sensor in the project settings.\n[INFO] Load active rules\n[INFO] Load active rules (done) | time=695ms\n[INFO] Load analysis cache\n[INFO] Load analysis cache (178 bytes) | time=35ms\n[INFO] Preprocessing files...\n[INFO] 2 languages detected in 3 preprocessed files (done) | time=67ms\n[INFO] Loading plugins for detected languages\n[INFO] Load/download plugins\n[INFO] Load/download plugins (done) | time=36ms\n[INFO] Load project repositories\n[INFO] Load project repositories (done) | time=303ms\n[INFO] Indexing files...\n[INFO] Project configuration:\n[INFO] 3 files indexed (done) | time=24ms\n[INFO] Quality profile for java: AutoFix-25-Java\n[INFO] Quality profile for xml: Sonar way\n[INFO] ------------- Run sensors on module rename-test\n[INFO] Load metrics repository\n[INFO] Load metrics repository (done) | time=46ms\n[INFO] Sensor JavaSensor [java]\n[INFO] Configured Java source version (sonar.java.source): 17, preview features enabled (sonar.java.enablePreview): false\n[INFO] Server-side caching is enabled. The Java analyzer will not try to leverage data from a previous analysis.\n[INFO] Using ECJ batch to parse 2 Main java source files with batch size 210 KB.\n[INFO] Starting batch processing.\n[INFO] The Java analyzer cannot skip unchanged files in this context. A full analysis is performed for all files.\n[INFO] 100% analyzed\n[INFO] Batch processing: Done.\n[INFO] Did not optimize analysis for any files, performed a full analysis for all 2 files.\n[INFO] No \"Test\" source files to scan.\n[INFO] No \"Generated\" source files to scan.\n[INFO] Sensor JavaSensor [java] (done) | time=1745ms\n[INFO] Sensor SurefireSensor [java]\n[INFO] parsing [C:\\sonar-workspace\\1773842094039_fixed\\target\\surefire-reports]\n[INFO] Sensor SurefireSensor [java] (done) | time=5ms\n[INFO] Sensor XML Sensor [xml]\n[INFO] 1 source file to be analyzed\n[INFO] 1/1 source file has been analyzed\n[INFO] Sensor XML Sensor [xml] (done) | time=254ms\n[INFO] Sensor JaCoCo XML Report Importer [jacoco]\n[INFO] 'sonar.coverage.jacoco.xmlReportPaths' is not defined. Using default locations: target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml,build/reports/jacoco/test/jacocoTestReport.xml\n[INFO] No report imported, no coverage information will be imported by JaCoCo XML Report Importer\n[INFO] Sensor JaCoCo XML Report Importer [jacoco] (done) | time=0ms\n[INFO] Sensor IaC hadolint report Sensor [iac]\n[INFO] Sensor IaC hadolint report Sensor [iac] (done) | time=9ms\n[INFO] Sensor Java Config Sensor [iac]\n[INFO] There are no files to be analyzed for the Java language\n[INFO] Sensor Java Config Sensor [iac] (done) | time=15ms\n[INFO] Sensor IaC Docker Sensor [iac]\n[INFO] There are no files to be analyzed for the Docker language\n[INFO] Sensor IaC Docker Sensor [iac] (done) | time=2ms\n[INFO] Sensor TextAndSecretsSensor [text]\n[INFO] Available processors: 12\n[INFO] Using 12 threads for analysis.\n[INFO] The property \"sonar.tests\" is not set. To improve the analysis accuracy, we categorize a file as a test file if any of the following is true:\n  * The filename starts with \"test\"\n  * The filename contains \"test.\" or \"tests.\"\n  * Any directory in the file path is named: \"doc\", \"docs\", \"test\", \"tests\", \"mock\" or \"mocks\"\n  * Any directory in the file path has a name ending in \"test\" or \"tests\"\n\n[INFO] Start fetching files for the text and secrets analysis\n[INFO] Using Git CLI to retrieve dirty files\n[WARNING] Retrieving only language associated files, make sure to run the analysis inside a git repository to make use of inclusions specified via \"sonar.text.inclusions\"\n[INFO] Starting the text and secrets analysis\n[INFO] 3 source files to be analyzed for the text and secrets analysis\n[INFO] 3/3 source files have been analyzed for the text and secrets analysis\n[INFO] Sensor TextAndSecretsSensor [text] (done) | time=797ms\n[INFO] ------------- Run sensors on project\n[INFO] Sensor JavaProjectSensor [java]\n[INFO] Sensor JavaProjectSensor [java] (done) | time=4ms\n[INFO] Sensor Zero Coverage Sensor\n[INFO] Sensor Zero Coverage Sensor (done) | time=16ms\n[INFO] Sensor Java CPD Block Indexer\n[INFO] Sensor Java CPD Block Indexer (done) | time=15ms\n[INFO] ------------- Gather SCA dependencies on project\n[INFO] Dependency analysis skipped\n[INFO] SCM Publisher No SCM system was detected. You can use the 'sonar.scm.provider' property to explicitly specify it.\n[INFO] CPD Executor 1 file had no CPD blocks\n[INFO] CPD Executor Calculating CPD for 1 file\n[INFO] CPD Executor CPD calculation finished (done) | time=13ms\n[INFO] Analysis report generated in 220ms, dir size=227.8 kB\n[INFO] Analysis report compressed in 208ms, zip size=29.1 kB\n[INFO] Analysis report uploaded in 132ms\n[INFO] ANALYSIS SUCCESSFUL, you can find the results at: http://localhost:9000/dashboard?id=auto-project-2a008f42-3ff3-4a7d-b23f-abd3f5399eab\n[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report\n[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=0d0e444b-20ff-430f-8eab-a0f03ce2c720\n[INFO] Analysis total time: 7.477 s\n[INFO] SonarScanner Engine completed successfully\n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD SUCCESS\n[INFO] ------------------------------------------------------------------------\n[INFO] Total time:  23.080 s\n[INFO] Finished at: 2026-03-18T19:27:24+05:30\n[INFO] ------------------------------------------------------------------------\n",
     "fixExecutionReport" : { },
     "totalFixesApplied" : 0,
     "fixReports" : [ ]

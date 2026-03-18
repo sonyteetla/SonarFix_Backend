@@ -34,6 +34,9 @@ public class ExtractConstantStrategy implements FixStrategy {
             if (shouldIgnoreLiteral(literal))
                 continue;
 
+            if (literal.findAncestor(FieldDeclaration.class).isPresent())
+                continue;
+
             Optional<ClassOrInterfaceDeclaration> clazzOpt =
                     literal.findAncestor(ClassOrInterfaceDeclaration.class);
 
@@ -55,7 +58,8 @@ public class ExtractConstantStrategy implements FixStrategy {
                                         + constantName + " = " + value + ";"
                         ).asFieldDeclaration();
 
-                clazz.getMembers().addFirst(field);
+                // Add at a safer place or check if it already shifted
+                clazz.getMembers().add(0, field);
             }
 
             literal.replace(new NameExpr(constantName));

@@ -19,6 +19,12 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
 
     @Override
     public boolean apply(CompilationUnit cu, int line) {
+        return apply(cu, line, null);
+    }
+
+    @Override
+    public boolean apply(CompilationUnit cu, int line, String projectPath) {
+
         boolean fixedAny = false;
 
         for (MethodCallExpr call : cu.findAll(MethodCallExpr.class)) {
@@ -28,7 +34,7 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
                 continue;
             }
 
-            if (transformIfSystemCall(cu, call)) {
+            if (transformIfSystemCall(cu, call, projectPath)) {
                 fixedAny = true;
                 if (line != -1) return true;
             }
@@ -37,7 +43,7 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
         return fixedAny;
     }
 
-    private boolean transformIfSystemCall(CompilationUnit cu, MethodCallExpr call) {
+    private boolean transformIfSystemCall(CompilationUnit cu, MethodCallExpr call, String projectPath) {
 
         if (call.getScope().isEmpty()) return false;
 
@@ -58,7 +64,7 @@ public class ReplaceSystemOutStrategy implements FixStrategy {
 
         String level = stream.equals("err") ? "error" : "info";
 
-        LoggerUtil.ensureSlf4jLoggerExists(cu);
+        LoggerUtil.ensureSlf4jLoggerExists(cu, projectPath);
 
         if (method.equals("printf")) {
             handlePrintf(call);

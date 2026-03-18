@@ -352,6 +352,17 @@ return executionId;
                     scanId
             );
 
+            // Persist fix stats so Summary page shows correct counts
+            task.setTotalFixesApplied(task.getTotalFixesApplied() + fixed);
+            Map<String, Integer> fixReport = task.getFixExecutionReport();
+            for (FixRequest req : requests) {
+                if (req.getRuleId() != null) {
+                    fixReport.merge(req.getRuleId(), 1, (a, b) -> a + b);
+                }
+            }
+            task.setFixExecutionReport(fixReport);
+            scanRepository.update(task);
+
             reScan(fixedProjectPath, task.getProjectKey());
 
             return fixed;
@@ -453,14 +464,16 @@ return executionId;
             System.out.println("No cached issues found. Fetching live issues from Sonar for project: " + task.getProjectKey());
             try {
                 List<SonarIssue> sonarIssues = sonarService.fetchIssues(task.getProjectKey());
+                System.out.println("Live fetch returned " + sonarIssues.size() + " Sonar issues.");
                 issues = issueMappingService.mapIssues(sonarIssues);
+                System.out.println("After mapping, we have " + issues.size() + " auto-fixable issues.");
             } catch (Exception e) {
                 System.err.println("Failed to fetch live issues: " + e.getMessage());
             }
         }
 
         if (issues == null || issues.isEmpty()) {
-            throw new IllegalStateException("No auto-fixable issues found");
+            throw new IllegalStateException("No auto-fixable issues found for scan " + scanId);
         }
 
         System.out.println("Applying fix for rule: " + ruleId);
@@ -520,6 +533,13 @@ return executionId;
                     task.getProjectKey(),
                     scanId
             );
+
+            // Update summary stats on the task so the Summary page shows correct counts
+            task.setTotalFixesApplied(task.getTotalFixesApplied() + fixed);
+            Map<String, Integer> report = task.getFixExecutionReport();
+            report.merge(ruleId, fixed, (a, b) -> a + b);
+            task.setFixExecutionReport(report);
+            scanRepository.update(task);
 
             System.out.println("ApplySuccess. Applied " + fixed + " fixes. Running re-scan...");
 

@@ -60,7 +60,7 @@ public class ScanController {
 
     // ================= STATUS =================
     @GetMapping("/status/{scanId}")
-    public ResponseEntity<?> getStatus(@PathVariable String scanId) {
+    public ResponseEntity<?> getStatus(@PathVariable("scanId") String scanId) {
 
         String status = scanService.getStatus(scanId);
 
@@ -78,13 +78,13 @@ public class ScanController {
 
     // ================= RESULT =================
     @GetMapping("/result/{scanId}")
-    public ResponseEntity<?> getResult(@PathVariable String scanId) {
+    public ResponseEntity<?> getResult(@PathVariable("scanId") String scanId) {
         return ResponseEntity.ok(scanService.getResult(scanId));
     }
 
     // ================= BUILD LOG =================
     @GetMapping("/build-log/{scanId}")
-    public ResponseEntity<?> getBuildLog(@PathVariable String scanId) {
+    public ResponseEntity<?> getBuildLog(@PathVariable("scanId") String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
         if (task == null) {
@@ -96,7 +96,7 @@ public class ScanController {
     
     @GetMapping("/scan/{scanId}/fix-report")
     public List<FixExecutionReport> getFixReport(
-            @PathVariable String scanId) {
+            @PathVariable("scanId") String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
 

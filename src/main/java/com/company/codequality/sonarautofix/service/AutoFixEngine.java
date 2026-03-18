@@ -80,7 +80,12 @@ public class AutoFixEngine {
 
                 Path path = Path.of(projectPath).resolve(filePath).normalize();
 
-                if (!Files.exists(path)) continue;
+                System.out.println("Resolving fix path: " + path + " | exists=" + Files.exists(path));
+
+                if (!Files.exists(path)) {
+                    System.err.println("FILE NOT FOUND: " + path);
+                    continue;
+                }
 
                 List<String> originalLines = Files.readAllLines(path);
 
@@ -88,7 +93,9 @@ public class AutoFixEngine {
 
                 try {
                     cu = StaticJavaParser.parse(path);
+                    com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.setup(cu);
                 } catch (Exception e) {
+                    System.err.println("Failed to parse " + path + ": " + e.getMessage());
                     continue;
                 }
 
@@ -106,6 +113,8 @@ public class AutoFixEngine {
 
                     FixStrategy strategy = strategyMap.get(type);
 
+                    System.out.println("Applying strategy " + type + " for file " + filePath + " at line " + request.getLine() + " | strategy found=" + (strategy != null));
+
                     if (strategy == null) continue;
 
                     try {
@@ -118,8 +127,9 @@ public class AutoFixEngine {
                             beforeCode = originalLines.get(lineIndex).trim();
                         }
 
-                        boolean applied = strategy.apply(cu, request.getLine());
+                        boolean applied = strategy.apply(cu, request.getLine(), projectPath);
 
+                        System.out.println("Strategy " + type + " applied=" + applied + " | beforeCode='" + beforeCode + "'");
                         if (applied) {
 
                             totalFixed++;
@@ -127,13 +137,13 @@ public class AutoFixEngine {
                             fixReport.put(type,
                                     fixReport.getOrDefault(type, 0) + 1);
 
-                            List<String> modifiedLines =
-                                    Arrays.asList(cu.toString().split("\n"));
+                            String currentFullCode = com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.print(cu);
+                            String[] modifiedLinesArr = currentFullCode.split("\\R");
 
                             String afterCode = "";
 
-                            if (lineIndex >= 0 && lineIndex < modifiedLines.size()) {
-                                afterCode = modifiedLines.get(lineIndex).trim();
+                            if (lineIndex >= 0 && lineIndex < modifiedLinesArr.length) {
+                                afterCode = modifiedLinesArr[lineIndex].trim();
                             }
 
                             // ================= STORE FIX RECORD =================
@@ -168,7 +178,7 @@ public class AutoFixEngine {
                         }
 
                     } catch (Exception ex) {
-
+                        System.err.println("Strategy " + strategy.getFixType() + " failed on line " + request.getLine() + ": " + ex.getMessage());
                         if (task != null) {
 
                             task.addSuggestion(
@@ -176,7 +186,7 @@ public class AutoFixEngine {
                                             filePath,
                                             request.getLine(),
                                             request.getFixType(),
-                                            "Manual fix required. AutoFix skipped.",
+                                            "Manual fix required. AutoFix skipped. Error: " + ex.getMessage(),
                                             "Review rule: " + request.getFixType()
                                     )
                             );
@@ -184,46 +194,48 @@ public class AutoFixEngine {
                     }
                 }
 
+
                 // ================= SMART AUTO FIX =================
+                // Only run smart fix if NO specific line requests were provided
+                // (i.e., this is a full "Fix All" mode, not a targeted fix)
+                if (fileFixes.stream().allMatch(r -> r.getLine() <= 0)) {
+                    for (FixStrategy strategy : strategyMap.values()) {
 
-                for (FixStrategy strategy : strategyMap.values()) {
+                        if (strategy.getFixType() == null) continue;
 
-                    if (strategy.getFixType() == null) continue;
+                        try {
 
-                    try {
+                            boolean applied = strategy.apply(cu, -1, projectPath);
 
-                        boolean applied = strategy.apply(cu, -1);
+                            if (applied) {
 
-                        if (applied) {
+                                totalFixed++;
 
-                            totalFixed++;
+                                FixType type = strategy.getFixType();
 
-                            FixType type = strategy.getFixType();
+                                fixReport.put(type,
+                                        fixReport.getOrDefault(type, 0) + 1);
 
-                            fixReport.put(type,
-                                    fixReport.getOrDefault(type, 0) + 1);
+                                FixRecord record = new FixRecord();
 
-                            FixRecord record = new FixRecord();
+                                record.setProjectKey(projectKey);
+                                record.setFilePath(filePath);
 
-                            record.setProjectKey(projectKey);
-                            record.setFilePath(filePath);
-                          
-                            record.setFixType(type.name());
-                           
-                           ;
+                                record.setFixType(type.name());
 
-                            fixRecordRepository.save(record);
+                                fixRecordRepository.save(record);
 
-                            System.out.println("SMART FIX APPLIED: " + type);
+                                System.out.println("SMART FIX APPLIED: " + type);
+                            }
+
+                        } catch (Exception ex) {
+                            System.out.println("SMART FIX FAILED: " + strategy.getFixType());
                         }
-
-                    } catch (Exception ex) {
-                        System.out.println("SMART FIX FAILED: " + strategy.getFixType());
                     }
                 }
 
-                Files.write(path,
-                        cu.toString().getBytes(StandardCharsets.UTF_8));
+                String codeToWrite = com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.print(cu);
+                Files.write(path, codeToWrite.getBytes(StandardCharsets.UTF_8));
             }
 
             // ================= STORE SUMMARY =================
