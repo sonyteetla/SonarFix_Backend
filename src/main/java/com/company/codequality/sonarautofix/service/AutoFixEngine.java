@@ -5,17 +5,14 @@ import com.company.codequality.sonarautofix.strategy.FixStrategy;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.*;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 
 @Service
@@ -54,9 +51,37 @@ public class AutoFixEngine {
 
         try {
 
+            // ================= 🔥 STEP 1: METHOD RENAME =================
+
+            for (FixRequest request : requests) {
+
+                if ("METHOD_RENAME".equals(request.getFixType())) {
+
+                    String oldName = request.getOldMethodName();
+                    String newName = request.getNewMethodName();
+
+                    if (oldName == null || newName == null) continue;
+
+                    System.out.println("🚀 METHOD RENAME: "
+                            + oldName + " → " + newName);
+
+                    applyMethodRename(projectPath, oldName, newName);
+
+                    totalFixed++;
+
+                    fixReport.put(FixType.METHOD_RENAME,
+                            fixReport.getOrDefault(FixType.METHOD_RENAME, 0) + 1);
+                }
+            }
+
+            // ================= NORMAL FIX FLOW =================
+
             Map<String, List<FixRequest>> grouped = new HashMap<>();
 
             for (FixRequest request : requests) {
+
+                if ("METHOD_RENAME".equals(request.getFixType())) continue;
+
                 if (request.getFilePath() == null ||
                         request.getFilePath().isBlank()) continue;
 
@@ -75,17 +100,10 @@ public class AutoFixEngine {
 
                 fileFixes.sort((a, b) ->
                         Integer.compare(b.getLine(), a.getLine()));
+
                 Path path = Path.of(projectPath).resolve(filePath).normalize();
 
-                System.out.println("---- FILE DEBUG ----");
-                System.out.println("projectPath = " + projectPath);
-                System.out.println("filePath = " + filePath);
-                System.out.println("resolved path = " + path);
-                System.out.println("exists = " + Files.exists(path));
-
                 if (!Files.exists(path)) continue;
-
-                List<String> originalLines = Files.readAllLines(path);
 
                 CompilationUnit cu;
 
@@ -94,8 +112,6 @@ public class AutoFixEngine {
                 } catch (Exception e) {
                     continue;
                 }
-
-                // ================= APPLY SONAR FIXES =================
 
                 for (FixRequest request : fileFixes) {
 
@@ -113,103 +129,17 @@ public class AutoFixEngine {
 
                     try {
 
-                        System.out.println("Running strategy: " + type +
-                                " | file=" + filePath +
-                                " | line=" + request.getLine());
-
-                        int lineIndex = request.getLine() - 1;
-
-                        String beforeCode = "";
-
-                        if (lineIndex >= 0 && lineIndex < originalLines.size()) {
-                            beforeCode = originalLines.get(lineIndex).trim();
-                        }
-
                         boolean applied = strategy.apply(cu, request.getLine());
 
                         if (applied) {
 
-                            System.out.println("SUCCESS: " + type);
-
                             totalFixed++;
 
                             fixReport.put(type,
                                     fixReport.getOrDefault(type, 0) + 1);
-
-                            List<String> modifiedLines =
-                                    Arrays.asList(cu.toString().split("\n"));
-
-                            String afterCode = "";
-
-                            if (lineIndex >= 0 && lineIndex < modifiedLines.size()) {
-                                afterCode = modifiedLines.get(lineIndex).trim();
-                            }
-
-                            if (task != null) {
-
-                                FixExecutionReport report =
-                                        new FixExecutionReport(
-                                                request.getRuleId(),
-                                                filePath,
-                                                request.getLine(),
-                                                beforeCode,
-                                                afterCode,
-                                                true,
-                                                "Fix applied successfully"
-                                        );
-
-                                task.addFixReport(report);
-                            }
                         }
 
                     } catch (Exception ex) {
-
-                        System.out.println("FAILED STRATEGY: " + type);
-                        ex.printStackTrace();
-
-                        if (task != null) {
-                            task.addSuggestion(
-                                    new FixSuggestion(
-                                            filePath,
-                                            request.getLine(),
-                                            request.getFixType(),
-                                            "Manual fix required. AutoFix skipped.",
-                                            "Review rule: " + request.getFixType()
-                                    )
-                            );
-                        }
-                    }
-                }
-
-                // ================= SMART AUTO FIX =================
-
-                System.out.println("⚡ Running Smart AutoFix Pattern Detection");
-
-                for (FixStrategy strategy : strategyMap.values()) {
-
-                    if (strategy.getFixType() == null) {
-                        continue;
-                    }
-
-                    try {
-
-                        boolean applied = strategy.apply(cu, -1);
-
-                        if (applied) {
-
-                            totalFixed++;
-
-                            FixType type = strategy.getFixType();
-
-                            fixReport.put(type,
-                                    fixReport.getOrDefault(type, 0) + 1);
-
-                            System.out.println("SMART FIX APPLIED: " + type);
-                        }
-
-                    } catch (Exception ex) {
-
-                        System.out.println("SMART FIX FAILED: " + strategy.getFixType());
                         ex.printStackTrace();
                     }
                 }
@@ -218,8 +148,7 @@ public class AutoFixEngine {
                         cu.toString().getBytes(StandardCharsets.UTF_8));
             }
 
-           
-            // ================= STORE SUMMARY =================
+            // ================= REPORT =================
 
             if (task != null) {
 
@@ -233,14 +162,9 @@ public class AutoFixEngine {
                 task.setTotalFixesApplied(totalFixed);
             }
 
-            System.out.println("\n====== AutoFix Execution Report ======");
-
-            for (Map.Entry<FixType, Integer> entry : fixReport.entrySet()) {
-                System.out.println(entry.getKey() + " -> " + entry.getValue() + " fixes");
-            }
-
+            System.out.println("\n====== AutoFix Report ======");
             System.out.println("Total fixes applied: " + totalFixed);
-            System.out.println("======================================\n");
+            System.out.println("===========================\n");
 
             return totalFixed;
 
@@ -248,6 +172,49 @@ public class AutoFixEngine {
             throw new RuntimeException("Auto fix failed", e);
         }
     }
+
+    // ================= 🔥 METHOD RENAME IMPLEMENTATION =================
+
+    private void applyMethodRename(String projectPath, String oldName, String newName) {
+
+        try {
+
+            Files.walk(Path.of(projectPath))
+                    .filter(p ->
+                            p.toString().endsWith(".java") &&
+                           !p.toString().contains(".git") &&
+                           !p.toString().contains("target"))
+                    .forEach(file -> {
+
+                        try {
+
+                            String content = Files.readString(file);
+
+                            // Rename method definition
+                            content = content.replaceAll(
+                                    "(\\b(public|private|protected)?\\s+\\w+\\s+)" + oldName + "\\s*\\(",
+                                    "$1" + newName + "("
+                            );
+
+                            // Rename method calls
+                            content = content.replaceAll(
+                                    "\\b" + oldName + "\\s*\\(",
+                                    newName + "("
+                            );
+
+                            Files.writeString(file, content);
+
+                        } catch (Exception e) {
+                            System.out.println("Rename failed for: " + file);
+                        }
+                    });
+
+        } catch (Exception e) {
+            throw new RuntimeException("Method rename failed", e);
+        }
+    }
+
+    // ================= SYMBOL SOLVER =================
 
     private void initSymbolSolver(String projectPath) {
 

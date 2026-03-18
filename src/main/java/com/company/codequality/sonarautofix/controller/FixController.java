@@ -142,4 +142,35 @@ public class FixController {
 
         return ResponseEntity.ok(response);
     }
+ // ================= PREVIEW FIXES (RENAME SUPPORT) =================
+    @PostMapping("/preview")
+    public ResponseEntity<?> previewFix(@RequestBody Map<String, Object> request) {
+
+        try {
+
+            String projectPath = (String) request.get("projectPath");
+            String projectKey = (String) request.get("projectKey");
+            String scanId = (String) request.get("scanId");
+
+            List<Map<String, Object>> fixes =
+                    (List<Map<String, Object>>) request.get("fixes");
+
+            if (projectPath == null || scanId == null || fixes == null) {
+                return ResponseEntity.badRequest()
+                        .body("Missing required fields");
+            }
+
+            // 🔥 Call service (you already have strategies working)
+            scanService.previewFixes(projectPath, scanId, fixes);
+
+            return ResponseEntity.ok("Preview generated successfully");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity.internalServerError()
+                    .body("Preview failed: " + e.getMessage());
+        }
+    }
 }

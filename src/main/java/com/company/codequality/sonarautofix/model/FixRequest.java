@@ -13,6 +13,8 @@ public class FixRequest {
     private String fixType;
 
     private String ruleId;
+    private String oldMethodName;
+    private String newMethodName;
   
 
 }

@@ -6,7 +6,9 @@ import java.util.*;
 public class ScanTask {
 
     private String scanId;
-    private String projectPath;
+    private String projectPath;   // ✅ ORIGINAL PATH
+    private String previewPath;   // 🔥 NEW: FIXED PATH
+
     private String status;
     private String result;
     private String projectKey;
@@ -47,6 +49,8 @@ public class ScanTask {
 
     public String getProjectPath() { return projectPath; }
 
+    public String getPreviewPath() { return previewPath; } // 🔥 NEW
+
     public String getStatus() { return status; }
 
     public String getResult() { return result; }
@@ -75,6 +79,10 @@ public class ScanTask {
 
     public void setProjectPath(String projectPath) {
         this.projectPath = projectPath;
+    }
+
+    public void setPreviewPath(String previewPath) {   // 🔥 NEW
+        this.previewPath = previewPath;
     }
 
     public void setStatus(String status) {

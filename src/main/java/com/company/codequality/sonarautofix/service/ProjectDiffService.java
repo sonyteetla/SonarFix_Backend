@@ -2,9 +2,6 @@ package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.DiffLine;
 import com.company.codequality.sonarautofix.model.FileDiff;
-import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.Patch;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.*;
@@ -19,126 +16,87 @@ public class ProjectDiffService {
 
         try {
 
-            Path originalPath = Paths.get(originalDir);
+            Path originalRoot = Paths.get(originalDir);
+            Path fixedRoot = Paths.get(fixedDir);
 
-            Files.walk(originalPath)
+            Files.walk(originalRoot)
                     .filter(Files::isRegularFile)
-                    .forEach(file -> {
+
+                    // ✅ Only Java files
+                    .filter(p -> p.toString().endsWith(".java"))
+
+                    // ✅ Skip unwanted folders
+                    .filter(p ->
+                            !p.toString().contains(".git") &&
+                            !p.toString().contains("target") &&
+                            !p.toString().contains("node_modules") &&
+                            !p.toString().contains("build"))
+
+                    .forEach(originalFile -> {
 
                         try {
 
-                            String relative =
-                                    originalPath.relativize(file).toString();
-
-                            Path fixedFile =
-                                    Paths.get(fixedDir, relative);
+                            // 🔥 CRITICAL: RELATIVE PATH MATCHING
+                            Path relativePath = originalRoot.relativize(originalFile);
+                            Path fixedFile = fixedRoot.resolve(relativePath);
 
                             if (!Files.exists(fixedFile)) return;
 
-                            List<String> originalLines =
-                                    Files.readAllLines(file);
+                            List<String> originalLines = Files.readAllLines(originalFile);
+                            List<String> fixedLines = Files.readAllLines(fixedFile);
 
-                            List<String> fixedLines =
-                                    Files.readAllLines(fixedFile);
+                            // 🔥 Skip if identical
+                            if (originalLines.equals(fixedLines)) return;
 
-                            Patch<String> patch =
-                                    DiffUtils.diff(originalLines, fixedLines);
+                            List<DiffLine> diffLines = new ArrayList<>();
 
-                            if (patch.getDeltas().isEmpty()) return;
+                            int max = Math.max(originalLines.size(), fixedLines.size());
 
-                            List<DiffLine> diffLines =
-                                    generateDiffLines(originalLines, fixedLines, patch);
+                            for (int i = 0; i < max; i++) {
 
-                            result.add(new FileDiff(relative, diffLines));
+                                String o = i < originalLines.size() ? originalLines.get(i) : null;
+                                String m = i < fixedLines.size() ? fixedLines.get(i) : null;
+
+                                // ✅ Skip unchanged lines (IMPORTANT for UI clarity)
+                                if (Objects.equals(o, m)) continue;
+
+                                String type;
+
+                                if (o == null) {
+                                    type = "ADDED";
+                                } else if (m == null) {
+                                    type = "REMOVED";
+                                } else {
+                                    type = "MODIFIED";
+                                }
+
+                                diffLines.add(new DiffLine(
+                                        i + 1,
+                                        o,
+                                        m,
+                                        type
+                                ));
+                            }
+
+                            if (!diffLines.isEmpty()) {
+                                result.add(new FileDiff(
+                                        relativePath.toString(),
+                                        diffLines
+                                ));
+                            }
 
                         } catch (Exception e) {
-
-                            System.err.println("Diff failed for file: " + file);
+                            System.err.println("❌ Diff failed for file: " + originalFile);
                             e.printStackTrace();
                         }
                     });
 
         } catch (Exception e) {
-
-            throw new RuntimeException("Project diff failed", e);
+            throw new RuntimeException("❌ Project diff failed", e);
         }
+
+        System.out.println("🔥 TOTAL DIFF FILES: " + result.size());
 
         return result;
-    }
-
-    private List<DiffLine> generateDiffLines(
-            List<String> original,
-            List<String> modified,
-            Patch<String> patch) {
-
-        List<DiffLine> lines = new ArrayList<>();
-
-        int originalIndex = 0;
-        int modifiedIndex = 0;
-
-        for (AbstractDelta<String> delta : patch.getDeltas()) {
-
-            int pos = delta.getSource().getPosition();
-
-            while (originalIndex < pos) {
-
-                lines.add(new DiffLine(
-                        originalIndex + 1,
-                        original.get(originalIndex),
-                        modified.get(modifiedIndex),
-                        "UNCHANGED"
-                ));
-
-                originalIndex++;
-                modifiedIndex++;
-            }
-
-            List<String> src = delta.getSource().getLines();
-            List<String> tgt = delta.getTarget().getLines();
-
-            int max = Math.max(src.size(), tgt.size());
-
-            for (int i = 0; i < max; i++) {
-
-                String o = i < src.size() ? src.get(i) : null;
-                String m = i < tgt.size() ? tgt.get(i) : null;
-
-                String type;
-
-                if (o != null && m != null)
-                    type = "MODIFIED";
-                else if (o != null)
-                    type = "REMOVED";
-                else
-                    type = "ADDED";
-
-                lines.add(new DiffLine(
-                        originalIndex + i + 1,
-                        o,
-                        m,
-                        type
-                ));
-            }
-
-            originalIndex += src.size();
-            modifiedIndex += tgt.size();
-        }
-
-        // add remaining unchanged lines
-        while (originalIndex < original.size()
-                && modifiedIndex < modified.size()) {
-
-            lines.add(new DiffLine(
-                    originalIndex + 1,
-                    original.get(originalIndex),
-                    modified.get(modifiedIndex),
-                    "UNCHANGED"
-            ));
-
-            originalIndex++;
-            modifiedIndex++;
-        }
-
-        return lines;
     }
 }

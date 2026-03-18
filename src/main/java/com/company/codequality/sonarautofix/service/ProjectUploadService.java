@@ -199,33 +199,52 @@ public class ProjectUploadService {
             deleteDirectory(fixedPath);
         }
 
-        Files.walk(sourcePath).forEach(source -> {
+        Files.walk(sourcePath)
+                .filter(p -> {
 
-            try {
+                    String path = p.toString().toLowerCase();
 
-                Path target =
-                        fixedPath.resolve(sourcePath.relativize(source));
+                    return !path.contains(".git")
+                            && !path.contains("target")
+                            && !path.contains(".idea")
+                            && !path.contains(".metadata")     // 🔥 FIX
+                            && !path.contains("node_modules")
+                            && !path.contains("gpucache")      // 🔥 FIX
+                            && !path.contains("plugins")       // 🔥 FIX
+                            && !path.endsWith(".class")
+                            && !path.endsWith(".jar")
+                            && !path.endsWith(".cbl");
+                })
+                .forEach(source -> {
 
-                if (Files.isDirectory(source)) {
+                    try {
 
-                    Files.createDirectories(target);
+                        Path target =
+                                fixedPath.resolve(sourcePath.relativize(source));
 
-                } else {
+                        if (Files.isDirectory(source)) {
 
-                    Files.createDirectories(target.getParent());
+                            Files.createDirectories(target);
 
-                    Files.copy(
-                            source,
-                            target,
-                            StandardCopyOption.REPLACE_EXISTING
-                    );
-                }
+                        } else {
 
-            } catch (IOException e) {
+                            Files.createDirectories(target.getParent());
 
-                throw new RuntimeException("Failed to copy: " + source, e);
-            }
-        });
+                            try {
+                                Files.copy(
+                                        source,
+                                        target,
+                                        StandardCopyOption.REPLACE_EXISTING
+                                );
+                            } catch (Exception e) {
+                                System.out.println("⚠️ Skipping locked file: " + source);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println("❌ Failed copying: " + source);
+                    }
+                });
 
         return fixedPath.toString();
     }
@@ -240,13 +259,14 @@ public class ProjectUploadService {
                 .forEach(p -> {
 
                     try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to delete: " + p, e);
-                    }
+
+                        if (p.toString().contains(".git")) return;
+
+                        Files.deleteIfExists(p);
+
+                    } catch (IOException ignored) {}
                 });
     }
-
     // ================= Store Project Key =================
     public void registerProjectKey(String projectDir, String projectKey) {
 

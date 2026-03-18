@@ -14,7 +14,11 @@ public class SonarProjectsDeleteService {
     @Value("${sonar.token}")
     private String sonarToken;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public SonarProjectsDeleteService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public String deleteProject(String projectKey) {
 

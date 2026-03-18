@@ -355,7 +355,15 @@ return executionId;
         }
     }
     
-    public String previewFixes(String scanId) {
+    public void previewFixes(
+            String projectPath,
+            String scanId,
+            List<Map<String, Object>> fixes
+    ) {
+
+        if (projectPath == null || projectPath.isBlank()) {
+            throw new IllegalArgumentException("Project path is missing from request");
+        }
 
         ScanTask task = scanRepository.findById(scanId);
 
@@ -363,59 +371,77 @@ return executionId;
             throw new IllegalArgumentException("Scan not found");
         }
 
-        List<MappedIssue> issues = task.getMappedIssues();
-
-        if (issues == null || issues.isEmpty()) {
-            return task.getProjectPath();
-        }
-
-        List<FixRequest> requests = new ArrayList<>();
-
-        for (MappedIssue issue : issues) {
-
-            if (!issue.isAutoFixable() || issue.getFixType() == null) continue;
-
-            String realPath = issue.getFile();
-
-            int idx = realPath.indexOf(":");
-            if (idx != -1) {
-                realPath = realPath.substring(idx + 1);
-            }
-
-            FixRequest request = FixRequest.builder()
-                    .filePath(realPath)
-                    .line(issue.getLine())
-                    .fixType(issue.getFixType())
-                    .ruleId(issue.getRuleId())
-                    .build();
-
-            requests.add(request);
-        }
-
-        if (requests.isEmpty()) {
-            return task.getProjectPath();
-        }
-
         try {
 
-            String originalPath = task.getProjectPath();
+            System.out.println("🔥 PREVIEW REQUEST PATH: " + projectPath);
 
-            // create preview copy
-            String previewPath =
-                    projectUploadService.copyProject(originalPath);
+            // ✅ KEEP ORIGINAL SAFE
+            String originalPath = projectPath;
 
-            // apply fixes to preview
+            // ✅ CREATE FIXED COPY
+            String fixedPath = projectUploadService.copyProject(originalPath);
+
+            if (fixedPath == null || fixedPath.isBlank()) {
+                throw new RuntimeException("Failed to create preview project copy");
+            }
+
+            System.out.println("📂 Preview project created at: " + fixedPath);
+
+            List<FixRequest> requests = new ArrayList<>();
+
+            for (Map<String, Object> fix : fixes) {
+
+                String fixType = (String) fix.get("fixType");
+
+                if ("METHOD_RENAME".equals(fixType)) {
+
+                    String oldMethod = (String) fix.get("oldMethodName");
+                    String newMethod = (String) fix.get("newMethodName");
+
+                    if (oldMethod == null || newMethod == null) {
+                        throw new IllegalArgumentException("Method names missing");
+                    }
+
+                    System.out.println("🚀 METHOD RENAME: " + oldMethod + " → " + newMethod);
+
+                    FixRequest req = FixRequest.builder()
+                            .fixType("METHOD_RENAME")
+                            .oldMethodName(oldMethod)
+                            .newMethodName(newMethod)
+                            .build();
+
+                    requests.add(req);
+                }
+            }
+
+            if (requests.isEmpty()) {
+                throw new IllegalStateException("No valid fixes found");
+            }
+
+            // ✅ APPLY FIXES ON FIXED COPY
             autoFixEngine.applyFixes(
                     requests,
-                    previewPath,
+                    fixedPath,
                     task.getProjectKey(),
                     scanId
             );
 
-            return previewPath;
+            // 🔥🔥🔥 CRITICAL FIX — SAVE PREVIEW PATH
+            task.setPreviewPath(fixedPath);
+            scanRepository.update(task);
+
+            System.out.println("✅ Preview path saved: " + fixedPath);
+
+            // ❌ DO NOT CALL RESCAN HERE
+            // reScan(fixedPath, task.getProjectKey(), scanId);
 
         } catch (Exception e) {
-            throw new RuntimeException("Preview generation failed", e);
+
+            System.err.println("❌ PREVIEW FAILED");
+            e.printStackTrace();
+
+            throw new RuntimeException("Preview failed", e);
         }
     }
+    
 }

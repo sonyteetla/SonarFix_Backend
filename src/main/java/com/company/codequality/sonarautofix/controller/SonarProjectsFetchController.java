@@ -18,8 +18,8 @@ public class SonarProjectsFetchController {
 
     public SonarProjectsFetchController(
             SonarProjectsFetchService sonarProjectsFetch,
-            SonarProjectsDeleteService sonarProjectDeleteService
-    ) {
+            SonarProjectsDeleteService sonarProjectDeleteService) {
+
         this.sonarProjectsFetch = sonarProjectsFetch;
         this.sonarProjectDeleteService = sonarProjectDeleteService;
     }
