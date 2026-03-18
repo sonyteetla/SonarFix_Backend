@@ -12,5 +12,5 @@ public class FilterCounts {
 
     private Map<String, Long> severityCounts;
     private Map<String, Long> qualityCounts;
-    private Map<String, Long> ruleCounts;
+    private Map<String, RuleCountInfo> ruleCounts;
 }

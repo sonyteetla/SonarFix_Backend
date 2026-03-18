@@ -3,13 +3,15 @@ package com.company.codequality.sonarautofix.strategy;
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class ExtractStringConstantStrategy implements FixStrategy {
@@ -24,30 +26,30 @@ public class ExtractStringConstantStrategy implements FixStrategy {
 
         try {
 
-            // Find string literal at given line
-            Optional<StringLiteralExpr> literalOpt =
-                    cu.findAll(StringLiteralExpr.class).stream()
-                            .filter(l -> l.getBegin().isPresent()
-                                    && l.getBegin().get().line == line)
-                            .findFirst();
+            List<StringLiteralExpr> literals = cu.findAll(StringLiteralExpr.class);
 
-            if (literalOpt.isEmpty()) {
+            StringLiteralExpr target = null;
+
+            for (StringLiteralExpr lit : literals) {
+
+                if (lit.getBegin().isPresent()) {
+
+                    int literalLine = lit.getBegin().get().line;
+
+                    // tolerate small line offset from Sonar
+                    if (Math.abs(literalLine - line) <= 1) {
+                        target = lit;
+                        break;
+                    }
+                }
+            }
+
+            if (target == null) {
                 return false;
             }
 
-            StringLiteralExpr literal = literalOpt.get();
-            String value = literal.getValue();
+            String value = target.getValue();
 
-            // Generate constant name
-            String constantName = value
-                    .toUpperCase()
-                    .replaceAll("[^A-Z0-9]", "_");
-
-            if (constantName.isBlank()) {
-                constantName = "EXTRACTED_CONSTANT";
-            }
-
-            // Find first class in file
             Optional<ClassOrInterfaceDeclaration> classOpt =
                     cu.findFirst(ClassOrInterfaceDeclaration.class);
 
@@ -57,39 +59,114 @@ public class ExtractStringConstantStrategy implements FixStrategy {
 
             ClassOrInterfaceDeclaration clazz = classOpt.get();
 
-            // Check if constant already exists (NO STREAMS → SAFE)
-            boolean exists = false;
+            String constantName = generateConstantName(value);
 
+            // check existing constant
             for (FieldDeclaration field : clazz.getFields()) {
+
                 if (!field.getVariables().isEmpty()) {
-                    String fieldName = field.getVariable(0).getNameAsString();
-                    if (fieldName.equals(constantName)) {
-                        exists = true;
-                        break;
+
+                    String existing = field.getVariable(0).getNameAsString();
+
+                    if (existing.equals(constantName)) {
+
+                        replaceAllOccurrences(clazz, value, constantName);
+                        return true;
                     }
                 }
             }
 
-            // Add constant if not present
-            if (!exists) {
-                clazz.addFieldWithInitializer(
-                        "String",
-                        constantName,
-                        new StringLiteralExpr(value),
-                        Modifier.Keyword.PRIVATE,
-                        Modifier.Keyword.STATIC,
-                        Modifier.Keyword.FINAL
-                );
-            }
+            // create constant field
+            FieldDeclaration constant =
+                    clazz.addFieldWithInitializer(
+                            "String",
+                            constantName,
+                            new StringLiteralExpr(value),
+                            Modifier.Keyword.PRIVATE,
+                            Modifier.Keyword.STATIC,
+                            Modifier.Keyword.FINAL
+                    );
 
-            // Replace literal usage
-            literal.replace(new NameExpr(constantName));
+            // move constant to top
+            clazz.getMembers().remove(constant);
+            clazz.getMembers().addFirst(constant);
+
+            // replace all occurrences
+            replaceAllOccurrences(clazz, value, constantName);
 
             return true;
 
         } catch (Exception e) {
+
             System.out.println("⚠ ExtractStringConstant failed at line " + line);
+            e.printStackTrace();
             return false;
         }
+    }
+
+    private void replaceAllOccurrences(ClassOrInterfaceDeclaration clazz,
+            String value,
+            String constantName) {
+
+List<StringLiteralExpr> literals = clazz.findAll(StringLiteralExpr.class);
+
+for (StringLiteralExpr lit : literals) {
+
+if (!lit.getValue().equals(value)) {
+continue;
+}
+
+Optional<Node> parent = lit.getParentNode();
+
+if (parent.isEmpty()) {
+continue;
+}
+
+Node p = parent.get();
+
+// skip annotation values
+if (p instanceof AnnotationExpr) {
+continue;
+}
+
+// skip constant initializer
+if (p.getParentNode().isPresent() &&
+p.getParentNode().get() instanceof FieldDeclaration) {
+
+FieldDeclaration field = (FieldDeclaration) p.getParentNode().get();
+
+if (field.isStatic() && field.isFinal()) {
+continue;
+}
+}
+if (lit.findAncestor(FieldDeclaration.class)
+	       .map(f -> f.getVariable(0).getNameAsString().equals(constantName))
+	       .orElse(false)) {
+	    continue;
+	}
+
+lit.replace(new NameExpr(constantName));
+}
+}
+    
+    private String generateConstantName(String value) {
+
+        String name = value
+                .trim()
+                .toUpperCase()
+                .replaceAll("[^A-Z0-9]+", "_");
+
+        name = name.replaceAll("^_+", "");
+        name = name.replaceAll("_+$", "");
+
+        if (name.isBlank()) {
+            name = "EXTRACTED_CONSTANT";
+        }
+
+        if (!Character.isLetter(name.charAt(0))) {
+            name = "CONST_" + name;
+        }
+
+        return name;
     }
 }

@@ -35,9 +35,13 @@ public class DiffController {
         }
 
         String original = task.getProjectPath();
-        String preview = original + "_fixed";
+        String fixed = task.getFixedPath();
 
-        return diffService.compareProjects(original, preview);
+        if (fixed == null || !new java.io.File(fixed).exists()) {
+            fixed = original + "_fixed";
+        }
+
+        return diffService.compareProjects(original, fixed);
     }
     
     @PostMapping("/preview/{scanId}")

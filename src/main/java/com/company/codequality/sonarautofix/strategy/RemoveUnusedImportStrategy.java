@@ -3,12 +3,14 @@ package com.company.codequality.sonarautofix.strategy;
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class RemoveUnusedImportStrategy implements FixStrategy {
@@ -23,53 +25,83 @@ public class RemoveUnusedImportStrategy implements FixStrategy {
 
         boolean fixed = false;
 
-        Iterator<ImportDeclaration> iterator = cu.getImports().iterator();
+        Set<String> usedNames = collectUsedNames(cu);
 
-        while (iterator.hasNext()) {
+        for (ImportDeclaration imp : cu.getImports()) {
 
-            ImportDeclaration imp = iterator.next();
-
-            // Skip wildcard imports
-            if (imp.isAsterisk()) continue;
-
-            String simpleName = imp.getName().getIdentifier();
-
-            boolean used = false;
-
-            // Check variable / method name usage
-            for (NameExpr name : cu.findAll(NameExpr.class)) {
-                if (name.getNameAsString().equals(simpleName)) {
-                    used = true;
-                    break;
-                }
+            if (!imp.getBegin().isPresent()) {
+                continue;
             }
 
-            // Check type usage
-            if (!used) {
-                for (ClassOrInterfaceType type : cu.findAll(ClassOrInterfaceType.class)) {
-                    if (type.getNameAsString().equals(simpleName)) {
-                        used = true;
-                        break;
-                    }
-                }
+            if (imp.getBegin().get().line != line) {
+                continue;
             }
 
-            // ⭐ NEW: Check annotation usage (Spring / Lombok / others)
-            if (!used) {
-                for (AnnotationExpr annotation : cu.findAll(AnnotationExpr.class)) {
-                    if (annotation.getNameAsString().equals(simpleName)) {
-                        used = true;
-                        break;
-                    }
+            String importName = imp.getNameAsString();
+
+            // wildcard imports
+            if (imp.isAsterisk()) {
+
+                String packageName = importName;
+
+                boolean used = usedNames.stream()
+                        .anyMatch(name -> name.startsWith(packageName));
+
+                if (!used) {
+                    imp.remove();
+                    fixed = true;
                 }
+
+                continue;
             }
 
-            if (!used) {
-                iterator.remove();
+            String simpleName =
+                    importName.substring(importName.lastIndexOf('.') + 1);
+
+            if (!usedNames.contains(simpleName)) {
+                imp.remove();
                 fixed = true;
             }
         }
 
         return fixed;
+    }
+
+    private Set<String> collectUsedNames(CompilationUnit cu) {
+
+        Set<String> names = new HashSet<>();
+
+        for (Node node : cu.findAll(Node.class)) {
+
+            if (node instanceof NameExpr n) {
+                names.add(n.getNameAsString());
+            }
+
+            if (node instanceof ClassOrInterfaceType t) {
+                names.add(t.getNameAsString());
+            }
+
+            if (node instanceof MethodCallExpr m) {
+                names.add(m.getNameAsString());
+            }
+
+            if (node instanceof FieldAccessExpr f) {
+                names.add(f.getNameAsString());
+            }
+
+            if (node instanceof ObjectCreationExpr o) {
+                names.add(o.getType().getNameAsString());
+            }
+
+            if (node instanceof AnnotationExpr a) {
+                names.add(a.getNameAsString());
+            }
+
+            if (node instanceof MethodReferenceExpr mr) {
+                names.add(mr.getIdentifier());
+            }
+        }
+
+        return names;
     }
 }

@@ -35,7 +35,7 @@ public class SonarService {
         try {
 
          ProcessBuilder builder = new ProcessBuilder(
-                    "C:\\Program Files\\Apache\\Maven\\bin\\mvn.cmd",
+                    "D:\\UI_Design\\apache-maven-3.9.12\\bin\\mvn.cmd",
                     "clean",
                     "verify",
                     "-DskipTests=true",

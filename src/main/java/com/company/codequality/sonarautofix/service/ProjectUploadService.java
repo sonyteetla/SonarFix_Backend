@@ -20,6 +20,16 @@ public class ProjectUploadService {
         Files.createDirectories(Paths.get(WORKSPACE));
     }
 
+    // ================= IGNORE FILTER =================
+    private boolean shouldIgnore(Path path) {
+        String p = path.toString().replace("\\", "/");
+
+        return p.contains("/.git/")
+                || p.contains("/node_modules/")
+                || p.contains("/target/")
+                || p.contains("/build/");
+    }
+
     // ================= ZIP Upload =================
     public String handleZipUpload(MultipartFile file) {
 
@@ -44,6 +54,8 @@ public class ProjectUploadService {
                         throw new IOException("Invalid ZIP entry: " + entry.getName());
                     }
 
+                    if (shouldIgnore(newFile)) continue;
+
                     if (entry.isDirectory()) {
 
                         Files.createDirectories(newFile);
@@ -65,19 +77,15 @@ public class ProjectUploadService {
                 }
             }
 
-            // ===== Detect if ZIP has a single root folder =====
-
             Path projectRoot = projectPath;
 
             try (var stream = Files.list(projectPath)) {
 
-                List<Path> children =
-                        stream.collect(Collectors.toList());
+                List<Path> children = stream.collect(Collectors.toList());
 
                 if (children.size() == 1 && Files.isDirectory(children.get(0))) {
 
                     projectRoot = children.get(0);
-
                     System.out.println("Detected root folder inside ZIP: " + projectRoot);
                 }
             }
@@ -85,7 +93,6 @@ public class ProjectUploadService {
             return projectRoot.toString();
 
         } catch (Exception e) {
-
             throw new RuntimeException("ZIP Upload failed: " + e.getMessage(), e);
         }
     }
@@ -100,22 +107,19 @@ public class ProjectUploadService {
             String projectDir = WORKSPACE + System.currentTimeMillis();
 
             ProcessBuilder builder =
-                    new ProcessBuilder(
-                            "C:\\Program Files\\Git\\bin\\git.exe",
-                            "clone",
-                            repoUrl,
-                            projectDir
-                    );
+                    new ProcessBuilder("git", "clone", "--depth", "1", repoUrl, projectDir);
 
             builder.redirectErrorStream(true);
 
             Process process = builder.start();
 
             try (BufferedReader reader =
-                         new BufferedReader(
-                                 new InputStreamReader(process.getInputStream()))) {
+                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 
-                while (reader.readLine() != null) {}
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
             }
 
             int exit = process.waitFor();
@@ -127,7 +131,6 @@ public class ProjectUploadService {
             return projectDir;
 
         } catch (Exception e) {
-
             throw new RuntimeException("Git clone failed: " + e.getMessage(), e);
         }
     }
@@ -148,84 +151,81 @@ public class ProjectUploadService {
             String projectDir = WORKSPACE + System.currentTimeMillis();
             Path dest = Paths.get(projectDir);
 
-            Files.walk(src).forEach(source -> {
+            Files.walk(src)
+                    .filter(p -> !shouldIgnore(p))
+                    .forEach(source -> {
 
-                try {
+                        try {
 
-                    Path target = dest.resolve(src.relativize(source));
+                            Path target = dest.resolve(src.relativize(source));
 
-                    if (Files.isDirectory(source)) {
+                            if (Files.isDirectory(source)) {
 
-                        Files.createDirectories(target);
+                                Files.createDirectories(target);
 
-                    } else {
+                            } else {
 
-                        Files.createDirectories(target.getParent());
+                                Files.createDirectories(target.getParent());
 
-                        Files.copy(
-                                source,
-                                target,
-                                StandardCopyOption.REPLACE_EXISTING
-                        );
-                    }
+                                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                            }
 
-                } catch (IOException e) {
-
-                    throw new RuntimeException(e);
-                }
-            });
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
             return projectDir;
 
         } catch (IOException e) {
-
             throw new RuntimeException("Local directory copy failed: " + e.getMessage(), e);
         }
     }
 
-    // ================= Copy Project =================
     public String copyProject(String originalPath) throws IOException {
+        Path sourcePath = Paths.get(originalPath).normalize();
 
-        Path sourcePath = Paths.get(originalPath);
+        if (originalPath.endsWith("_fixed") || originalPath.endsWith("_fixed/")) {
+             if (Files.exists(sourcePath)) {
+                 System.out.println("Path is already fixed version: " + originalPath);
+                 return originalPath;
+             }
+        }
 
-        String fixedPathStr =
-                originalPath.endsWith("_fixed")
-                        ? originalPath
-                        : originalPath + "_fixed";
-
-        Path fixedPath = Paths.get(fixedPathStr);
+        String fixedPathStr = originalPath.endsWith("/") || originalPath.endsWith("\\") 
+                ? originalPath.substring(0, originalPath.length()-1) + "_fixed"
+                : originalPath + "_fixed";
+        
+        Path fixedPath = Paths.get(fixedPathStr).normalize();
+        
+        System.out.println("Copying project from [" + sourcePath + "] to [" + fixedPath + "]");
 
         if (Files.exists(fixedPath)) {
+            System.out.println("Target already exists, deleting first: " + fixedPath);
             deleteDirectory(fixedPath);
         }
 
-        Files.walk(sourcePath).forEach(source -> {
+        if (!Files.exists(sourcePath)) {
+            throw new IOException("Source path does not exist: " + sourcePath);
+        }
 
-            try {
-
-                Path target =
-                        fixedPath.resolve(sourcePath.relativize(source));
-
-                if (Files.isDirectory(source)) {
-
-                    Files.createDirectories(target);
-
-                } else {
-
-                    Files.createDirectories(target.getParent());
-
-                    Files.copy(
-                            source,
-                            target,
-                            StandardCopyOption.REPLACE_EXISTING
-                    );
-                }
-
-            } catch (IOException e) {
-
-                throw new RuntimeException("Failed to copy: " + source, e);
-            }
-        });
+        Files.walk(sourcePath)
+                .filter(p -> !shouldIgnore(p))
+                .forEach(source -> {
+                    try {
+                        Path target = fixedPath.resolve(sourcePath.relativize(source));
+                        if (Files.isDirectory(source)) {
+                            Files.createDirectories(target);
+                        } else {
+                            if (target.getParent() != null) {
+                                Files.createDirectories(target.getParent());
+                            }
+                            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error copying " + source + " -> " + fixedPath, e);
+                    }
+                });
 
         return fixedPath.toString();
     }
@@ -238,27 +238,21 @@ public class ProjectUploadService {
         Files.walk(path)
                 .sorted(Comparator.reverseOrder())
                 .forEach(p -> {
-
                     try {
-                        Files.delete(p);
+                        Files.deleteIfExists(p);
                     } catch (IOException e) {
-                        throw new RuntimeException("Failed to delete: " + p, e);
+                        throw new RuntimeException("Failed deleting: " + p, e);
                     }
                 });
     }
 
-    // ================= Store Project Key =================
+    // ================= METADATA =================
     public void registerProjectKey(String projectDir, String projectKey) {
 
         try {
-
-            Path metadata =
-                    Paths.get(projectDir, ".project-key");
-
+            Path metadata = Paths.get(projectDir, ".project-key");
             Files.writeString(metadata, projectKey);
-
         } catch (IOException e) {
-
             throw new RuntimeException("Failed to store project key", e);
         }
     }

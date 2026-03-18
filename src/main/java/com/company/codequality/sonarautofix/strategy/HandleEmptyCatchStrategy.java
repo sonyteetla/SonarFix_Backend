@@ -2,46 +2,66 @@ package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.CatchClause;
+import com.github.javaparser.ast.stmt.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HandleEmptyCatchStrategy implements FixStrategy {
 
-    @Override
-    public FixType getFixType() {
-        return FixType.HANDLE_EMPTY_CATCH;
-    }
 
-    @Override
-    public boolean apply(CompilationUnit cu, int line) {
+@Override
+public FixType getFixType() {
+    return FixType.HANDLE_EMPTY_CATCH;
+}
 
-        boolean fixed = false;
+@Override
+public boolean apply(CompilationUnit cu, int line) {
 
-        for (CatchClause catchClause : cu.findAll(CatchClause.class)) {
+    boolean fixed = false;
 
-            if (catchClause.getBody().getStatements().isEmpty()) {
+    // ---- HANDLE EMPTY TRY BLOCK ----
+    for (TryStmt tryStmt : cu.findAll(TryStmt.class)) {
 
-                String exceptionVar =
-                        catchClause.getParameter().getNameAsString();
+        BlockStmt tryBlock = tryStmt.getTryBlock();
 
-                MethodCallExpr printCall =
-                        new MethodCallExpr(
-                                new NameExpr(exceptionVar),
-                                "printStackTrace"
-                        );
+        if (tryBlock.getStatements().isEmpty()) {
 
-                BlockStmt newBody = new BlockStmt();
-                newBody.addStatement(printCall);
+            tryBlock.addOrphanComment(
+                    new LineComment(" intentionally left empty ")
+            );
 
-                catchClause.setBody(newBody);
-                fixed = true;
-            }
+            fixed = true;
         }
-
-        return fixed;
     }
+
+    // ---- HANDLE EMPTY CATCH BLOCK ----
+    for (CatchClause catchClause : cu.findAll(CatchClause.class)) {
+
+        if (catchClause.getBody().getStatements().isEmpty()) {
+
+            String exceptionVar =
+                    catchClause.getParameter().getNameAsString();
+
+            MethodCallExpr printCall =
+                    new MethodCallExpr(
+                            new NameExpr(exceptionVar),
+                            "printStackTrace"
+                    );
+
+            BlockStmt newBody = new BlockStmt();
+            newBody.addStatement(printCall);
+
+            catchClause.setBody(newBody);
+
+            fixed = true;
+        }
+    }
+
+    return fixed;
+}
+
+
 }

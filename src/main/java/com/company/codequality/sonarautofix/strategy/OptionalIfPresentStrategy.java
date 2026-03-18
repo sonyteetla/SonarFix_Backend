@@ -1,6 +1,7 @@
 package com.company.codequality.sonarautofix.strategy;
 
 import com.company.codequality.sonarautofix.model.FixType;
+import com.github.javaparser.Range;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
@@ -13,189 +14,209 @@ import java.util.Optional;
 @Component
 public class OptionalIfPresentStrategy implements FixStrategy {
 
-    @Override
-    public FixType getFixType() {
-        return FixType.OPTIONAL_IF_PRESENT;
+
+@Override
+public FixType getFixType() {
+    return FixType.OPTIONAL_IF_PRESENT;
+}
+
+@Override
+public boolean apply(CompilationUnit cu, int startLine) {
+
+    for (MethodCallExpr call : cu.findAll(MethodCallExpr.class)) {
+
+        Optional<Range> rangeOpt = call.getRange();
+        if (rangeOpt.isEmpty())
+            continue;
+
+        Range range = rangeOpt.get();
+
+        if (startLine != -1 &&
+                (startLine < range.begin.line || startLine > range.end.line))
+            continue;
+
+        if (!call.getNameAsString().equals("get"))
+            continue;
+
+        if (call.getScope().isEmpty())
+            continue;
+
+        Expression scope = call.getScope().get();
+
+        if (!isJavaOptional(scope))
+            continue;
+
+        if (isPrimitiveOptional(scope))
+            continue;
+
+        if (isAlreadySafeChain(call))
+            continue;
+
+        if (isGuardedByDominatingCheck(call, scope))
+            continue;
+
+        MethodCallExpr replacement =
+                new MethodCallExpr(scope.clone(), "orElseThrow");
+
+        call.replace(replacement);
+        return true;
     }
 
-    @Override
-    public boolean apply(CompilationUnit cu, int startLine) {
+    return false;
+}
 
-        for (MethodCallExpr call : cu.findAll(MethodCallExpr.class)) {
+// ================= TYPE CHECK =================
 
-            if (!call.getRange().isPresent())
-                continue;
+private boolean isJavaOptional(Expression scope) {
+    try {
 
-            var range = call.getRange().get();
-            if (range.begin.line > startLine || range.end.line < startLine)
-                continue;
+        ResolvedType type = scope.calculateResolvedType();
 
-            if (!call.getNameAsString().equals("get"))
-                continue;
+        if (!type.isReferenceType())
+            return false;
 
-            if (call.getScope().isEmpty())
-                continue;
+        String qName = type.asReferenceType().getQualifiedName();
 
-            Expression scope = call.getScope().get();
+        return "java.util.Optional".equals(qName);
 
-            if (!isJavaOptional(scope))
-                continue;
-
-            if (isPrimitiveOptional(scope))
-                continue;
-
-            if (isAlreadySafeChain(call))
-                continue;
-
-            if (isGuardedByDominatingCheck(call, scope))
-                continue;
-
-            MethodCallExpr replacement =
-                    new MethodCallExpr(scope.clone(), "orElseThrow");
-
-            call.replace(replacement);
-            return true;
-        }
-
+    } catch (Exception e) {
         return false;
     }
+}
 
-    // ================= TYPE CHECK =================
+private boolean isPrimitiveOptional(Expression scope) {
+    try {
 
-    private boolean isJavaOptional(Expression scope) {
-        try {
-            ResolvedType type = scope.calculateResolvedType();
-            if (!type.isReferenceType())
-                return false;
+        ResolvedType type = scope.calculateResolvedType();
 
-            String qName = type.asReferenceType().getQualifiedName();
-            return qName.equals("java.util.Optional");
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isPrimitiveOptional(Expression scope) {
-        try {
-            ResolvedType type = scope.calculateResolvedType();
-            if (!type.isReferenceType())
-                return false;
-
-            String qName = type.asReferenceType().getQualifiedName();
-            return qName.equals("java.util.OptionalInt")
-                    || qName.equals("java.util.OptionalLong")
-                    || qName.equals("java.util.OptionalDouble");
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ================= SAFE CONTEXT CHECK =================
-
-    private boolean isAlreadySafeChain(MethodCallExpr call) {
-
-        Optional<Node> parent = call.getParentNode();
-        if (parent.isEmpty())
+        if (!type.isReferenceType())
             return false;
 
-        if (parent.get() instanceof MethodCallExpr parentCall) {
+        String qName = type.asReferenceType().getQualifiedName();
 
-            String name = parentCall.getNameAsString();
+        return qName.equals("java.util.OptionalInt")
+                || qName.equals("java.util.OptionalLong")
+                || qName.equals("java.util.OptionalDouble");
 
-            return name.equals("orElse")
-                    || name.equals("orElseThrow")
-                    || name.equals("ifPresent")
-                    || name.equals("map")
-                    || name.equals("flatMap")
-                    || name.equals("filter");
-        }
-
+    } catch (Exception e) {
         return false;
     }
+}
 
-    // ================= DOMINATING GUARD DETECTION =================
+// ================= SAFE CONTEXT CHECK =================
 
-    private boolean isGuardedByDominatingCheck(MethodCallExpr call,
-                                               Expression scope) {
+private boolean isAlreadySafeChain(MethodCallExpr call) {
 
-        Optional<BlockStmt> blockOpt =
-                call.findAncestor(BlockStmt.class);
+    Optional<Node> parent = call.getParentNode();
 
-        if (blockOpt.isEmpty())
-            return false;
-
-        BlockStmt block = blockOpt.get();
-
-        List<Statement> statements = block.getStatements();
-
-        Statement currentStmt =
-                call.findAncestor(Statement.class).orElse(null);
-
-        if (currentStmt == null)
-            return false;
-
-        int index = statements.indexOf(currentStmt);
-        if (index == -1)
-            return false;
-
-        // Look at previous statements for dominant guard
-        for (int i = 0; i < index; i++) {
-
-            Statement stmt = statements.get(i);
-
-            if (!(stmt instanceof IfStmt ifStmt))
-                continue;
-
-            if (!containsIsPresentCheck(ifStmt.getCondition(), scope))
-                continue;
-
-            // Pattern 1: if (!opt.isPresent()) return;
-            if (isNegativeGuardWithExit(ifStmt))
-                return true;
-
-            // Pattern 2: if (opt.isPresent()) { ... }
-            if (callIsInsideThen(call, ifStmt))
-                return true;
-        }
-
+    if (parent.isEmpty())
         return false;
+
+    if (parent.get() instanceof MethodCallExpr parentCall) {
+
+        String name = parentCall.getNameAsString();
+
+        return name.equals("orElse")
+                || name.equals("orElseThrow")
+                || name.equals("ifPresent")
+                || name.equals("map")
+                || name.equals("flatMap")
+                || name.equals("filter");
     }
 
-    private boolean containsIsPresentCheck(Expression condition,
+    return false;
+}
+
+// ================= DOMINATING GUARD DETECTION =================
+
+private boolean isGuardedByDominatingCheck(MethodCallExpr call,
                                            Expression scope) {
 
-        return condition.findAll(MethodCallExpr.class)
-                .stream()
-                .anyMatch(m ->
-                        m.getNameAsString().equals("isPresent")
-                                && m.getScope().isPresent()
-                                && m.getScope().get().toString()
-                                .equals(scope.toString()));
+    Optional<BlockStmt> blockOpt =
+            call.findAncestor(BlockStmt.class);
+
+    if (blockOpt.isEmpty())
+        return false;
+
+    BlockStmt block = blockOpt.get();
+
+    List<Statement> statements = block.getStatements();
+
+    Statement currentStmt =
+            call.findAncestor(Statement.class).orElse(null);
+
+    if (currentStmt == null)
+        return false;
+
+    int index = statements.indexOf(currentStmt);
+
+    if (index == -1)
+        return false;
+
+    for (int i = 0; i < index; i++) {
+
+        Statement stmt = statements.get(i);
+
+        if (!(stmt instanceof IfStmt ifStmt))
+            continue;
+
+        if (!containsIsPresentCheck(ifStmt.getCondition(), scope))
+            continue;
+
+        if (isNegativeGuardWithExit(ifStmt))
+            return true;
+
+        if (callIsInsideThen(call, ifStmt))
+            return true;
     }
 
-    private boolean isNegativeGuardWithExit(IfStmt ifStmt) {
+    return false;
+}
 
-        Expression cond = ifStmt.getCondition();
+private boolean containsIsPresentCheck(Expression condition,
+                                       Expression scope) {
 
-        if (cond instanceof UnaryExpr unary &&
-                unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+    return condition.findAll(MethodCallExpr.class)
+            .stream()
+            .anyMatch(m ->
+                    m.getNameAsString().equals("isPresent")
+                            && m.getScope().isPresent()
+                            && m.getScope().get().toString()
+                            .equals(scope.toString()));
+}
 
-            if (ifStmt.getThenStmt() instanceof ReturnStmt ||
-                ifStmt.getThenStmt() instanceof ThrowStmt) {
+private boolean isNegativeGuardWithExit(IfStmt ifStmt) {
+
+    Expression cond = ifStmt.getCondition();
+
+    if (cond instanceof UnaryExpr unary
+            && unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+
+        Expression inner = unary.getExpression();
+
+        if (inner instanceof MethodCallExpr m
+                && m.getNameAsString().equals("isPresent")) {
+
+            Statement thenStmt = ifStmt.getThenStmt();
+
+            if (thenStmt instanceof ReturnStmt
+                    || thenStmt instanceof ThrowStmt) {
                 return true;
             }
         }
-
-        return false;
     }
 
-    private boolean callIsInsideThen(MethodCallExpr call,
-                                     IfStmt ifStmt) {
+    return false;
+}
 
-        return ifStmt.getThenStmt()
-                .findAll(MethodCallExpr.class)
-                .contains(call);
-    }
+private boolean callIsInsideThen(MethodCallExpr call,
+                                 IfStmt ifStmt) {
+
+    return ifStmt.getThenStmt()
+            .findAll(MethodCallExpr.class)
+            .stream()
+            .anyMatch(c -> c == call);
+}
+
+
 }

@@ -3,15 +3,13 @@ package com.company.codequality.sonarautofix.strategy;
 import com.company.codequality.sonarautofix.model.FixType;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-
 import com.github.javaparser.ast.body.MethodDeclaration;
-
-import com.github.javaparser.ast.expr.AssignExpr;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.stmt.*;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class StringBuilderLoopStrategy implements FixStrategy {
@@ -30,73 +28,115 @@ public class StringBuilderLoopStrategy implements FixStrategy {
 
             if (!method.getBody().isPresent()) continue;
 
+            VariableDeclarator stringVar = null;
+
             // Find String variable initialized to ""
-            String stringVarName = null;
-
-            for (var varDecl : method.findAll(com.github.javaparser.ast.body.VariableDeclarator.class)) {
-                if (varDecl.getType().asString().equals("String")
-                        && varDecl.getInitializer().isPresent()
-                        && varDecl.getInitializer().get().toString().equals("\"\"")) {
-
-                    stringVarName = varDecl.getNameAsString();
-                    varDecl.remove(); // remove original String result = "";
+            for (VariableDeclarator v : method.findAll(VariableDeclarator.class)) {
+                if (v.getType().asString().equals("String")
+                        && v.getInitializer().isPresent()
+                        && v.getInitializer().get().toString().equals("\"\"")) {
+                    stringVar = v;
                     break;
                 }
             }
 
-            if (stringVarName == null) continue;
+            if (stringVar == null) continue;
 
-            for (ForStmt loop : method.findAll(ForStmt.class)) {
+            String varName = stringVar.getNameAsString();
+            String builderName = varName + "Builder";
 
-                boolean hasConcat = false;
+            boolean concatFound = false;
+
+            List<Statement> loops = new ArrayList<>();
+            loops.addAll(method.findAll(ForStmt.class));
+            loops.addAll(method.findAll(ForEachStmt.class));
+
+            for (Statement loop : loops) {
 
                 for (AssignExpr assign : loop.findAll(AssignExpr.class)) {
 
-                    if (assign.getTarget().toString().equals(stringVarName)
+                    if (!assign.getTarget().toString().equals(varName)) continue;
+
+                    List<Expression> parts = new ArrayList<>();
+
+                    if (assign.getOperator() == AssignExpr.Operator.PLUS) {
+
+                        parts.add(assign.getValue());
+
+                    } else if (assign.getOperator() == AssignExpr.Operator.ASSIGN
                             && assign.getValue() instanceof BinaryExpr) {
 
-                        BinaryExpr binary = (BinaryExpr) assign.getValue();
+                        BinaryExpr bin = (BinaryExpr) assign.getValue();
 
-                        if (binary.getOperator() == BinaryExpr.Operator.PLUS) {
-
-                            // Replace with sb.append(...)
-                            assign.replace(
-                                    StaticJavaParser.parseStatement(
-                                            "sb.append(" + binary.getRight() + ");"
-                                    )
-                            );
-
-                            hasConcat = true;
+                        if (bin.getOperator() == BinaryExpr.Operator.PLUS) {
+                            flatten(bin, parts);
+                            parts.removeIf(p -> p.toString().equals(varName));
                         }
                     }
-                }
 
-                if (hasConcat) {
+                    if (parts.isEmpty()) continue;
 
-                    // Add StringBuilder at top of method
-                    method.getBody().get().addStatement(
-                            0,
-                            StaticJavaParser.parseStatement(
-                                    "StringBuilder sb = new StringBuilder();"
-                            )
+                    StringBuilder code = new StringBuilder(builderName);
+
+                    for (Expression p : parts) {
+                        code.append(".append(").append(p.toString()).append(")");
+                    }
+
+                    code.append(";");
+
+                    assign.replace(
+                            StaticJavaParser.parseStatement(code.toString())
                     );
 
-                    // Replace return result → return sb.toString();
-                    for (ReturnStmt ret : method.findAll(ReturnStmt.class)) {
-                        if (ret.getExpression().isPresent()
-                                && ret.getExpression().get().toString().equals(stringVarName)) {
-
-                            ret.setExpression(
-                                    new NameExpr("sb.toString()")
-                            );
-                        }
-                    }
-
-                    fixed = true;
+                    concatFound = true;
                 }
             }
+
+            if (!concatFound) continue;
+
+            // Insert StringBuilder
+            method.getBody().get().addStatement(
+                    0,
+                    StaticJavaParser.parseStatement(
+                            "StringBuilder " + builderName + " = new StringBuilder();"
+                    )
+            );
+
+            // Remove original String variable
+            stringVar.remove();
+
+            // Replace return result → resultBuilder.toString()
+            for (ReturnStmt ret : method.findAll(ReturnStmt.class)) {
+                if (ret.getExpression().isPresent()
+                        && ret.getExpression().get().toString().equals(varName)) {
+
+                    ret.setExpression(
+                            StaticJavaParser.parseExpression(
+                                    builderName + ".toString()"
+                            )
+                    );
+                }
+            }
+
+            fixed = true;
         }
 
         return fixed;
+    }
+
+    private void flatten(Expression expr, List<Expression> parts) {
+
+        if (expr instanceof BinaryExpr) {
+
+            BinaryExpr b = (BinaryExpr) expr;
+
+            if (b.getOperator() == BinaryExpr.Operator.PLUS) {
+                flatten(b.getLeft(), parts);
+                flatten(b.getRight(), parts);
+                return;
+            }
+        }
+
+        parts.add(expr);
     }
 }
