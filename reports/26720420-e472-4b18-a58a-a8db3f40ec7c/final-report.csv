@@ -1,0 +1,9 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeAllRulesValidation,NewAllRulesValidation,AllRulesValidation.java,20,CLASS
+UserService,Divhbhj,UserController.java,10,CLASS
+UserService,Divhbhj,UserController.java,13,CLASS
+UserService,Divhbhj,UserController.java,23,CLASS
+UserService,Divhbhj,UserController.java,3,CLASS
+UserService,Divhbhj,OrderService.java,10,CLASS
+UserService,Divhbhj,OrderService.java,13,CLASS
+UserService,Divhbhj,OrderService.java,23,CLASS
+UserService,Divhbhj,UserService.java,8,CLASS

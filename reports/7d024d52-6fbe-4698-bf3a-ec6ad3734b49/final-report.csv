@@ -1,0 +1,20 @@
+OldName,NewName,UsedInFile,LineNumber,UsageType
+UserService,New,UserController.java,10,CLASS, FIELD
+UserService,New,UserController.java,13,CLASS, PARAMETER
+UserService,New,UserController.java,23,CLASS, LOCAL_VAR
+UserService,New,UserController.java,23,CLASS, TYPE_REFERENCE
+UserService,New,UserController.java,3,IMPORT
+UserService,New,OrderService.java,10,CLASS, FIELD
+UserService,New,OrderService.java,13,CLASS, PARAMETER
+UserService,New,OrderService.java,23,CLASS, LOCAL_VAR
+UserService,New,OrderService.java,23,CLASS, TYPE_REFERENCE
+UserService,New,UserService.java,8,CLASS, TYPE_REFERENCE
+emptyCatchExample,newCatch,AllRulesValidation.java,31,METHOD,METHOD_DECL
+userService,new,UserController.java,10,VARIABLE, VARIABLE_USAGE
+userService,new,UserController.java,13,VARIABLE, VARIABLE_USAGE
+userService,new,UserController.java,14,VARIABLE, VARIABLE_USAGE
+userService,new,UserController.java,20,VARIABLE, VARIABLE_USAGE
+userService,new,OrderService.java,10,VARIABLE, VARIABLE_USAGE
+userService,new,OrderService.java,13,VARIABLE, VARIABLE_USAGE
+userService,new,OrderService.java,14,VARIABLE, VARIABLE_USAGE
+userService,new,OrderService.java,20,VARIABLE, VARIABLE_USAGE

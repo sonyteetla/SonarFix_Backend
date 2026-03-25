@@ -2,6 +2,7 @@ package com.company.codequality.sonarautofix.service;
 
 import com.company.codequality.sonarautofix.model.ScanTask;
 import com.company.codequality.sonarautofix.model.SonarIssue;
+import com.company.codequality.sonarautofix.repository.ScanRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,77 +26,112 @@ public class SonarService {
     private String sonarHost;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ScanRepository scanRepository;
+
+    public SonarService(ScanRepository scanRepository) {
+        this.scanRepository = scanRepository;
+    }
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // ================= RUN SONAR SCAN =================
     public void runSonarScan(String projectPath,
-                             String projectKey,
-                             ScanTask task) {
+            String projectKey,
+            ScanTask task) {
 
-        try {
+try {
+	ProcessBuilder builder = new ProcessBuilder(
+		    "C:\\Program Files\\Apache\\Maven\\bin\\mvn.cmd",
+		    "compile",
+		    "sonar:sonar",         
+		    "-DskipTests=true",
+		    "-Dsonar.projectKey=" + projectKey,
+		    "-Dsonar.host.url=" + sonarHost,
+		    "-Dsonar.login=" + token
+		);
 
-        	ProcessBuilder builder = new ProcessBuilder(
-                    "mvn.cmd",
-                    "clean",
-                    "verify",
-                    "-DskipTests=true",
-                    "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar",
-                    "-Dsonar.projectKey=" + projectKey,
-                    "-Dsonar.host.url=" + sonarHost,
-                    "-Dsonar.token=" + token
-            );
+builder.directory(new java.io.File(projectPath));
+builder.redirectErrorStream(true);
 
+Process process = builder.start();
 
-            builder.directory(new java.io.File(projectPath));
-            builder.redirectErrorStream(true);
+StringBuilder logBuffer = new StringBuilder();
+task.setBuildLog("");
+String ceTaskId = null;
 
-            Process process = builder.start();
+task.setProgress(10);
+scanRepository.update(task);
 
-            StringBuilder logBuffer = new StringBuilder();
-            String ceTaskId = null;
+try (BufferedReader reader =
+         new BufferedReader(new InputStreamReader(
+                 process.getInputStream(),
+                 StandardCharsets.UTF_8))) {
 
-            try (BufferedReader reader =
-                         new BufferedReader(new InputStreamReader(
-                                 process.getInputStream(),
-                                 StandardCharsets.UTF_8))) {
+String line;
+int lineCount = 0;
+int lastProgress = task.getProgress();
 
-                String line;
+while ((line = reader.readLine()) != null) {
 
-                while ((line = reader.readLine()) != null) {
+    System.out.println(line);
+    logBuffer.append(line).append("\n");
 
-                    System.out.println(line);
-                    logBuffer.append(line).append("\n");
+    // ✅ Extract CE Task ID
+    if (line.contains("/api/ce/task?id=")) {
+        int idx = line.indexOf("/api/ce/task?id=");
+        ceTaskId = line.substring(idx + 16).trim();
 
-                    if (line.contains("ce/task?id=")) {
-                        int idx = line.indexOf("ce/task?id=");
-                        ceTaskId = line.substring(idx + 11).trim();
-                    }
-                }
-            }
-
-            task.setBuildLog(logBuffer.toString());
-
-            int exitCode = process.waitFor();
-
-            if (exitCode != 0) {
-                System.out.println("⚠ Maven build failed but continuing scan");
-            }
-
-            if (ceTaskId != null) {
-                waitForCeTaskCompletion(ceTaskId);
-            } else {
-                throw new RuntimeException("CE Task ID not found in Sonar logs");
-            }
-
-        } catch (Exception e) {
-
-            task.setBuildLog("Scan failed: " + e.getMessage());
-            throw new RuntimeException("Sonar scan failed", e);
+        if (ceTaskId.contains(" ")) {
+            ceTaskId = ceTaskId.substring(0, ceTaskId.indexOf(" "));
         }
+
+        System.out.println("CE Task ID: " + ceTaskId);
     }
 
+    lineCount++;
+
+    if (lineCount % 40 == 0) {
+        int newProgress = Math.min(60, lastProgress + 2);
+
+        if (newProgress != lastProgress) {
+            lastProgress = newProgress;
+
+            task.setProgress(newProgress);
+            task.setBuildLog(logBuffer.toString());
+            scanRepository.update(task);
+        }
+    }
+}
+}
+
+int exitCode = process.waitFor();
+
+task.setProgress(70);
+scanRepository.update(task);
+
+if (exitCode != 0) {
+task.setStatus("FAILED");
+scanRepository.update(task);
+throw new RuntimeException("Maven build failed. Scan aborted.");
+}
+
+if (ceTaskId != null) {
+waitForCeTaskCompletion(ceTaskId, task);
+} else {
+System.out.println("WARNING: CE Task ID not found. Skipping wait.");
+}
+
+} catch (Exception e) {
+
+task.setBuildLog(
+    (task.getBuildLog() != null ? task.getBuildLog() : "") +
+            "\nScan failed: " + e.getMessage()
+);
+scanRepository.update(task);
+
+throw new RuntimeException("Sonar scan failed", e);
+}
+}
     // ================= WAIT FOR SONAR BACKGROUND PROCESS =================
-    private void waitForCeTaskCompletion(String ceTaskId) throws Exception {
+    private void waitForCeTaskCompletion(String ceTaskId, ScanTask task) throws Exception {
 
         System.out.println("Waiting for Sonar CE task: " + ceTaskId);
 
@@ -116,6 +152,11 @@ public class SonarService {
 
             if ("SUCCESS".equalsIgnoreCase(status)) {
                 System.out.println("Sonar analysis completed successfully.");
+
+                // ✅ Update progress after CE completes
+                task.setProgress(85);
+                scanRepository.update(task);
+
                 break;
             }
 
@@ -128,71 +169,80 @@ public class SonarService {
             Thread.sleep(2000);
         }
     }
-
     // ================= FETCH ISSUES FROM SONAR =================
     public List<SonarIssue> fetchIssues(String projectKey) {
 
+        List<SonarIssue> allIssues = new ArrayList<>();
+
+        int page = 1;
+        int pageSize = 500;
+        int maxResults = 10000;
+        boolean hasMore = true;
+
         try {
-
-            String url = sonarHost +
-                    "/api/issues/search?componentKeys=" +
-                    projectKey +
-                    "&resolved=false&ps=500";
-
-            System.out.println("Fetching issues for projectKey = " + projectKey);
-            System.out.println("URL = " + url);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setBasicAuth(token, "");
-
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            while (hasMore) {
 
-            JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode issuesNode = root.path("issues");
+                String url = sonarHost +
+                        "/api/issues/search?componentKeys=" + projectKey +
+                        "&resolved=false" +
+                        "&p=" + page +
+                        "&ps=" + pageSize +
+                        "&languages=java"; // optional but useful
 
-            List<SonarIssue> issues = new ArrayList<>();
+                System.out.println("Fetching page " + page + " → " + url);
 
-            if (issuesNode.isArray()) {
+                ResponseEntity<String> response =
+                        restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-                for (JsonNode node : issuesNode) {
+                JsonNode root = objectMapper.readTree(response.getBody());
+                JsonNode issuesNode = root.path("issues");
 
-                    SonarIssue issue = new SonarIssue();
+                if (issuesNode.isArray()) {
 
-                    /* FIX: read issue key */
-                    issue.setKey(node.path("key").asText());
+                    for (JsonNode node : issuesNode) {
 
-                    issue.setRule(node.path("rule").asText());
+                        String fullComponent = node.path("component").asText();
 
-                    String fullComponent = node.path("component").asText();
+                        String filePath = fullComponent.contains(":")
+                                ? fullComponent.substring(fullComponent.indexOf(":") + 1)
+                                : fullComponent;
 
-                    String filePath = fullComponent.contains(":")
-                            ? fullComponent.substring(fullComponent.indexOf(":") + 1)
-                            : fullComponent;
+                        // ✅ FILTER ONLY JAVA FILES (mandatory)
+                        if (!filePath.endsWith(".java")) {
+                            continue;
+                        }
 
-                    issue.setComponent(filePath);
+                        SonarIssue issue = new SonarIssue();
 
-                    int line = node.has("line") ? node.get("line").asInt() : -1;
-                    issue.setLine(line);
+                        issue.setKey(node.path("key").asText());
+                        issue.setRule(node.path("rule").asText());
+                        issue.setComponent(filePath);
 
-                    issues.add(issue);
+                        int line = node.has("line") ? node.get("line").asInt() : -1;
+                        issue.setLine(line);
 
-                    System.out.println(
-                            "ISSUE -> key=" + issue.getKey() +
-                            " rule=" + issue.getRule() +
-                            " line=" + issue.getLine()
-                    );
+                        allIssues.add(issue);
+                    }
                 }
+
+                int total = root.path("paging").path("total").asInt();
+
+                // ✅ CRITICAL FIX (prevents 10k crash)
+                hasMore = page * pageSize < Math.min(total, maxResults);
+
+                page++;
             }
 
-            System.out.println("Total issues fetched: " + issues.size());
+            System.out.println("Total issues fetched (filtered .java): " + allIssues.size());
 
-            return issues;
+            return allIssues;
 
         } catch (Exception e) {
-
             e.printStackTrace();
             return new ArrayList<>();
         }

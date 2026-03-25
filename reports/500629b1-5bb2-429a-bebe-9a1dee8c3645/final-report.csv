@@ -1,0 +1,20 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeUserService,NewUserService,UserController.java,10,CLASS, FIELD
+UserService,NewUserService,UserController.java,13,CLASS, PARAMETER
+UserService,NewUserService,UserController.java,23,CLASS, LOCAL_VAR
+UserService,NewUserService,UserController.java,23,CLASS, TYPE_REFERENCE
+UserService,NewUserService,UserController.java,3,CLASS,IMPORT
+UserService,NewUserService,OrderService.java,10,CLASS, FIELD
+UserService,NewUserService,OrderService.java,13,CLASS, PARAMETER
+UserService,NewUserService,OrderService.java,23,CLASS, LOCAL_VAR
+UserService,NewUserService,OrderService.java,23,CLASS, TYPE_REFERENCE
+UserService,NewUserService,UserService.java,8,CLASS, TYPE_REFERENCE
+getUserName,newGetUserName,UserController.java,20,METHOD,METHOD_CALL
+getUserName,newGetUserName,NewUserService.java,10,METHOD,METHOD_DECL
+getUserName,newGetUserName,OrderService.java,20,METHOD,METHOD_CALL
+flag,placeholder,AllRulesValidation.java,46,VARIABLE, VARIABLE_USAGE
+flag,placeholder,AllRulesValidation.java,47,VARIABLE, VARIABLE_USAGE
+flag,placeholder,AllRulesValidation.java,85,VARIABLE, VARIABLE_USAGE
+flag,placeholder,AllRulesValidation.java,86,VARIABLE, VARIABLE_USAGE
+flag,placeholder,AllRulesValidation.java,89,VARIABLE, VARIABLE_USAGE
+flag,placeholder,TestService.java,28,VARIABLE, VARIABLE_USAGE
+flag,placeholder,TestService.java,29,VARIABLE, VARIABLE_USAGE

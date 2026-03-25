@@ -1,0 +1,9 @@
+OldName,NewName,UsedInFile,LineNumber,UsageType
+UserService,gdfg,UserController.java,10,CLASS
+UserService,gdfg,UserController.java,13,CLASS
+UserService,gdfg,UserController.java,23,CLASS
+UserService,gdfg,UserController.java,3,IMPORT
+UserService,gdfg,OrderService.java,10,CLASS
+UserService,gdfg,OrderService.java,13,CLASS
+UserService,gdfg,OrderService.java,23,CLASS
+UserService,gdfg,UserService.java,8,CLASS

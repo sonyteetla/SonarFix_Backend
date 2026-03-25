@@ -1,0 +1,13 @@
+OldName,NewName,UsedInFile,LineNumber,UsageType
+AllRulesValidation,ghjkgfhuk,AllRulesValidation.java,12,VARIABLE
+AllRulesValidation,ghjkgfhuk,AllRulesValidation.java,20,VARIABLE
+UserService,drfghjkhhu,UserController.java,10,FIELD
+UserService,drfghjkhhu,UserController.java,13,PARAMETER
+UserService,drfghjkhhu,UserController.java,23,LOCAL_VAR
+UserService,drfghjkhhu,UserController.java,23,TYPE
+UserService,drfghjkhhu,UserController.java,3,IMPORT
+UserService,drfghjkhhu,OrderService.java,10,FIELD
+UserService,drfghjkhhu,OrderService.java,13,PARAMETER
+UserService,drfghjkhhu,OrderService.java,23,LOCAL_VAR
+UserService,drfghjkhhu,OrderService.java,23,TYPE
+UserService,drfghjkhhu,UserService.java,8,TYPE

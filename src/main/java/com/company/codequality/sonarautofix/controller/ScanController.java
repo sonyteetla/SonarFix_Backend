@@ -5,8 +5,6 @@ import com.company.codequality.sonarautofix.model.FixExecutionReport;
 import com.company.codequality.sonarautofix.model.ScanTask;
 import java.util.List;
 
-import com.company.codequality.sonarautofix.model.ScanTask;
-import java.util.List;
 import com.company.codequality.sonarautofix.service.ScanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,31 +58,32 @@ public class ScanController {
 
     // ================= STATUS =================
     @GetMapping("/status/{scanId}")
-    public ResponseEntity<?> getStatus(@PathVariable("scanId") String scanId) {
+    public ResponseEntity<?> getStatus(@PathVariable String scanId) {
 
-        String status = scanService.getStatus(scanId);
+        ScanTask task = scanService.getScanTask(scanId);
 
-        if ("NOT_FOUND".equals(status)) {
+        if (task == null) {
             return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(
                 Map.of(
                         "scanId", scanId,
-                        "status", status
+                        "status", task.getStatus(),
+                        "progress", task.getProgress()
                 )
         );
     }
 
     // ================= RESULT =================
     @GetMapping("/result/{scanId}")
-    public ResponseEntity<?> getResult(@PathVariable("scanId") String scanId) {
+    public ResponseEntity<?> getResult(@PathVariable String scanId) {
         return ResponseEntity.ok(scanService.getResult(scanId));
     }
 
     // ================= BUILD LOG =================
     @GetMapping("/build-log/{scanId}")
-    public ResponseEntity<?> getBuildLog(@PathVariable("scanId") String scanId) {
+    public ResponseEntity<?> getBuildLog(@PathVariable String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
         if (task == null) {
@@ -96,7 +95,7 @@ public class ScanController {
     
     @GetMapping("/scan/{scanId}/fix-report")
     public List<FixExecutionReport> getFixReport(
-            @PathVariable("scanId") String scanId) {
+            @PathVariable String scanId) {
 
         ScanTask task = scanService.getScanTask(scanId);
 

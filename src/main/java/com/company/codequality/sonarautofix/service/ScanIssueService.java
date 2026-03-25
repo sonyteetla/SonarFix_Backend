@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 @Service
 public class ScanIssueService {
 
+    private static final int MAX_RESULTS = 10000;
+    private static final int PAGE_SIZE = 500;
+
     @Value("${sonar.host.url}")
     private String sonarUrl;
 
@@ -36,7 +39,7 @@ public class ScanIssueService {
         this.scanRepository = scanRepository;
     }
 
-
+    // ================= MAIN FETCH =================
 
     public IssueResponse fetchIssues(String projectKey,
                                      List<String> softwareQualities,
@@ -65,46 +68,34 @@ public class ScanIssueService {
                         page,
                         safePageSize);
 
-        // --- FILTER COUNTS (kept exactly as your logic) ---
-
-        List<Issue> severityBase = fetchAllIssuesForCounts(
-                projectKey,
-                softwareQualities,
-                Collections.emptyList(),
-                rules,
-                autoFixOnly
-        );
-
-        List<Issue> qualityBase = fetchAllIssuesForCounts(
+        // ✅ SINGLE FETCH FOR COUNTS (FIXED)
+        List<Issue> allIssues = fetchAllIssuesForCounts(
                 projectKey,
                 Collections.emptyList(),
-                severities,
-                rules,
-                autoFixOnly
-        );
-
-        List<Issue> ruleBase = fetchAllIssuesForCounts(
-                projectKey,
-                softwareQualities,
-                severities,
+                Collections.emptyList(),
                 Collections.emptyList(),
                 autoFixOnly
         );
 
-        Map<String, Long> severityCounts = severityBase.stream()
+        Map<String, Long> severityCounts = allIssues.stream()
                 .collect(Collectors.groupingBy(
                         Issue::getSeverity,
                         Collectors.counting()));
 
-        Map<String, Long> qualityCounts = qualityBase.stream()
+        Map<String, Long> qualityCounts = allIssues.stream()
                 .collect(Collectors.groupingBy(
                         Issue::getSoftwareQuality,
                         Collectors.counting()));
 
         Map<String, RuleCountInfo> ruleCounts = new HashMap<>();
-        for (Issue issue : ruleBase) {
+        for (Issue issue : allIssues) {
             String ruleKey = issue.getRule();
-            RuleCountInfo info = ruleCounts.getOrDefault(ruleKey, new RuleCountInfo(0, issue.isAutoFixable()));
+
+            RuleCountInfo info = ruleCounts.getOrDefault(
+                    ruleKey,
+                    new RuleCountInfo(0, issue.isAutoFixable())
+            );
+
             info.setCount(info.getCount() + 1);
             ruleCounts.put(ruleKey, info);
         }
@@ -129,7 +120,7 @@ public class ScanIssueService {
                 .build();
     }
 
-    //PAGED RESPONSE 
+    // ================= PAGED RESPONSE =================
 
     private IssueResponse processPagedResponse(String body,
                                                Boolean autoFixOnly,
@@ -157,7 +148,7 @@ public class ScanIssueService {
                             .collect(Collectors.toList());
 
             int totalPages =
-                    (int) Math.ceil((double) total / sonarPageSize);
+                    (int) Math.ceil((double) Math.min(total, MAX_RESULTS) / sonarPageSize);
 
             return IssueResponse.builder()
                     .totalElements(total)
@@ -172,7 +163,7 @@ public class ScanIssueService {
         }
     }
 
-    // FETCH ALL FOR COUNTS
+    // ================= SAFE FETCH ALL =================
 
     private List<Issue> fetchAllIssuesForCounts(String projectKey,
                                                 List<String> softwareQualities,
@@ -181,7 +172,6 @@ public class ScanIssueService {
                                                 Boolean autoFixOnly) {
 
         int page = 1;
-        int pageSize = 500;
         boolean hasMore = true;
 
         List<Issue> allIssues = new ArrayList<>();
@@ -194,7 +184,7 @@ public class ScanIssueService {
                     severities,
                     rules,
                     page,
-                    pageSize
+                    PAGE_SIZE
             );
 
             ResponseEntity<String> response = callSonar(url);
@@ -214,14 +204,15 @@ public class ScanIssueService {
             allIssues.addAll(pageIssues);
 
             int total = root.path("paging").path("total").asInt();
-            hasMore = page * pageSize < total;
+
+            hasMore = page * PAGE_SIZE < Math.min(total, MAX_RESULTS);
             page++;
         }
 
         return allIssues;
     }
 
-    // SONAR CALL 
+    // ================= SONAR CALL =================
 
     private ResponseEntity<String> callSonar(String url) {
 
@@ -234,13 +225,14 @@ public class ScanIssueService {
                 restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("SonarQube API returned error");
+            throw new RuntimeException("SonarQube API error");
         }
 
         return response;
     }
 
-    //  ISSUE PARSER
+    // ================= PARSER =================
+
     private List<Issue> parseIssuesFromSonar(JsonNode issuesNode,
                                              Boolean autoFixOnly) {
 
@@ -255,6 +247,11 @@ public class ScanIssueService {
                 String filePath = fullComponent.contains(":")
                         ? fullComponent.substring(fullComponent.indexOf(":") + 1)
                         : fullComponent;
+
+                
+                if (!filePath.endsWith(".java")) {
+                    continue;
+                }
 
                 Issue issue = Issue.builder()
                         .key(node.path("key").asText())
@@ -271,8 +268,6 @@ public class ScanIssueService {
             }
         }
 
-        
-        // Enrich AFTER parsing 
         ruleEngineService.enrichIssues(parsedIssues);
 
         if (Boolean.TRUE.equals(autoFixOnly)) {
@@ -284,6 +279,7 @@ public class ScanIssueService {
         return parsedIssues;
     }
 
+    // ================= HELPERS =================
 
     private List<String> mapSoftwareQualityToTypes(List<String> qualities) {
 
@@ -291,15 +287,9 @@ public class ScanIssueService {
 
         for (String quality : qualities) {
             switch (quality.toUpperCase()) {
-                case "SECURITY":
-                    types.add("VULNERABILITY");
-                    break;
-                case "RELIABILITY":
-                    types.add("BUG");
-                    break;
-                case "MAINTAINABILITY":
-                    types.add("CODE_SMELL");
-                    break;
+                case "SECURITY": types.add("VULNERABILITY"); break;
+                case "RELIABILITY": types.add("BUG"); break;
+                case "MAINTAINABILITY": types.add("CODE_SMELL"); break;
             }
         }
 
@@ -332,143 +322,138 @@ public class ScanIssueService {
                 .append("&ps=").append(pageSize);
 
         if (severities != null && !severities.isEmpty()) {
-            url.append("&severities=")
-                    .append(String.join(",", severities));
+            url.append("&severities=").append(String.join(",", severities));
         }
 
         if (softwareQualities != null && !softwareQualities.isEmpty()) {
-
             List<String> types = mapSoftwareQualityToTypes(softwareQualities);
-
             if (!types.isEmpty()) {
-                url.append("&types=")
-                        .append(String.join(",", types));
+                url.append("&types=").append(String.join(",", types));
             }
         }
 
         if (rules != null && !rules.isEmpty()) {
-            url.append("&rules=")
-                    .append(String.join(",", rules));
+            url.append("&rules=").append(String.join(",", rules));
         }
 
         return url.toString();
     }
-
-    // FETCH ALL 
-
-    public List<Issue> fetchAllIssues(String projectKey,
-                                      List<String> softwareQualities,
-                                      List<String> severities,
-                                      List<String> rules) {
-
-        int page = 1;
-        int pageSize = 500;
-        boolean hasMore = true;
-
-        List<Issue> allIssues = new ArrayList<>();
-
-        while (hasMore) {
-
-            IssueResponse response =
-                    fetchIssues(projectKey,
-                            softwareQualities,
-                            severities,
-                            rules,
-                            false,
-                            page,
-                            pageSize);
-
-            response.getContent()
-                    .forEach(group -> allIssues.addAll(group.getIssues()));
-
-            hasMore = page < response.getTotalPages();
-            page++;
-        }
-
-        return allIssues;
-    }
-
-    //DTO MAPPING 
-
-    public List<MappedIssue> toMappedIssues(List<Issue> issues) {
-        if (issues == null)
-            return new ArrayList<>();
-
-        return issues.stream()
-                .map(this::toMappedIssue)
-                .collect(Collectors.toList());
-    }
-
-    public MappedIssue toMappedIssue(Issue issue) {
-        return new MappedIssue(
-        		 issue.getKey(),
-                issue.getRule(),
-                issue.getFilePath(),
-                issue.getLine() != null ? issue.getLine() : 0,
-                issue.getMessage(),
-                issue.getSeverity(),
-                issue.getSoftwareQuality(),
-                issue.isAutoFixable(),
-                issue.getFixType() != null ? issue.getFixType().name() : null
-        );
-    }
-    
     public IssueResponse fetchAllIssuesForViewer(String projectKey,
             List<String> softwareQualities,
             List<String> severities,
             List<String> rules,
             Boolean autoFixOnly) {
 
-           int page = 1;
-           int pageSize = 500;
-           boolean hasMore = true;
-           List<Issue> allIssues = new ArrayList<>();
-           while (hasMore) {
-        	   String url = buildSonarUrl(
-        			   projectKey,
-        			   softwareQualities,
-        			   severities,
-        			   rules,
-        			   page,
-        			   pageSize
-        			   );
-        	   ResponseEntity<String> response = callSonar(url);
-        	   
-        	   try {
-        		   JsonNode root = objectMapper.readTree(response.getBody());
-        		   JsonNode issuesNode = root.path("issues");
-        		   List<Issue> pageIssues = parseIssuesFromSonar(issuesNode, autoFixOnly);
-        		   allIssues.addAll(pageIssues);
-        		   
-        		   int total = root.path("paging").path("total").asInt();
-        		   hasMore = page * pageSize < total;
-        		   page++;
-        	   } catch (Exception e) {
-        			   throw new RuntimeException("Error fetching all issues", e);
-        		 }
-        	   }
-           
-           // Group by file 
-           Map<String, List<Issue>> grouped = allIssues.stream() 
-        		   .collect(Collectors.groupingBy(Issue::getFilePath));
-           List<FileIssueGroup> content = grouped.entrySet().stream()
-        		   .map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
-        		   .collect(Collectors.toList());
-           
-           String currentScanId = null;
-           ScanTask latestTask = scanRepository.findLatestByProjectKey(projectKey);
-           if (latestTask != null) {
-               currentScanId = latestTask.getScanId();
-           }
+int page = 1;
+boolean hasMore = true;
 
-           return IssueResponse.builder()
-        		   .scanId(currentScanId)
-        		   .totalElements(allIssues.size())
-        		   .page(1)
-        		   .pageSize(allIssues.size())
-        		   .totalPages(1)
-        		   .content(content)
-        		   .filterCounts(null) 
-        		   .build();
-           }
- }
+List<Issue> allIssues = new ArrayList<>();
+
+while (hasMore) {
+
+String url = buildSonarUrl(
+projectKey,
+softwareQualities,
+severities,
+rules,
+page,
+PAGE_SIZE
+);
+
+ResponseEntity<String> response = callSonar(url);
+
+try {
+JsonNode root = objectMapper.readTree(response.getBody());
+JsonNode issuesNode = root.path("issues");
+
+List<Issue> pageIssues =
+parseIssuesFromSonar(issuesNode, autoFixOnly);
+
+allIssues.addAll(pageIssues);
+
+int total = root.path("paging").path("total").asInt();
+
+// ✅ FIXED (10k safe)
+hasMore = page * PAGE_SIZE < Math.min(total, MAX_RESULTS);
+
+page++;
+
+} catch (Exception e) {
+throw new RuntimeException("Error fetching all issues", e);
+}
+}
+
+// Group by file
+Map<String, List<Issue>> grouped =
+allIssues.stream()
+.collect(Collectors.groupingBy(Issue::getFilePath));
+
+List<FileIssueGroup> content =
+grouped.entrySet().stream()
+.map(e -> new FileIssueGroup(e.getKey(), e.getValue()))
+.collect(Collectors.toList());
+
+String currentScanId = null;
+ScanTask latestTask = scanRepository.findLatestByProjectKey(projectKey);
+if (latestTask != null) {
+currentScanId = latestTask.getScanId();
+}
+
+return IssueResponse.builder()
+.scanId(currentScanId)
+.totalElements(allIssues.size())
+.page(1)
+.pageSize(allIssues.size())
+.totalPages(1)
+.content(content)
+.filterCounts(null)
+.build();
+}
+    
+    public List<Issue> fetchAllIssues(String projectKey,
+            List<String> softwareQualities,
+            List<String> severities,
+            List<String> rules) {
+
+int page = 1;
+boolean hasMore = true;
+
+List<Issue> allIssues = new ArrayList<>();
+
+while (hasMore) {
+
+String url = buildSonarUrl(
+projectKey,
+softwareQualities,
+severities,
+rules,
+page,
+PAGE_SIZE
+);
+
+ResponseEntity<String> response = callSonar(url);
+
+try {
+JsonNode root = objectMapper.readTree(response.getBody());
+JsonNode issuesNode = root.path("issues");
+
+List<Issue> pageIssues =
+parseIssuesFromSonar(issuesNode, false);
+
+allIssues.addAll(pageIssues);
+
+int total = root.path("paging").path("total").asInt();
+
+
+hasMore = page * PAGE_SIZE < Math.min(total, MAX_RESULTS);
+
+page++;
+
+} catch (Exception e) {
+throw new RuntimeException("Error fetching all issues", e);
+}
+}
+
+return allIssues;
+}
+}

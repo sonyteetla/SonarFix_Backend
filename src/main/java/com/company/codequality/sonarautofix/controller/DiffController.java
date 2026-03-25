@@ -27,21 +27,19 @@ public class DiffController {
 
     @GetMapping("/project/{scanId}")
     public List<FileDiff> compareProjects(@PathVariable String scanId) {
-
         ScanTask task = scanRepository.findById(scanId);
-
         if (task == null) {
             throw new RuntimeException("Scan task not found for id: " + scanId);
         }
-
         String original = task.getProjectPath();
         String fixed = task.getFixedPath();
-
         if (fixed == null || !new java.io.File(fixed).exists()) {
             fixed = original + "_fixed";
         }
-
-        return diffService.compareProjects(original, fixed);
+        return diffService.compareProjects(original, fixed)
+                .stream()
+                .filter(f -> f.getRelativePath().endsWith(".java"))
+                .toList();
     }
     
     @PostMapping("/preview/{scanId}")

@@ -7,6 +7,7 @@ import com.company.codequality.sonarautofix.service.ScanIssueService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,7 +33,10 @@ public class FileContentController {
                 fileContentService.getFileContent(projectKey, filePath);
 
         List<Issue> allIssues =
-                scanIssueService.fetchAllIssues(projectKey, null, null, null);
+                scanIssueService.fetchAllIssues(projectKey,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        Collections.emptyList());
 
         List<Issue> issuesForFile =
                 allIssues.stream()

@@ -14,7 +14,8 @@ import java.util.zip.ZipInputStream;
 @Service
 public class ProjectUploadService {
 
-    private static final String WORKSPACE = "C:/sonar-workspace/";
+    @org.springframework.beans.factory.annotation.Value("${project.workspace}")
+    private String WORKSPACE;
 
     private void ensureWorkspace() throws IOException {
         Files.createDirectories(Paths.get(WORKSPACE));
@@ -27,7 +28,8 @@ public class ProjectUploadService {
         return p.contains("/.git/")
                 || p.contains("/node_modules/")
                 || p.contains("/target/")
-                || p.contains("/build/");
+                || p.contains("/build/")
+                 || p.contains("/.history");
     }
 
     // ================= ZIP Upload =================
@@ -46,7 +48,7 @@ public class ProjectUploadService {
                 originalName = "project";
             }
 
-            String projectDir = WORKSPACE + originalName + "_" + System.currentTimeMillis();
+            String projectDir = Paths.get(WORKSPACE, originalName + "_" + System.currentTimeMillis()).toString();
             Path projectPath = Paths.get(projectDir);
 
             Files.createDirectories(projectPath);
@@ -116,7 +118,7 @@ public class ProjectUploadService {
 
             ensureWorkspace();
 
-            String projectDir = WORKSPACE + System.currentTimeMillis();
+            String projectDir = Paths.get(WORKSPACE, String.valueOf(System.currentTimeMillis())).toString();
 
             ProcessBuilder builder =
                     new ProcessBuilder("git", "clone", "--depth", "1", repoUrl, projectDir);
@@ -173,7 +175,7 @@ public class ProjectUploadService {
 
             ensureWorkspace();
 
-            String projectDir = WORKSPACE + System.currentTimeMillis();
+            String projectDir = Paths.get(WORKSPACE, String.valueOf(System.currentTimeMillis())).toString();
             Path dest = Paths.get(projectDir);
 
             Files.walk(src)
@@ -214,12 +216,11 @@ public class ProjectUploadService {
     public String copyProject(String originalPath) throws IOException {
         Path sourcePath = Paths.get(originalPath).normalize();
 
-        if (originalPath.endsWith("_fixed") || originalPath.endsWith("_fixed/")) {
-             if (Files.exists(sourcePath)) {
-                 System.out.println("Path is already fixed version: " + originalPath);
-                 return originalPath;
-             }
-        }
+        if (Files.exists(sourcePath.resolve("class-mapping.csv")) ||
+        	    Files.exists(sourcePath.resolve("final-report.csv"))) {
+        	    System.out.println("Already a processed project: " + sourcePath);
+        	    return sourcePath.toString();
+        	}
 
         String fixedPathStr = originalPath.endsWith("/") || originalPath.endsWith("\\") 
                 ? originalPath.substring(0, originalPath.length()-1) + "_fixed"
@@ -230,8 +231,8 @@ public class ProjectUploadService {
         System.out.println("Copying project from [" + sourcePath + "] to [" + fixedPath + "]");
 
         if (Files.exists(fixedPath)) {
-            System.out.println("Target already exists, deleting first: " + fixedPath);
-            deleteDirectory(fixedPath);
+            System.out.println("Reusing existing fixed project: " + fixedPath);
+            return fixedPath.toString();   
         }
 
         if (!Files.exists(sourcePath)) {

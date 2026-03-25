@@ -1,0 +1,12 @@
+OldClass,NewClass,UsedInFile,LineNumber,UsageType
+AllRulesValidation,devvvvvvvvvvvvvv,AllRulesValidation.java,20,TYPE
+UserService,fhjkgkj,UserController.java,10,FIELD
+UserService,fhjkgkj,UserController.java,13,PARAMETER
+UserService,fhjkgkj,UserController.java,23,LOCAL_VAR
+UserService,fhjkgkj,UserController.java,23,TYPE
+UserService,fhjkgkj,UserController.java,3,IMPORT
+UserService,fhjkgkj,OrderService.java,10,FIELD
+UserService,fhjkgkj,OrderService.java,13,PARAMETER
+UserService,fhjkgkj,OrderService.java,23,LOCAL_VAR
+UserService,fhjkgkj,OrderService.java,23,TYPE
+UserService,fhjkgkj,UserService.java,8,TYPE

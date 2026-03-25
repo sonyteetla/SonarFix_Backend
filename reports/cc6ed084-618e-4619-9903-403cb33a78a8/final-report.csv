@@ -1,0 +1,2 @@
+OldName,NewName,UsedInFile,LineNumber,UsageType
+AllRulesValidation,bhm,AllRulesValidation.java,20,CLASS

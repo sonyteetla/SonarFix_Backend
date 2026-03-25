@@ -20,46 +20,57 @@ public class ProjectDiffService {
         try {
 
             Path originalPath = Paths.get(originalDir);
+            Map<String, String> renameMap = loadClassMapping(fixedDir);
 
             Files.walk(originalPath)
                     .filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".java"))
                     .forEach(file -> {
 
                         try {
 
-                            String relative =
-                                    originalPath.relativize(file).toString();
+                            String relative = originalPath.relativize(file).toString();
+                            Path fixedFile = Paths.get(fixedDir, relative);
 
-                            Path fixedFile =
-                                    Paths.get(fixedDir, relative);
+                            String oldName = file.getFileName().toString().replace(".java", "");
+
+                            // 🔥 HANDLE RENAME
+                            if (!Files.exists(fixedFile) && renameMap.containsKey(oldName)) {
+
+                                String newName = renameMap.get(oldName);
+
+                                fixedFile = Paths.get(fixedDir)
+                                        .resolve(originalPath.relativize(file.getParent()))
+                                        .resolve(newName + ".java");
+                            }
 
                             if (!Files.exists(fixedFile)) return;
 
-                            List<String> originalLines =
-                                    Files.readAllLines(file);
+                            List<String> originalLines = Files.readAllLines(file);
+                            List<String> fixedLines = Files.readAllLines(fixedFile);
 
-                            List<String> fixedLines =
-                                    Files.readAllLines(fixedFile);
-
-                            Patch<String> patch =
-                                    DiffUtils.diff(originalLines, fixedLines);
+                            Patch<String> patch = DiffUtils.diff(originalLines, fixedLines);
 
                             if (patch.getDeltas().isEmpty()) return;
 
                             List<DiffLine> diffLines =
                                     generateDiffLines(originalLines, fixedLines, patch);
 
-                            result.add(new FileDiff(relative, diffLines));
+                            // 🔥 update filename if renamed
+                            String finalRelative = relative;
+                            if (renameMap.containsKey(oldName)) {
+                                String newName = renameMap.get(oldName);
+                                finalRelative = relative.replace(oldName + ".java", newName + ".java");
+                            }
+
+                            result.add(new FileDiff(finalRelative, diffLines));
 
                         } catch (Exception e) {
-
-                            System.err.println("Diff failed for file: " + file);
                             e.printStackTrace();
                         }
                     });
 
         } catch (Exception e) {
-
             throw new RuntimeException("Project diff failed", e);
         }
 
@@ -124,7 +135,6 @@ public class ProjectDiffService {
             modifiedIndex += tgt.size();
         }
 
-        // add remaining unchanged lines
         while (originalIndex < original.size()
                 && modifiedIndex < modified.size()) {
 
@@ -140,5 +150,30 @@ public class ProjectDiffService {
         }
 
         return lines;
+    }
+
+    private Map<String, String> loadClassMapping(String fixedDir) {
+
+        Map<String, String> map = new HashMap<>();
+
+        try {
+            Path path = Paths.get(fixedDir, "class-mapping.csv");
+
+            if (!Files.exists(path)) return map;
+
+            List<String> lines = Files.readAllLines(path);
+
+            for (String line : lines.stream().skip(1).toList()) {
+                String[] p = line.split(",");
+                if (p.length >= 2) {
+                    map.put(p[0].trim(), p[1].trim());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
     }
 }
