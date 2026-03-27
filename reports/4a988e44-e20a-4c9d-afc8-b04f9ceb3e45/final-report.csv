@@ -1,0 +1,50 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeCobolAdapter,Adapter,BankingService.java,24,CLASS, FIELD
+CobolAdapter,Adapter,BankingService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,EmiPaymentService.java,22,CLASS, FIELD
+CobolAdapter,Adapter,EmiPaymentService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,LoanService.java,33,CLASS, FIELD
+CobolAdapter,Adapter,LoanService.java,10,CLASS,IMPORT
+BankingService,BankService,BankingController.java,23,CLASS, FIELD
+BankingService,BankService,BankingController.java,13,CLASS,IMPORT
+sendOtp,sendNewOtp,EmailService.java,19,METHOD,DECLARATION
+sendOtp,sendNewOtp,AuthService.java,91,METHOD,CALL_FALLBACK
+sendOtp,sendNewOtp,AuthService.java,129,METHOD,CALL_FALLBACK
+handleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+acc,account,AccountService.java,67,VARIABLE,LOCAL_DECLARATION
+acc,account,AccountService.java,81,VARIABLE,LOCAL_DECLARATION
+acc,account,AccountService.java,68,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,69,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,70,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,71,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,72,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,74,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,76,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,87,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,147,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,148,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,149,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,150,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,151,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,152,VARIABLE,USAGE_FALLBACK
+acc,account,AccountService.java,153,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,31,VARIABLE,LOCAL_DECLARATION
+acc,account,BankService.java,67,VARIABLE,LOCAL_DECLARATION
+acc,account,BankService.java,163,VARIABLE,LOCAL_DECLARATION
+acc,account,BankService.java,35,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,45,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,49,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,50,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,55,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,71,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,81,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,85,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,86,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,91,VARIABLE,USAGE_FALLBACK
+acc,account,BankService.java,164,VARIABLE,USAGE_FALLBACK
+acc,account,TransactionService.java,45,VARIABLE,LOCAL_DECLARATION
+acc,account,TransactionService.java,46,VARIABLE,USAGE_FALLBACK
+msg,message,AdminController.java,57,VARIABLE,LOCAL_DECLARATION
+msg,message,AdminController.java,58,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,21,VARIABLE,FIELD_DECLARATION
+transactionService,transService,TransactionController.java,28,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,33,VARIABLE,USAGE_FALLBACK

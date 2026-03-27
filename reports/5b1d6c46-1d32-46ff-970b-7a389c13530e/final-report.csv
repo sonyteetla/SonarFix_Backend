@@ -1,0 +1,9 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeUserService,CustomerService,UserController.java,10,CLASS
+UserService,CustomerService,UserController.java,13,CLASS
+UserService,CustomerService,UserController.java,23,CLASS
+UserService,CustomerService,UserController.java,3,CLASS
+UserService,CustomerService,OrderService.java,10,CLASS
+UserService,CustomerService,OrderService.java,13,CLASS
+UserService,CustomerService,OrderService.java,23,CLASS
+UserService,CustomerService,UserService.java,8,CLASS
+OrderService,gnhjbnhj,OrderService.java,8,CLASS

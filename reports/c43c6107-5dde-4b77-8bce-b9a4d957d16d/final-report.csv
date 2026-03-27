@@ -1,0 +1,14 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeCobolAdapter,Adapter,BankingService.java,24,CLASS, FIELD
+CobolAdapter,Adapter,BankingService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,EmiPaymentService.java,22,CLASS, FIELD
+CobolAdapter,Adapter,EmiPaymentService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,LoanService.java,33,CLASS, FIELD
+CobolAdapter,Adapter,LoanService.java,10,CLASS,IMPORT
+getallHistory,getHistories,TransactionController.java,31,METHOD,DECLARATION
+handleCommonErrors,handleErrors,Adapter.java,158,METHOD,DECLARATION
+salary,sal,Loan.java,37,VARIABLE,DECLARATION
+getSalary,getSal,LoanService.java,61,VARIABLE,GETTER
+setSalary,setSal,LoanService.java,115,VARIABLE,SETTER
+getSalary,getSal,LoanService.java,115,VARIABLE,GETTER
+getNewPassword,getNewPass,AuthController.java,76,VARIABLE,GETTER
+cmd,command,Adapter.java,34,VARIABLE,DECLARATION

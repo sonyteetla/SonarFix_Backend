@@ -1,0 +1,28 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeBankingService,BankService,BankingController.java,22,CLASS, FIELD
+BankingService,BankService,BankingController.java,13,CLASS,IMPORT
+calculateWithdraw,computeWithdraw,CobolAdapter.java,77,METHOD,METHOD_DECL
+calculateWithdraw,computeWithdraw,BankService.java,80,METHOD,METHOD_CALL
+calculateWithdraw,computeWithdraw,EmiPaymentService.java,50,METHOD,METHOD_CALL
+token,tok,AuthController.java,101,VARIABLE, VARIABLE_USAGE
+token,tok,AuthController.java,103,VARIABLE, VARIABLE_USAGE
+token,tok,AuthController.java,104,VARIABLE, VARIABLE_USAGE
+token,tok,LoginResponse.java,11,VARIABLE, VARIABLE_USAGE
+token,tok,JwtAuthFilter.java,45,VARIABLE, VARIABLE_USAGE
+token,tok,JwtAuthFilter.java,47,VARIABLE, VARIABLE_USAGE
+token,tok,JwtAuthFilter.java,52,VARIABLE, VARIABLE_USAGE
+token,tok,JwtAuthFilter.java,56,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,35,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,36,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,39,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,40,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,43,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,44,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,47,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,49,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,56,VARIABLE, VARIABLE_USAGE
+token,tok,JwtUtil.java,60,VARIABLE, VARIABLE_USAGE
+token,tok,RevokedTokenService.java,12,VARIABLE, VARIABLE_USAGE
+token,tok,RevokedTokenService.java,13,VARIABLE, VARIABLE_USAGE
+token,tok,RevokedTokenService.java,16,VARIABLE, VARIABLE_USAGE
+token,tok,RevokedTokenService.java,17,VARIABLE, VARIABLE_USAGE
+token,tok,RevokedTokenService.java,22,VARIABLE, VARIABLE_USAGE

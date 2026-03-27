@@ -34,7 +34,7 @@ public class ProjectDiffService {
 
                             String oldName = file.getFileName().toString().replace(".java", "");
 
-                            // 🔥 HANDLE RENAME
+                            // HANDLE RENAME: if fixed path doesn't exist, try the renamed path
                             if (!Files.exists(fixedFile) && renameMap.containsKey(oldName)) {
 
                                 String newName = renameMap.get(oldName);
@@ -47,20 +47,33 @@ public class ProjectDiffService {
                             if (!Files.exists(fixedFile)) return;
 
                             List<String> originalLines = Files.readAllLines(file);
-                            List<String> fixedLines = Files.readAllLines(fixedFile);
+                            List<String> fixedLines    = Files.readAllLines(fixedFile);
 
                             Patch<String> patch = DiffUtils.diff(originalLines, fixedLines);
 
-                            if (patch.getDeltas().isEmpty()) return;
+                            if (patch.getDeltas().isEmpty()) {
+                                // ADD THIS BLOCK
+                                if (renameMap.containsKey(oldName)) {
+                                    String newName = renameMap.get(oldName);
+
+                                    String finalRelative = relative.replace(
+                                        oldName + ".java", newName + ".java"
+                                    );
+
+                                    result.add(new FileDiff(finalRelative, new ArrayList<>()));
+                                }
+                                return;
+                            }
 
                             List<DiffLine> diffLines =
                                     generateDiffLines(originalLines, fixedLines, patch);
 
-                            // 🔥 update filename if renamed
+                            // Update filename in result if the class was renamed
                             String finalRelative = relative;
                             if (renameMap.containsKey(oldName)) {
                                 String newName = renameMap.get(oldName);
-                                finalRelative = relative.replace(oldName + ".java", newName + ".java");
+                                finalRelative = relative.replace(
+                                        oldName + ".java", newName + ".java");
                             }
 
                             result.add(new FileDiff(finalRelative, diffLines));
@@ -84,6 +97,8 @@ public class ProjectDiffService {
 
         List<DiffLine> lines = new ArrayList<>();
 
+     
+
         int originalIndex = 0;
         int modifiedIndex = 0;
 
@@ -91,7 +106,11 @@ public class ProjectDiffService {
 
             int pos = delta.getSource().getPosition();
 
-            while (originalIndex < pos) {
+            // FIX: Guard modifiedIndex so we never read past the end of
+            // the modified list when the two files have different lengths.
+            while (originalIndex < pos
+                    && originalIndex < original.size()
+                    && modifiedIndex < modified.size()) {
 
                 lines.add(new DiffLine(
                         originalIndex + 1,
@@ -123,18 +142,21 @@ public class ProjectDiffService {
                 else
                     type = "ADDED";
 
-                lines.add(new DiffLine(
-                        originalIndex + i + 1,
-                        o,
-                        m,
-                        type
-                ));
+                // Line number is based on position in the original file.
+                // For ADDED lines o is null so we use the delta position
+                // rather than a potentially invalid originalIndex + i offset.
+                int lineNumber = (o != null) ? (originalIndex + i + 1) : (originalIndex + 1);
+
+                lines.add(new DiffLine(lineNumber, o, m, type));
             }
 
+            // Advance both cursors by how many lines each side consumed.
             originalIndex += src.size();
             modifiedIndex += tgt.size();
         }
 
+        // Trailing UNCHANGED lines after the last delta.
+        // FIX: Guard was already correct here in the original; kept as-is.
         while (originalIndex < original.size()
                 && modifiedIndex < modified.size()) {
 
@@ -176,4 +198,5 @@ public class ProjectDiffService {
 
         return map;
     }
+
 }

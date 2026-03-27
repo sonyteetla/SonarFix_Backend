@@ -1,0 +1,19 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeAllRulesValidation,hhbjjkkj,AllRulesValidation.java,20,CLASS, TYPE_REFERENCE
+UserService,CustomerService,UserController.java,10,CLASS, FIELD
+UserService,CustomerService,UserController.java,13,CLASS, PARAMETER
+UserService,CustomerService,UserController.java,23,CLASS, LOCAL_VAR
+UserService,CustomerService,UserController.java,23,CLASS, TYPE_REFERENCE
+UserService,CustomerService,UserController.java,3,CLASS,IMPORT
+UserService,CustomerService,OrderService.java,10,CLASS, FIELD
+UserService,CustomerService,OrderService.java,13,CLASS, PARAMETER
+UserService,CustomerService,OrderService.java,23,CLASS, LOCAL_VAR
+UserService,CustomerService,OrderService.java,23,CLASS, TYPE_REFERENCE
+UserService,CustomerService,UserService.java,8,CLASS, TYPE_REFERENCE
+systemOutExample,sotExample,hhbjjkkj.java,26,METHOD,METHOD_DECL
+flag,placeholder,hhbjjkkj.java,46,VARIABLE, VARIABLE_USAGE
+flag,placeholder,hhbjjkkj.java,47,VARIABLE, VARIABLE_USAGE
+flag,placeholder,hhbjjkkj.java,85,VARIABLE, VARIABLE_USAGE
+flag,placeholder,hhbjjkkj.java,86,VARIABLE, VARIABLE_USAGE
+flag,placeholder,hhbjjkkj.java,89,VARIABLE, VARIABLE_USAGE
+flag,placeholder,TestService.java,30,VARIABLE, VARIABLE_USAGE
+flag,placeholder,TestService.java,31,VARIABLE, VARIABLE_USAGE

@@ -1,0 +1,7 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypesendOtp,newSendOtp,EmailService.java,19,METHOD,DECLARATION
+handleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+transactionService,transService,TransactionController.java,21,VARIABLE,FIELD_DECLARATION
+transactionService,transService,TransactionController.java,28,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,33,VARIABLE,USAGE_FALLBACK
+totalPayment,totalpay,CobolAdapter.java,151,VARIABLE,LOCAL_DECLARATION
+totalPayment,totalpay,CobolAdapter.java,154,VARIABLE,USAGE_FALLBACK

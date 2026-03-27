@@ -1,0 +1,9 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypesendOtp,sendNewOtp,EmailService.java,19,METHOD,DECLARATION
+sendOtp,sendNewOtp,AuthService.java,91,METHOD,CALL_FALLBACK
+sendOtp,sendNewOtp,AuthService.java,129,METHOD,CALL_FALLBACK
+handleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+msg,message,AdminController.java,57,VARIABLE,LOCAL_DECLARATION
+msg,message,AdminController.java,58,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,21,VARIABLE,FIELD_DECLARATION
+transactionService,transService,TransactionController.java,28,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,33,VARIABLE,USAGE_FALLBACK

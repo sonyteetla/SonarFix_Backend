@@ -72,9 +72,27 @@ public class ExtractConstantStrategy implements FixStrategy {
 
     private boolean shouldIgnoreLiteral(LiteralExpr literal) {
 
+        // Ignore small integers
         if (literal instanceof IntegerLiteralExpr intLit) {
             int v = intLit.asInt();
             return v == 0 || v == 1 || v == -1;
+        }
+
+        // Ignore functional string literals
+        if (literal instanceof StringLiteralExpr str) {
+
+            String value = str.asString();
+
+            // Skip delimiters and common symbols
+            if (value.length() <= 2) return true;
+
+            if (value.matches("^[@.,:;|\\-_/\\\\]$")) return true;
+
+            // Skip regex-like patterns
+            if (value.contains("@") || value.contains(".")) return true;
+
+            // Skip empty / whitespace
+            if (value.trim().isEmpty()) return true;
         }
 
         return false;

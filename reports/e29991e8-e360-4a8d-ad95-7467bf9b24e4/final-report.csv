@@ -1,0 +1,16 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeCobolAdapter,Adapter,BankingService.java,24,CLASS, FIELD
+CobolAdapter,Adapter,BankingService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,EmiPaymentService.java,22,CLASS, FIELD
+CobolAdapter,Adapter,EmiPaymentService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,LoanService.java,33,CLASS, FIELD
+CobolAdapter,Adapter,LoanService.java,10,CLASS,IMPORT
+calculateDeposit,computeDeposit,Adapter.java,72,METHOD,METHOD_DECL
+calculateDeposit,computeDeposit,BankingService.java,44,METHOD,METHOD_CALL
+calculateWithdraw,computeWithdraw,Adapter.java,80,METHOD,METHOD_DECL
+calculateWithdraw,computeWithdraw,BankingService.java,80,METHOD,METHOD_CALL
+calculateWithdraw,computeWithdraw,EmiPaymentService.java,50,METHOD,METHOD_CALL
+cmd,commad,CobolAdapter.java,34,VARIABLE,DECLARATION
+result,res,CobolAdapter.java,56,VARIABLE,DECLARATION
+result,res,AdminController.java,82,VARIABLE,DECLARATION
+parts,part,CobolAdapter.java,94,VARIABLE,DECLARATION
+parts,part,CobolAdapter.java,145,VARIABLE,DECLARATION

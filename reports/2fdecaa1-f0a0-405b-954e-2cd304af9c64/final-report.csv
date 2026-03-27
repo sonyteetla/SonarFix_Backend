@@ -1,0 +1,21 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeUserService,CustomerService,UserController.java,10,CLASS, FIELD
+UserService,CustomerService,UserController.java,13,CLASS, PARAMETER
+UserService,CustomerService,UserController.java,23,CLASS, LOCAL_VAR
+UserService,CustomerService,UserController.java,23,CLASS, TYPE_REFERENCE
+UserService,CustomerService,UserController.java,3,CLASS,IMPORT
+UserService,CustomerService,OrderService.java,10,CLASS, FIELD
+UserService,CustomerService,OrderService.java,13,CLASS, PARAMETER
+UserService,CustomerService,OrderService.java,23,CLASS, LOCAL_VAR
+UserService,CustomerService,OrderService.java,23,CLASS, TYPE_REFERENCE
+UserService,CustomerService,UserService.java,8,CLASS, TYPE_REFERENCE
+log,logger,AllRulesValidation.java,21,VARIABLE,DECLARATION
+log,logger,TestController.java,11,VARIABLE,DECLARATION
+log,logger,UserController.java,8,VARIABLE,DECLARATION
+log,logger,LambdaExamples.java,12,VARIABLE,DECLARATION
+log,logger,OrderService.java,8,VARIABLE,DECLARATION
+log,logger,TestService.java,11,VARIABLE,DECLARATION
+log,logger,UserService.java,8,VARIABLE,DECLARATION
+log,logger,SonarTestIssues.java,11,VARIABLE,DECLARATION
+log,logger,UserFileProcessor.java,9,VARIABLE,DECLARATION
+log,logger,AppUtils.java,8,VARIABLE,DECLARATION
+dependency,dep,AllRulesValidation.java,24,VARIABLE,DECLARATION

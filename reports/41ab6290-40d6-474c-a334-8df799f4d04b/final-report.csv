@@ -1,0 +1,14 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeCobolAdapter,Adapter,BankingService.java,24,CLASS, FIELD
+CobolAdapter,Adapter,BankingService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,EmiPaymentService.java,22,CLASS, FIELD
+CobolAdapter,Adapter,EmiPaymentService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,LoanService.java,33,CLASS, FIELD
+CobolAdapter,Adapter,LoanService.java,10,CLASS,IMPORT
+BankingService,BankService,BankingController.java,23,CLASS, FIELD
+BankingService,BankService,BankingController.java,13,CLASS,IMPORT
+sendOtp,sendNewOtp,EmailService.java,19,METHOD,DECLARATION
+sendOtp,sendNewOtp,AuthService.java,91,METHOD,CALL_FALLBACK
+sendOtp,sendNewOtp,AuthService.java,129,METHOD,CALL_FALLBACK
+handleGeneral,handleGen,GlobalExceptionHandler.java,59,METHOD,DECLARATION
+calculateTotalBalance,calculateTotalBal,CobolAdapter.java,107,METHOD,DECLARATION
+calculateTotalBalance,calculateTotalBal,BankingService.java,168,METHOD,CALL_FALLBACK

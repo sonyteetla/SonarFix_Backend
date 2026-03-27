@@ -1,0 +1,11 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypesendOtp,sendNewOtp,EmailService.java,19,METHOD,DECLARATION
+sendOtp,sendNewOtp,AuthService.java,91,METHOD,CALL_FALLBACK
+sendOtp,sendNewOtp,AuthService.java,129,METHOD,CALL_FALLBACK
+handleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+calculateTotalBalance,calculateTotalBal,CobolAdapter.java,107,METHOD,DECLARATION
+calculateTotalBalance,calculateTotalBal,BankingService.java,168,METHOD,CALL_FALLBACK
+transactionService,transService,TransactionController.java,21,VARIABLE,FIELD_DECLARATION
+transactionService,transService,TransactionController.java,28,VARIABLE,USAGE_FALLBACK
+transactionService,transService,TransactionController.java,33,VARIABLE,USAGE_FALLBACK
+totalPayment,totalPay,CobolAdapter.java,151,VARIABLE,LOCAL_DECLARATION
+totalPayment,totalPay,CobolAdapter.java,154,VARIABLE,USAGE_FALLBACK

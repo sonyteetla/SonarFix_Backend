@@ -1,0 +1,3 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypehandleGeneral,handleGen,GlobalExceptionHandler.java,59,METHOD,DECLARATION
+getMonthlyTransactions,getTransactionsMonthly,AdminController.java,78,METHOD,DECLARATION
+generateAccountNumber,getAccNumber,AccountService.java,157,METHOD,DECLARATION

@@ -1,0 +1,10 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypeCobolAdapter,Adapter,BankingService.java,24,CLASS, FIELD
+CobolAdapter,Adapter,BankingService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,EmiPaymentService.java,22,CLASS, FIELD
+CobolAdapter,Adapter,EmiPaymentService.java,3,CLASS,IMPORT
+CobolAdapter,Adapter,LoanService.java,33,CLASS, FIELD
+CobolAdapter,Adapter,LoanService.java,10,CLASS,IMPORT
+BankingService,BankService,BankingController.java,23,CLASS, FIELD
+BankingService,BankService,BankingController.java,13,CLASS,IMPORT
+handleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+addCorsMappings,corsMapping,CorsConfig.java,12,METHOD,DECLARATION

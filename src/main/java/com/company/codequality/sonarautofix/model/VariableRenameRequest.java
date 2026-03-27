@@ -7,4 +7,5 @@ public class VariableRenameRequest {
     private String scanId;
     private String oldName;
     private String newName;
+    private String csvPath;
 }

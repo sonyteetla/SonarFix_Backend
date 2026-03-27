@@ -1,0 +1,7 @@
+OldName,NewName,UsedInFile,LineNumber,EntityType,UsageTypehandleGeneral,handleGen,GlobalExceptionHandler.java,61,METHOD,DECLARATION
+rejectLoan,loanReject,LoanController.java,36,METHOD,DECLARATION
+rejectLoan,loanReject,LoanController.java,38,METHOD,CALL
+rejectLoan,loanReject,LoanService.java,80,METHOD,DECLARATION
+transactionService,transService,TransactionController.java,21,VARIABLE,DECLARATION
+stats,stat,AdminController.java,69,VARIABLE,DECLARATION
+payment,pay,EmiPaymentService.java,58,VARIABLE,DECLARATION
